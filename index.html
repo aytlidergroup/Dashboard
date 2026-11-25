@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#060911">
-<title>CLASAMENT_CLIENTI • Comparație Lunară (Luna Curentă vs Luna Trecută)</title>
+<title>CLASAMENT_CLIENTI • Raport Lunar & Pattern Zile Client</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
@@ -71,7 +71,7 @@
   }
 
   .topbar-inner {
-    max-width: 1220px;
+    max-width: 1200px;
     margin: 0 auto;
   }
 
@@ -179,7 +179,7 @@
   }
 
   .container {
-    max-width: 1220px;
+    max-width: 1200px;
     margin: 0 auto;
     padding: 18px 16px;
   }
@@ -470,7 +470,6 @@
   .pill-inactive { background: rgba(239, 68, 68, 0.15); color: var(--c-inactive); border: 1px solid rgba(239, 68, 68, 0.28); }
   .pill-neutral { background: rgba(255, 255, 255, 0.06); color: var(--text-secondary); border: 1px solid var(--glass-border); }
   .pill-day { background: rgba(56, 189, 248, 0.12); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.25); }
-  .pill-month { background: rgba(167, 139, 250, 0.14); color: #ddd6fe; border: 1px solid rgba(167, 139, 250, 0.3); }
 
   .star-box {
     flex-shrink: 0;
@@ -493,6 +492,7 @@
   .star-num { font-size: 12px; font-weight: 700; margin-top: 3px; }
   .star-meta { font-size: 11px; opacity: 0.88; margin-top: 2px; }
 
+  /* Monthly Daily Matrix Section */
   .mgmt-card {
     background: var(--bg-card);
     backdrop-filter: blur(20px) saturate(165%);
@@ -516,72 +516,6 @@
     font-size: 16px;
     font-weight: 800;
   }
-
-  /* Comparison Cards: Luna Curentă vs Luna Trecută vs Total General */
-  .compare-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-top: 14px;
-  }
-  @media (max-width: 820px) {
-    .compare-grid { grid-template-columns: 1fr; }
-  }
-
-  .cmp-box {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--r-md);
-    padding: 14px;
-  }
-  .cmp-box.cur {
-    border-color: rgba(16, 185, 129, 0.42);
-    background: rgba(16, 185, 129, 0.08);
-  }
-  .cmp-box.prev {
-    border-color: rgba(245, 158, 11, 0.42);
-    background: rgba(245, 158, 11, 0.08);
-  }
-  .cmp-box.all {
-    border-color: rgba(56, 189, 248, 0.42);
-    background: rgba(56, 189, 248, 0.08);
-  }
-
-  .cmp-label { font-size: 12px; font-weight: 700; color: var(--text-secondary); }
-  .cmp-val { font-size: 24px; font-weight: 800; margin-top: 5px; }
-  .cmp-sub { font-size: 11.5px; color: var(--text-muted); margin-top: 4px; }
-
-  .delta-badge {
-    display: inline-block;
-    margin-top: 6px;
-    padding: 3px 9px;
-    border-radius: 999px;
-    font-size: 11.5px;
-    font-weight: 700;
-  }
-  .delta-up { background: rgba(16, 185, 129, 0.18); color: #6ee7b7; }
-  .delta-down { background: rgba(239, 68, 68, 0.18); color: #fca5a5; }
-  .delta-flat { background: rgba(255, 255, 255, 0.10); color: var(--text-secondary); }
-
-  /* Full Monthly Comparison Table (All Clients) */
-  .city-summary-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-  }
-  .city-summary-table th, .city-summary-table td {
-    padding: 10px 12px;
-    text-align: left;
-    border-bottom: 1px solid var(--glass-border);
-  }
-  .city-summary-table th {
-    color: var(--text-secondary);
-    font-size: 11.5px;
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-  }
-  .clickable-row { cursor: pointer; }
-  .clickable-row:hover { background: rgba(255, 255, 255, 0.05); }
 
   .matrix-scroll {
     overflow-x: auto;
@@ -633,6 +567,7 @@
     display: inline-block;
   }
 
+  /* Client Pattern Report Tab */
   .client-picker-grid {
     display: grid;
     grid-template-columns: 1.4fr 1fr;
@@ -685,6 +620,25 @@
     font-weight: 700;
   }
 
+  .city-summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .city-summary-table th, .city-summary-table td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--glass-border);
+  }
+  .city-summary-table th {
+    color: var(--text-secondary);
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .clickable-row { cursor: pointer; }
+  .clickable-row:hover { background: rgba(255, 255, 255, 0.05); }
+
   #mgmtMap {
     width: 100%;
     height: 350px;
@@ -726,7 +680,7 @@
       <div class="brand">
         <div class="brand-icon">★</div>
         <div>
-          <div class="app-title">CLASAMENT_CLIENTI • Raport Lunar & Total General</div>
+          <div class="app-title">CLASAMENT_CLIENTI • Raport Lunar & Zile Client</div>
           <div class="app-subtitle" id="statusSub">Se încarcă datele din CLASAMENT_CLIENTI...</div>
         </div>
       </div>
@@ -742,7 +696,7 @@
 
     <div class="nav-tabs">
       <button class="nav-tab active" data-tab="cities" onclick="switchTab('cities', this)">Categorii pe Oraș & Stele</button>
-      <button class="nav-tab" data-tab="client-report" onclick="switchTab('client-report', this)">Comparație Lunară & Client</button>
+      <button class="nav-tab" data-tab="client-report" onclick="switchTab('client-report', this)">Raport Individual Client (Zile & Date)</button>
       <button class="nav-tab" data-tab="monthly-matrix" onclick="switchTab('monthly-matrix', this)">Tabel Lunar Ziua 1..31</button>
       <button class="nav-tab" data-tab="management" onclick="switchTab('management', this)">Management & Hartă</button>
     </div>
@@ -750,7 +704,7 @@
 </header>
 
 <main class="container">
-  <!-- TAB 1: CATEGORII PE ORAȘ + LUNA CURENTĂ / LUNA TRECUTĂ / TOTAL GENERAL -->
+  <!-- TAB 1: CATEGORII PE ORAȘ -->
   <section class="view-section active" id="tab-cities">
     <div class="kpi-grid">
       <div class="kpi-card">
@@ -758,16 +712,16 @@
         <div class="kpi-num" id="kpiTotal">0</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">Comenzi Luna Curentă</div>
-        <div class="kpi-num" id="kpiCurMonth" style="color:var(--c-active)">0</div>
+        <div class="kpi-label">Categorii orașe</div>
+        <div class="kpi-num" id="kpiCities" style="color:var(--accent)">0</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">Comenzi Luna Trecută</div>
-        <div class="kpi-num" id="kpiPrevMonth" style="color:var(--c-low)">0</div>
+        <div class="kpi-label">Stele medii</div>
+        <div class="kpi-num" id="kpiAvgStars" style="color:var(--gold)">0.0 ★</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">Total General Comenzi</div>
-        <div class="kpi-num" id="kpiAllTotal" style="color:var(--accent)">0</div>
+        <div class="kpi-label">Clienți inactivi (100% gri)</div>
+        <div class="kpi-num" id="kpiInactive" style="color:var(--c-inactive)">0</div>
       </div>
     </div>
 
@@ -779,9 +733,9 @@
 
         <select id="sortSelect" class="select-ctrl" onchange="renderViews()">
           <option value="stars_desc">Sortare: Stele (5 ★ → 1 ★)</option>
-          <option value="cur_month_desc">Sortare: Comenzi Luna Curentă (mare → mic)</option>
-          <option value="all_total_desc">Sortare: Total General Comenzi (mare → mic)</option>
-          <option value="prev_month_desc">Sortare: Comenzi Luna Trecută (mare → mic)</option>
+          <option value="stars_asc">Sortare: Stele (1 ★ → 5 ★)</option>
+          <option value="score_desc">Sortare: Scor (+/-) descrescător</option>
+          <option value="gray_asc">Sortare: Procent gri (0% → 100%)</option>
           <option value="name_asc">Sortare: Nume client (A–Z)</option>
         </select>
       </div>
@@ -803,10 +757,10 @@
     <div id="citiesListContainer"></div>
   </section>
 
-  <!-- TAB 2: RAPORT INDIVIDUAL CLIENT (LUNA CURENTĂ vs LUNA TRECUTĂ vs TOTAL GENERAL + ZILE & DATE) -->
+  <!-- TAB 2: RAPORT INDIVIDUAL CLIENT (CE ZILE DIN SĂPTĂMÂNĂ ȘI CE DATE A COMANDAT) -->
   <section class="view-section" id="tab-client-report">
     <div class="control-panel">
-      <div class="mgmt-title" style="margin-bottom:10px;">Comparație Lunară (Luna Curentă vs Luna Trecută vs Total General) și Zilele Clientului</div>
+      <div class="mgmt-title" style="margin-bottom:10px;">Selectează clientul pentru analiza zilelor săptămânii și a datelor de comandă</div>
       <div class="client-picker-grid">
         <input type="search" id="clientReportSearch" class="input-ctrl" placeholder="Filtrează lista de clienți..." oninput="populateClientSelect()">
         <select id="clientReportSelect" class="select-ctrl" onchange="renderClientReport()"></select>
@@ -814,26 +768,6 @@
     </div>
 
     <div id="clientReportContainer"></div>
-
-    <div class="mgmt-card">
-      <div class="mgmt-title">Tabel Comparativ Toți Clienții (Luna Curentă • Luna Trecută • Total General)</div>
-      <div style="overflow-x:auto;">
-        <table class="city-summary-table">
-          <thead>
-            <tr>
-              <th>Client</th>
-              <th>Oraș</th>
-              <th>Luna Curentă</th>
-              <th>Luna Trecută</th>
-              <th>Diferență</th>
-              <th>Total General</th>
-              <th>Zile săptămână</th>
-            </tr>
-          </thead>
-          <tbody id="allClientsCompareBody"></tbody>
-        </table>
-      </div>
-    </div>
   </section>
 
   <!-- TAB 3: TABEL LUNAR (ZIUA 1 .. ZIUA N) -->
@@ -858,16 +792,16 @@
   <!-- TAB 4: MANAGEMENT & HARTĂ -->
   <section class="view-section" id="tab-management">
     <div class="mgmt-card">
-      <div class="mgmt-title">Sinteză Management pe Categorii de Oraș (Luna Curentă • Luna Trecută • Total General)</div>
+      <div class="mgmt-title">Sinteză Management pe Categorii de Oraș (click pe oraș pentru filtrare)</div>
       <div style="overflow-x:auto;">
         <table class="city-summary-table" id="citySummaryTable">
           <thead>
             <tr>
               <th>Oraș (Coloana G)</th>
-              <th>Clienți</th>
-              <th>Luna Curentă</th>
-              <th>Luna Trecută</th>
-              <th>Total General</th>
+              <th>Total clienți</th>
+              <th>Activi</th>
+              <th>Puțin activi</th>
+              <th>Inactivi</th>
               <th>Stele medii</th>
             </tr>
           </thead>
@@ -949,60 +883,31 @@ function parseCoords(loc) {
 function getWeekdayRoFromDateStr(dateStr) {
   const dt = new Date(String(dateStr) + "T12:00:00");
   if (isNaN(dt.getTime())) return "";
-  const idx = (dt.getDay() + 6) % 7;
+  const idx = (dt.getDay() + 6) % 7; // 0=Luni .. 6=Duminică
   return WEEKDAYS_RO[idx] || "";
 }
 
-function getYearMonthKeys() {
-  const now = new Date();
-  const curYear = now.getFullYear();
-  const curMonthIdx = now.getMonth();
-  const curYm = `${curYear}-${String(curMonthIdx + 1).padStart(2, "0")}`;
-
-  const prevDate = new Date(curYear, curMonthIdx - 1, 1);
-  const prevYm = `${prevDate.getFullYear()}-${String(prevDate.getMonth() + 1).padStart(2, "0")}`;
-
-  return { curYm, prevYm };
-}
-
-function getClientStats(client) {
+function getClientPatternData(client) {
   const rawPat = clientPatterns[client.key] || {};
   const dates = Array.isArray(rawPat.orderDates) ? rawPat.orderDates.slice().sort() : [];
-  const { curYm, prevYm } = getYearMonthKeys();
-
-  let curMonthCount = 0;
-  let prevMonthCount = 0;
   const freq = { Luni: 0, Marți: 0, Miercuri: 0, Joi: 0, Vineri: 0, Sâmbătă: 0, Duminică: 0 };
 
-  dates.forEach(ds => {
-    const s = String(ds || "").trim();
-    if (s.startsWith(curYm + "-")) curMonthCount++;
-    if (s.startsWith(prevYm + "-")) prevMonthCount++;
-    const wd = getWeekdayRoFromDateStr(s);
-    if (freq[wd] !== undefined) freq[wd]++;
-  });
-
-  if (rawPat.weekdayFrequency && typeof rawPat.weekdayFrequency === "object" && dates.length === 0) {
+  if (rawPat.weekdayFrequency && typeof rawPat.weekdayFrequency === "object") {
     WEEKDAYS_RO.forEach(wd => {
       freq[wd] = Number(rawPat.weekdayFrequency[wd]) || 0;
     });
+  } else {
+    dates.forEach(ds => {
+      const wd = getWeekdayRoFromDateStr(ds);
+      if (freq[wd] !== undefined) freq[wd]++;
+    });
   }
-
-  // Total general: dacă există date în istoric folosim lungimea lor, altfelfallback la valoarea din tabel dacă există
-  const recordedCount = Number(rawPat.totalOrdersRecorded) || 0;
-  const allTotalCount = Math.max(dates.length, recordedCount);
 
   const preferredDays = Array.isArray(rawPat.preferredDays) && rawPat.preferredDays.length
     ? rawPat.preferredDays
     : WEEKDAYS_RO.filter(wd => freq[wd] > 0).sort((a, b) => freq[b] - freq[a]);
 
   return {
-    curYm,
-    prevYm,
-    curMonthCount,
-    prevMonthCount,
-    allTotalCount,
-    diffMonth: curMonthCount - prevMonthCount,
     orderDates: dates,
     weekdayFrequency: freq,
     preferredDays
@@ -1098,6 +1003,7 @@ async function loadData() {
         grayPct,
         score,
         isActive,
+        orderWeekdays: r.orderWeekdays || "-",
         lastOrderDate: r.lastOrderDate || "-",
         coords: parseCoords(loc)
       });
@@ -1119,6 +1025,7 @@ async function loadData() {
           grayPct,
           score: stars === 1 ? -3 : 1,
           isActive: stars > 1,
+          orderWeekdays: "-",
           lastOrderDate: "-",
           coords: parseCoords(cu.location)
         });
@@ -1256,7 +1163,6 @@ function populateClientSelect() {
 
 function renderClientReport() {
   const container = document.getElementById("clientReportContainer");
-  const allBody = document.getElementById("allClientsCompareBody");
   if (!container) return;
 
   const sel = document.getElementById("clientReportSelect");
@@ -1267,107 +1173,61 @@ function renderClientReport() {
   const client = clients.find(c => c.key === selectedClientKey) || clients[0];
   if (!client) {
     container.innerHTML = `<div class="empty-box">Nu există clienți disponibili pentru raport.</div>`;
-  } else {
-    const st = getStatusInfo(client);
-    const cityLabel = getCityCategoryLabel(client.cityKey);
-    const stats = getClientStats(client);
-    const daysSummary = stats.preferredDays.length ? stats.preferredDays.join(", ") : "Nicio zi înregistrată încă";
+    return;
+  }
 
-    const diffText = stats.diffMonth > 0
-      ? `+${stats.diffMonth} față de luna trecută`
-      : stats.diffMonth < 0
-      ? `${stats.diffMonth} față de luna trecută`
-      : `Egal cu luna trecută (0)`;
-    const diffClass = stats.diffMonth > 0 ? "delta-up" : stats.diffMonth < 0 ? "delta-down" : "delta-flat";
+  const st = getStatusInfo(client);
+  const cityLabel = getCityCategoryLabel(client.cityKey);
+  const pat = getClientPatternData(client);
+  const daysSummary = pat.preferredDays.length ? pat.preferredDays.join(", ") : "Nicio zi înregistrată încă";
 
-    container.innerHTML = `
-      <div class="mgmt-card">
-        <div class="mgmt-title-row">
-          <div>
-            <div class="mgmt-title" style="font-size:18px;">${esc(client.name)}</div>
-            <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:6px;">
-              <span class="pill ${st.pillClass}">${esc(st.label)}</span>
-              <span class="pill pill-neutral">Oraș: ${esc(cityLabel)}</span>
-              <span class="pill pill-day">Zile săptămână: ${esc(daysSummary)}</span>
-            </div>
-          </div>
-          <div class="star-box ${st.code === "INACTIVE" ? "gray" : "gold"}">
-            <div class="star-icons">${starIcons(client.stars)}</div>
-            <div class="star-num">${client.stars} / 5 stele</div>
-            <div class="star-meta">${client.grayPct}% gri</div>
+  container.innerHTML = `
+    <div class="mgmt-card">
+      <div class="mgmt-title-row">
+        <div>
+          <div class="mgmt-title" style="font-size:18px;">${esc(client.name)}</div>
+          <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:6px;">
+            <span class="pill ${st.pillClass}">${esc(st.label)}</span>
+            <span class="pill pill-neutral">Oraș: ${esc(cityLabel)}</span>
+            <span class="pill pill-day">Zile săptămână: ${esc(daysSummary)}</span>
           </div>
         </div>
-
-        <div class="compare-grid">
-          <div class="cmp-box cur">
-            <div class="cmp-label">Luna Curentă (${esc(stats.curYm)})</div>
-            <div class="cmp-val" style="color:var(--c-active);">${stats.curMonthCount}</div>
-            <div class="cmp-sub">comenzi în luna curentă</div>
-            <span class="delta-badge ${diffClass}">${esc(diffText)}</span>
-          </div>
-
-          <div class="cmp-box prev">
-            <div class="cmp-label">Luna Trecută (${esc(stats.prevYm)})</div>
-            <div class="cmp-val" style="color:var(--c-low);">${stats.prevMonthCount}</div>
-            <div class="cmp-sub">comenzi în luna anterioară</div>
-          </div>
-
-          <div class="cmp-box all">
-            <div class="cmp-label">Total General (Toate lunile)</div>
-            <div class="cmp-val" style="color:var(--accent);">${stats.allTotalCount}</div>
-            <div class="cmp-sub">total comenzi înregistrate</div>
-          </div>
-        </div>
-
-        <div style="margin-top:16px;">
-          <div style="font-size:13.5px;font-weight:700;color:var(--text-secondary);">Frecvența comenzilor pe zilele săptămânii</div>
-          <div class="weekday-grid">
-            ${WEEKDAYS_RO.map(wd => {
-              const cnt = stats.weekdayFrequency[wd] || 0;
-              return `
-                <div class="wd-box ${cnt > 0 ? "has-orders" : ""}">
-                  <div class="wd-name">${esc(wd)}</div>
-                  <div class="wd-count">${cnt}</div>
-                  <div class="wd-sub">${cnt === 1 ? "comandă" : "comenzi"}</div>
-                </div>
-              `;
-            }).join("")}
-          </div>
-        </div>
-
-        <div style="margin-top:18px;">
-          <div style="font-size:13.5px;font-weight:700;color:var(--text-secondary);">Istoric date în care a comandat (${stats.orderDates.length} date)</div>
-          ${
-            stats.orderDates.length
-              ? `<div class="dates-list">${stats.orderDates.map(d => {
-                  const wd = getWeekdayRoFromDateStr(d);
-                  return `<span class="date-chip">${esc(d)}${wd ? " (" + esc(wd) + ")" : ""}</span>`;
-                }).join("")}</div>`
-              : `<div style="margin-top:8px;font-size:13px;color:var(--text-muted);">Nu există încă date salvate în istoric.</div>`
-          }
+        <div class="star-box ${st.code === "INACTIVE" ? "gray" : "gold"}">
+          <div class="star-icons">${starIcons(client.stars)}</div>
+          <div class="star-num">${client.stars} / 5 stele</div>
+          <div class="star-meta">${client.grayPct}% gri</div>
         </div>
       </div>
-    `;
-  }
 
-  if (allBody) {
-    allBody.innerHTML = clients.map(c => {
-      const s = getClientStats(c);
-      const diffStr = s.diffMonth > 0 ? `+${s.diffMonth}` : `${s.diffMonth}`;
-      const diffCol = s.diffMonth > 0 ? "var(--c-active)" : s.diffMonth < 0 ? "var(--c-inactive)" : "var(--text-secondary)";
-      return `
-        <tr class="clickable-row" onclick="openClientReport('${escJs(c.key)}')">
-          <td><b>${esc(c.name)}</b></td>
-          <td>${esc(getCityCategoryLabel(c.cityKey))}</td>
-          <td style="color:var(--c-active);font-weight:700;">${s.curMonthCount}</td>
-          <td style="color:var(--c-low);font-weight:700;">${s.prevMonthCount}</td>
-          <td style="color:${diffCol};font-weight:700;">${diffStr}</td>
-          <td style="color:var(--accent);font-weight:800;">${s.allTotalCount}</td>
-          <td>${esc(s.preferredDays.join(", ") || "-")}</td>
-        </tr>
-      `;
-    }).join("") || `<tr><td colspan="7" style="text-align:center;">Fără date</td></tr>`;
-  }
+      <div style="margin-top:14px;">
+        <div style="font-size:13.5px;font-weight:700;color:var(--text-secondary);">Frecvența comenzilor pe zilele săptămânii</div>
+        <div class="weekday-grid">
+          ${WEEKDAYS_RO.map(wd => {
+            const cnt = pat.weekdayFrequency[wd] || 0;
+            return `
+              <div class="wd-box ${cnt > 0 ? "has-orders" : ""}">
+                <div class="wd-name">${esc(wd)}</div>
+                <div class="wd-count">${cnt}</div>
+                <div class="wd-sub">${cnt === 1 ? "comandă" : "comenzi"}</div>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      </div>
+
+      <div style="margin-top:18px;">
+        <div style="font-size:13.5px;font-weight:700;color:var(--text-secondary);">Istoric date în care a comandat (${pat.orderDates.length} date)</div>
+        ${
+          pat.orderDates.length
+            ? `<div class="dates-list">${pat.orderDates.map(d => {
+                const wd = getWeekdayRoFromDateStr(d);
+                return `<span class="date-chip">${esc(d)}${wd ? " (" + esc(wd) + ")" : ""}</span>`;
+              }).join("")}</div>`
+            : `<div style="margin-top:8px;font-size:13px;color:var(--text-muted);">Nu există încă date salvate în istoric.</div>`
+        }
+      </div>
+    </div>
+  `;
 }
 
 function initMonthSelector() {
@@ -1414,12 +1274,12 @@ function renderMonthlyMatrix() {
     const wdShort = WEEKDAYS_RO[(dt.getDay() + 6) % 7].slice(0, 2);
     headHtml += `<th>Z${d}<br><span style="font-weight:500;opacity:0.75;">${wdShort}</span></th>`;
   }
-  headHtml += `<th>Total Lună</th><th>Total General</th></tr>`;
+  headHtml += `<th>Total</th></tr>`;
 
   const bodyHtml = clients.map(c => {
-    const stats = getClientStats(c);
+    const pat = getClientPatternData(c);
     const orderedDays = new Set();
-    stats.orderDates.forEach(ds => {
+    pat.orderDates.forEach(ds => {
       if (ds.startsWith(prefix)) {
         const dayNum = parseInt(ds.slice(8, 10), 10);
         if (dayNum >= 1 && dayNum <= daysInMonth) orderedDays.add(dayNum);
@@ -1431,23 +1291,22 @@ function renderMonthlyMatrix() {
       const hasOrder = orderedDays.has(d);
       cells += `<td>${hasOrder ? `<span class="day-yes">DA</span>` : `<span style="color:var(--text-muted);">·</span>`}</td>`;
     }
-    cells += `<td style="font-weight:800;color:var(--c-active);">${orderedDays.size}</td>`;
-    cells += `<td style="font-weight:800;color:var(--accent);">${stats.allTotalCount}</td>`;
+    cells += `<td style="font-weight:800;color:var(--accent);">${orderedDays.size}</td>`;
     return `<tr>${cells}</tr>`;
   }).join("");
 
-  table.innerHTML = `<thead>${headHtml}</thead><tbody>${bodyHtml || `<tr><td colspan="${daysInMonth + 4}">Fără date</td></tr>`}</tbody>`;
+  table.innerHTML = `<thead>${headHtml}</thead><tbody>${bodyHtml || `<tr><td colspan="${daysInMonth + 3}">Fără date</td></tr>`}</tbody>`;
 }
 
 function sortClients(list, mode) {
   const arr = list.slice();
   switch (mode) {
-    case "cur_month_desc":
-      return arr.sort((a, b) => getClientStats(b).curMonthCount - getClientStats(a).curMonthCount || b.stars - a.stars);
-    case "all_total_desc":
-      return arr.sort((a, b) => getClientStats(b).allTotalCount - getClientStats(a).allTotalCount || b.stars - a.stars);
-    case "prev_month_desc":
-      return arr.sort((a, b) => getClientStats(b).prevMonthCount - getClientStats(a).prevMonthCount || b.stars - a.stars);
+    case "stars_asc":
+      return arr.sort((a, b) => a.stars - b.stars || a.name.localeCompare(b.name, "ro"));
+    case "score_desc":
+      return arr.sort((a, b) => b.score - a.score || a.name.localeCompare(b.name, "ro"));
+    case "gray_asc":
+      return arr.sort((a, b) => a.grayPct - b.grayPct || b.stars - a.stars);
     case "name_asc":
       return arr.sort((a, b) => a.name.localeCompare(b.name, "ro"));
     case "stars_desc":
@@ -1478,21 +1337,16 @@ function renderViews() {
   const filtered = getFilteredClients();
   const sortMode = document.getElementById("sortSelect").value;
 
-  let sumCurMonth = 0;
-  let sumPrevMonth = 0;
-  let sumAllTotal = 0;
-
-  filtered.forEach(c => {
-    const st = getClientStats(c);
-    sumCurMonth += st.curMonthCount;
-    sumPrevMonth += st.prevMonthCount;
-    sumAllTotal += st.allTotalCount;
-  });
+  const uniqueCities = new Set(filtered.map(c => c.cityKey));
+  const avgStars = filtered.length
+    ? (filtered.reduce((acc, c) => acc + c.stars, 0) / filtered.length).toFixed(1)
+    : "0.0";
+  const inactiveCnt = filtered.filter(c => getStatusInfo(c).code === "INACTIVE").length;
 
   document.getElementById("kpiTotal").textContent = filtered.length;
-  document.getElementById("kpiCurMonth").textContent = sumCurMonth;
-  document.getElementById("kpiPrevMonth").textContent = sumPrevMonth;
-  document.getElementById("kpiAllTotal").textContent = sumAllTotal;
+  document.getElementById("kpiCities").textContent = uniqueCities.size;
+  document.getElementById("kpiAvgStars").textContent = avgStars + " ★";
+  document.getElementById("kpiInactive").textContent = inactiveCnt;
 
   const grouped = new Map();
   filtered.forEach(c => {
@@ -1537,21 +1391,18 @@ function renderViews() {
             ${items.map(c => {
               const st = getStatusInfo(c);
               const isGray = st.code === "INACTIVE";
-              const stats = getClientStats(c);
-              const daysTag = stats.preferredDays.length ? stats.preferredDays.join(", ") : "Fără zile salvate";
+              const pat = getClientPatternData(c);
+              const daysTag = pat.preferredDays.length ? pat.preferredDays.join(", ") : "Fără zile salvate";
               return `
                 <div class="client-card">
                   <div class="client-left">
                     <div class="client-name-row">
                       <span class="client-name">${esc(c.name)}</span>
-                      <button type="button" class="btn-detail-mini" onclick="openClientReport('${escJs(c.key)}')">Comparație lunară & zile</button>
+                      <button type="button" class="btn-detail-mini" onclick="openClientReport('${escJs(c.key)}')">Raport zile & date</button>
                     </div>
                     <div class="client-tags">
                       <span class="pill ${st.pillClass}">${esc(st.label)}</span>
                       <span class="pill pill-neutral">${esc(cityLabel)}</span>
-                      <span class="pill pill-month">Luna curentă: ${stats.curMonthCount}</span>
-                      <span class="pill pill-neutral">Luna trecută: ${stats.prevMonthCount}</span>
-                      <span class="pill pill-day">Total general: ${stats.allTotalCount}</span>
                       <span class="pill pill-day">${esc(daysTag)}</span>
                     </div>
                   </div>
@@ -1574,21 +1425,17 @@ function renderViews() {
   tbody.innerHTML = sortedCityKeys.map(cityKey => {
     const cityLabel = getCityCategoryLabel(cityKey);
     const items = grouped.get(cityKey);
-    let cCur = 0, cPrev = 0, cAll = 0;
-    items.forEach(x => {
-      const s = getClientStats(x);
-      cCur += s.curMonthCount;
-      cPrev += s.prevMonthCount;
-      cAll += s.allTotalCount;
-    });
+    const act = items.filter(x => getStatusInfo(x).code === "ACTIVE").length;
+    const low = items.filter(x => getStatusInfo(x).code === "LOW").length;
+    const inact = items.filter(x => getStatusInfo(x).code === "INACTIVE").length;
     const avg = (items.reduce((s, x) => s + x.stars, 0) / items.length).toFixed(1);
     return `
       <tr class="clickable-row" onclick="selectCityCategoryFromMgmt('${escJs(cityKey)}')">
         <td><b>${esc(cityLabel)}</b></td>
         <td>${items.length}</td>
-        <td style="color:var(--c-active);font-weight:700;">${cCur}</td>
-        <td style="color:var(--c-low);font-weight:700;">${cPrev}</td>
-        <td style="color:var(--accent);font-weight:800;">${cAll}</td>
+        <td style="color:var(--c-active);font-weight:700;">${act}</td>
+        <td style="color:var(--c-low);font-weight:700;">${low}</td>
+        <td style="color:var(--c-inactive);font-weight:700;">${inact}</td>
         <td style="color:var(--gold);font-weight:700;">${avg} ★</td>
       </tr>
     `;
@@ -1606,17 +1453,17 @@ function selectCityCategoryFromMgmt(cityKey) {
 
 function exportCsv() {
   const list = sortClients(getFilteredClients(), document.getElementById("sortSelect").value);
-  const rows = [["Categorie Oras", "Nume Client", "Luna Curenta", "Luna Trecuta", "Total General", "Stele", "Zile Saptamana"]];
+  const rows = [["Categorie Oras", "Nume Client", "Stele", "Status", "Zile Saptamana", "Date Comenzi", "Procent Gri"]];
   list.forEach(c => {
-    const s = getClientStats(c);
+    const pat = getClientPatternData(c);
     rows.push([
       getCityCategoryLabel(c.cityKey),
       c.name,
-      s.curMonthCount,
-      s.prevMonthCount,
-      s.allTotalCount,
       c.stars,
-      s.preferredDays.join(" | ")
+      getStatusInfo(c).label,
+      pat.preferredDays.join(" | "),
+      pat.orderDates.join(" | "),
+      c.grayPct + "%"
     ]);
   });
 
@@ -1625,7 +1472,7 @@ function exportCsv() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "clasament-clienti-comparatie-lunara-si-total.csv";
+  a.download = "clasament-clienti-raport-lunar-zile.csv";
   a.click();
   URL.revokeObjectURL(url);
 }
