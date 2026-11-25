@@ -1,0 +1,1647 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#060911">
+<title>CLASAMENT_CLIENTI • Comparație Lunară (Luna Curentă vs Luna Trecută)</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+  :root {
+    --bg-base: #060911;
+    --bg-panel: rgba(16, 24, 42, 0.78);
+    --bg-card: rgba(23, 34, 58, 0.68);
+    --bg-card-hover: rgba(32, 47, 79, 0.86);
+    --glass-border: rgba(255, 255, 255, 0.11);
+    --glass-highlight: rgba(255, 255, 255, 0.21);
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+
+    --c-active: #10b981;
+    --c-low: #f59e0b;
+    --c-inactive: #ef4444;
+
+    --gold: #facc15;
+    --gold-soft: rgba(250, 204, 21, 0.14);
+    --gray-star: #9ca3af;
+    --gray-soft: rgba(156, 163, 175, 0.16);
+    --accent: #38bdf8;
+    --purple: #a78bfa;
+
+    --r-xl: 28px;
+    --r-lg: 22px;
+    --r-md: 16px;
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html, body {
+    min-height: 100%;
+    font-family: var(--font);
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    background-image:
+      radial-gradient(ellipse 80% 50% at 10% -6%, rgba(16, 185, 129, 0.14), transparent 60%),
+      radial-gradient(ellipse 75% 50% at 92% 6%, rgba(250, 204, 21, 0.12), transparent 58%),
+      radial-gradient(ellipse 75% 55% at 50% 106%, rgba(56, 189, 248, 0.11), transparent 62%);
+    background-attachment: fixed;
+    padding-bottom: calc(64px + env(safe-area-inset-bottom));
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 80;
+    padding: max(12px, env(safe-area-inset-top)) 16px 12px;
+    background: rgba(7, 11, 20, 0.78);
+    backdrop-filter: blur(28px) saturate(190%);
+    -webkit-backdrop-filter: blur(28px) saturate(190%);
+    border-bottom: 1px solid var(--glass-border);
+  }
+
+  .topbar-inner {
+    max-width: 1220px;
+    margin: 0 auto;
+  }
+
+  .top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .brand-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 15px;
+    background: linear-gradient(145deg, rgba(250, 204, 21, 0.25), rgba(56, 189, 248, 0.22));
+    border: 1px solid var(--glass-highlight);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 8px 22px rgba(0, 0, 0, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--gold);
+    flex-shrink: 0;
+  }
+
+  .app-title {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -0.35px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .app-subtitle {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .btn-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .btn-glass {
+    height: 40px;
+    padding: 0 15px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--glass-highlight);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 6px 16px rgba(0, 0, 0, 0.25);
+    color: var(--text-primary);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: transform 0.2s cubic-bezier(0.32, 0.72, 0, 1), background 0.2s ease;
+  }
+  .btn-glass:active { transform: scale(0.94); background: rgba(255, 255, 255, 0.16); }
+  .btn-glass.spinning .spin-ico { animation: spin 0.85s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .nav-tabs {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+
+  .nav-tab {
+    flex-shrink: 0;
+    height: 36px;
+    padding: 0 16px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .nav-tab.active {
+    background: var(--text-primary);
+    color: #060911;
+    border-color: var(--text-primary);
+  }
+
+  .container {
+    max-width: 1220px;
+    margin: 0 auto;
+    padding: 18px 16px;
+  }
+
+  .view-section { display: none; }
+  .view-section.active { display: block; }
+
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  @media (max-width: 720px) {
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .kpi-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(20px) saturate(165%);
+    -webkit-backdrop-filter: blur(20px) saturate(165%);
+    border: 1px solid var(--glass-border);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 10px 26px rgba(0, 0, 0, 0.25);
+    border-radius: var(--r-lg);
+    padding: 15px 16px;
+  }
+  .kpi-label { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
+  .kpi-num { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; margin-top: 6px; }
+
+  .control-panel {
+    background: var(--bg-panel);
+    backdrop-filter: blur(22px) saturate(170%);
+    -webkit-backdrop-filter: blur(22px) saturate(170%);
+    border: 1px solid var(--glass-border);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 12px 30px rgba(0, 0, 0, 0.30);
+    border-radius: var(--r-xl);
+    padding: 15px;
+    margin-bottom: 16px;
+  }
+
+  .controls-top {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  @media (max-width: 760px) {
+    .controls-top { grid-template-columns: 1fr; }
+  }
+
+  .input-ctrl, .select-ctrl {
+    width: 100%;
+    height: 42px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--glass-border);
+    padding: 0 14px;
+    color: var(--text-primary);
+    font-size: 13.5px;
+    font-weight: 500;
+    outline: none;
+  }
+  .input-ctrl::placeholder { color: var(--text-muted); }
+  .input-ctrl:focus, .select-ctrl:focus {
+    border-color: rgba(250, 204, 21, 0.65);
+    background: rgba(255, 255, 255, 0.10);
+  }
+  .select-ctrl option {
+    background: #0f172a;
+    color: #f8fafc;
+  }
+
+  .city-category-bar {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--glass-border);
+  }
+  .city-category-bar::-webkit-scrollbar { display: none; }
+
+  .city-pill-btn {
+    flex-shrink: 0;
+    height: 36px;
+    padding: 0 15px;
+    border-radius: 999px;
+    background: rgba(56, 189, 248, 0.08);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    color: #bae6fd;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    transition: all 0.2s ease;
+  }
+  .city-pill-btn .cnt-tag {
+    background: rgba(255, 255, 255, 0.12);
+    padding: 2px 7px;
+    border-radius: 999px;
+    font-size: 11px;
+  }
+  .city-pill-btn.active {
+    background: var(--accent);
+    color: #04101c;
+    border-color: var(--accent);
+  }
+  .city-pill-btn.active .cnt-tag {
+    background: rgba(4, 16, 28, 0.18);
+    color: #04101c;
+  }
+
+  .chips-bar {
+    display: flex;
+    gap: 7px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+  .chips-bar::-webkit-scrollbar { display: none; }
+
+  .chip-btn {
+    flex-shrink: 0;
+    height: 34px;
+    padding: 0 14px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    color: var(--text-secondary);
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+  }
+  .chip-btn.active {
+    background: var(--text-primary);
+    color: #060911;
+    border-color: var(--text-primary);
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .city-block {
+    background: rgba(16, 24, 42, 0.56);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--r-xl);
+    padding: 14px;
+    margin-bottom: 18px;
+  }
+
+  .city-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 11px 14px;
+    border-radius: var(--r-md);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--glass-border);
+    margin-bottom: 12px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .city-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .city-name {
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: -0.25px;
+  }
+
+  .city-badge {
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 11px;
+    border-radius: 999px;
+    background: rgba(56, 189, 248, 0.14);
+    color: var(--accent);
+    border: 1px solid rgba(56, 189, 248, 0.28);
+  }
+
+  .city-right-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .city-avg {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--gold);
+  }
+
+  .collapse-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--glass-border);
+    color: var(--text-secondary);
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 11.5px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .city-clients-wrap.collapsed { display: none; }
+
+  .client-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(18px) saturate(165%);
+    -webkit-backdrop-filter: blur(18px) saturate(165%);
+    border: 1px solid var(--glass-border);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 8px 22px rgba(0, 0, 0, 0.24);
+    border-radius: var(--r-lg);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+  }
+  .client-card:last-child { margin-bottom: 0; }
+  .client-card:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--glass-highlight);
+  }
+
+  .client-left { min-width: 0; flex: 1; }
+  .client-name-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 7px;
+  }
+  .client-name {
+    font-size: 15.5px;
+    font-weight: 700;
+    word-break: break-word;
+  }
+
+  .btn-detail-mini {
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(167, 139, 250, 0.14);
+    border: 1px solid rgba(167, 139, 250, 0.35);
+    color: #ddd6fe;
+    font-size: 11.5px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .btn-detail-mini:hover {
+    background: rgba(167, 139, 250, 0.25);
+  }
+
+  .client-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .pill {
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+  .pill-active { background: rgba(16, 185, 129, 0.15); color: var(--c-active); border: 1px solid rgba(16, 185, 129, 0.28); }
+  .pill-low { background: rgba(245, 158, 11, 0.15); color: var(--c-low); border: 1px solid rgba(245, 158, 11, 0.28); }
+  .pill-inactive { background: rgba(239, 68, 68, 0.15); color: var(--c-inactive); border: 1px solid rgba(239, 68, 68, 0.28); }
+  .pill-neutral { background: rgba(255, 255, 255, 0.06); color: var(--text-secondary); border: 1px solid var(--glass-border); }
+  .pill-day { background: rgba(56, 189, 248, 0.12); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.25); }
+  .pill-month { background: rgba(167, 139, 250, 0.14); color: #ddd6fe; border: 1px solid rgba(167, 139, 250, 0.3); }
+
+  .star-box {
+    flex-shrink: 0;
+    min-width: 132px;
+    text-align: right;
+    padding: 10px 13px;
+    border-radius: var(--r-md);
+  }
+  .star-box.gold {
+    background: var(--gold-soft);
+    border: 1px solid rgba(250, 204, 21, 0.36);
+    color: var(--gold);
+  }
+  .star-box.gray {
+    background: var(--gray-soft);
+    border: 1px solid rgba(156, 163, 175, 0.28);
+    color: var(--gray-star);
+  }
+  .star-icons { font-size: 15px; letter-spacing: 1.5px; font-weight: 800; }
+  .star-num { font-size: 12px; font-weight: 700; margin-top: 3px; }
+  .star-meta { font-size: 11px; opacity: 0.88; margin-top: 2px; }
+
+  .mgmt-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(20px) saturate(165%);
+    -webkit-backdrop-filter: blur(20px) saturate(165%);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--r-xl);
+    padding: 16px;
+    margin-bottom: 18px;
+  }
+
+  .mgmt-title-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .mgmt-title {
+    font-size: 16px;
+    font-weight: 800;
+  }
+
+  /* Comparison Cards: Luna Curentă vs Luna Trecută vs Total General */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 14px;
+  }
+  @media (max-width: 820px) {
+    .compare-grid { grid-template-columns: 1fr; }
+  }
+
+  .cmp-box {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--r-md);
+    padding: 14px;
+  }
+  .cmp-box.cur {
+    border-color: rgba(16, 185, 129, 0.42);
+    background: rgba(16, 185, 129, 0.08);
+  }
+  .cmp-box.prev {
+    border-color: rgba(245, 158, 11, 0.42);
+    background: rgba(245, 158, 11, 0.08);
+  }
+  .cmp-box.all {
+    border-color: rgba(56, 189, 248, 0.42);
+    background: rgba(56, 189, 248, 0.08);
+  }
+
+  .cmp-label { font-size: 12px; font-weight: 700; color: var(--text-secondary); }
+  .cmp-val { font-size: 24px; font-weight: 800; margin-top: 5px; }
+  .cmp-sub { font-size: 11.5px; color: var(--text-muted); margin-top: 4px; }
+
+  .delta-badge {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 700;
+  }
+  .delta-up { background: rgba(16, 185, 129, 0.18); color: #6ee7b7; }
+  .delta-down { background: rgba(239, 68, 68, 0.18); color: #fca5a5; }
+  .delta-flat { background: rgba(255, 255, 255, 0.10); color: var(--text-secondary); }
+
+  /* Full Monthly Comparison Table (All Clients) */
+  .city-summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .city-summary-table th, .city-summary-table td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--glass-border);
+  }
+  .city-summary-table th {
+    color: var(--text-secondary);
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .clickable-row { cursor: pointer; }
+  .clickable-row:hover { background: rgba(255, 255, 255, 0.05); }
+
+  .matrix-scroll {
+    overflow-x: auto;
+    border: 1px solid var(--glass-border);
+    border-radius: var(--r-md);
+    background: rgba(8, 13, 24, 0.55);
+  }
+
+  .matrix-table {
+    width: max-content;
+    min-width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+
+  .matrix-table th, .matrix-table td {
+    padding: 8px 9px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .matrix-table th {
+    background: rgba(255, 255, 255, 0.07);
+    color: var(--text-secondary);
+    font-size: 11px;
+    font-weight: 700;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+
+  .matrix-table td:first-child, .matrix-table th:first-child {
+    text-align: left;
+    position: sticky;
+    left: 0;
+    background: #0d1526;
+    z-index: 3;
+    font-weight: 700;
+  }
+
+  .day-yes {
+    background: rgba(16, 185, 129, 0.24);
+    color: #6ee7b7;
+    font-weight: 800;
+    border-radius: 6px;
+    padding: 2px 6px;
+    display: inline-block;
+  }
+
+  .client-picker-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  @media (max-width: 760px) {
+    .client-picker-grid { grid-template-columns: 1fr; }
+  }
+
+  .weekday-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    margin-top: 12px;
+  }
+  @media (max-width: 820px) {
+    .weekday-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .wd-box {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--r-md);
+    padding: 12px;
+    text-align: center;
+  }
+  .wd-box.has-orders {
+    background: rgba(56, 189, 248, 0.14);
+    border-color: rgba(56, 189, 248, 0.42);
+  }
+  .wd-name { font-size: 12.5px; font-weight: 700; color: var(--text-secondary); }
+  .wd-count { font-size: 20px; font-weight: 800; color: var(--accent); margin-top: 4px; }
+  .wd-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  .dates-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 10px;
+  }
+
+  .date-chip {
+    padding: 6px 11px;
+    border-radius: 999px;
+    background: rgba(16, 185, 129, 0.14);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: #a7f3d0;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  #mgmtMap {
+    width: 100%;
+    height: 350px;
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    border: 1px solid var(--glass-border);
+    background: #0c1424;
+  }
+
+  .pin-wrap { background: none; border: none; }
+  .pin-dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    border: 2.5px solid #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  }
+  .pin-dot.s-active { background: var(--c-active); }
+  .pin-dot.s-low { background: var(--c-low); }
+  .pin-dot.s-inactive { background: var(--c-inactive); }
+
+  .empty-box {
+    text-align: center;
+    padding: 42px 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--r-xl);
+    color: var(--text-secondary);
+    font-size: 14px;
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="top-row">
+      <div class="brand">
+        <div class="brand-icon">★</div>
+        <div>
+          <div class="app-title">CLASAMENT_CLIENTI • Raport Lunar & Total General</div>
+          <div class="app-subtitle" id="statusSub">Se încarcă datele din CLASAMENT_CLIENTI...</div>
+        </div>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn-glass" onclick="exportCsv()">Export CSV</button>
+        <button class="btn-glass" id="syncBtn" onclick="loadData()">
+          <span class="spin-ico">↻</span>
+          <span>Actualizează</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="nav-tabs">
+      <button class="nav-tab active" data-tab="cities" onclick="switchTab('cities', this)">Categorii pe Oraș & Stele</button>
+      <button class="nav-tab" data-tab="client-report" onclick="switchTab('client-report', this)">Comparație Lunară & Client</button>
+      <button class="nav-tab" data-tab="monthly-matrix" onclick="switchTab('monthly-matrix', this)">Tabel Lunar Ziua 1..31</button>
+      <button class="nav-tab" data-tab="management" onclick="switchTab('management', this)">Management & Hartă</button>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <!-- TAB 1: CATEGORII PE ORAȘ + LUNA CURENTĂ / LUNA TRECUTĂ / TOTAL GENERAL -->
+  <section class="view-section active" id="tab-cities">
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Total clienți</div>
+        <div class="kpi-num" id="kpiTotal">0</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Comenzi Luna Curentă</div>
+        <div class="kpi-num" id="kpiCurMonth" style="color:var(--c-active)">0</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Comenzi Luna Trecută</div>
+        <div class="kpi-num" id="kpiPrevMonth" style="color:var(--c-low)">0</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Total General Comenzi</div>
+        <div class="kpi-num" id="kpiAllTotal" style="color:var(--accent)">0</div>
+      </div>
+    </div>
+
+    <div class="control-panel">
+      <div class="city-category-bar" id="cityCategoryBar"></div>
+
+      <div class="controls-top">
+        <input type="search" id="searchInput" class="input-ctrl" placeholder="Caută client sau oraș (Coloana G)..." oninput="renderViews()">
+
+        <select id="sortSelect" class="select-ctrl" onchange="renderViews()">
+          <option value="stars_desc">Sortare: Stele (5 ★ → 1 ★)</option>
+          <option value="cur_month_desc">Sortare: Comenzi Luna Curentă (mare → mic)</option>
+          <option value="all_total_desc">Sortare: Total General Comenzi (mare → mic)</option>
+          <option value="prev_month_desc">Sortare: Comenzi Luna Trecută (mare → mic)</option>
+          <option value="name_asc">Sortare: Nume client (A–Z)</option>
+        </select>
+      </div>
+
+      <div class="chips-bar" id="statusChips">
+        <button class="chip-btn active" data-st="ALL" onclick="setStatusFilter('ALL', this)">Toate statusurile</button>
+        <button class="chip-btn" data-st="ACTIVE" onclick="setStatusFilter('ACTIVE', this)">
+          <span class="status-dot" style="background:var(--c-active)"></span>Client activ
+        </button>
+        <button class="chip-btn" data-st="LOW" onclick="setStatusFilter('LOW', this)">
+          <span class="status-dot" style="background:var(--c-low)"></span>Client puțin activ
+        </button>
+        <button class="chip-btn" data-st="INACTIVE" onclick="setStatusFilter('INACTIVE', this)">
+          <span class="status-dot" style="background:var(--c-inactive)"></span>Client inactiv (100% gri)
+        </button>
+      </div>
+    </div>
+
+    <div id="citiesListContainer"></div>
+  </section>
+
+  <!-- TAB 2: RAPORT INDIVIDUAL CLIENT (LUNA CURENTĂ vs LUNA TRECUTĂ vs TOTAL GENERAL + ZILE & DATE) -->
+  <section class="view-section" id="tab-client-report">
+    <div class="control-panel">
+      <div class="mgmt-title" style="margin-bottom:10px;">Comparație Lunară (Luna Curentă vs Luna Trecută vs Total General) și Zilele Clientului</div>
+      <div class="client-picker-grid">
+        <input type="search" id="clientReportSearch" class="input-ctrl" placeholder="Filtrează lista de clienți..." oninput="populateClientSelect()">
+        <select id="clientReportSelect" class="select-ctrl" onchange="renderClientReport()"></select>
+      </div>
+    </div>
+
+    <div id="clientReportContainer"></div>
+
+    <div class="mgmt-card">
+      <div class="mgmt-title">Tabel Comparativ Toți Clienții (Luna Curentă • Luna Trecută • Total General)</div>
+      <div style="overflow-x:auto;">
+        <table class="city-summary-table">
+          <thead>
+            <tr>
+              <th>Client</th>
+              <th>Oraș</th>
+              <th>Luna Curentă</th>
+              <th>Luna Trecută</th>
+              <th>Diferență</th>
+              <th>Total General</th>
+              <th>Zile săptămână</th>
+            </tr>
+          </thead>
+          <tbody id="allClientsCompareBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 3: TABEL LUNAR (ZIUA 1 .. ZIUA N) -->
+  <section class="view-section" id="tab-monthly-matrix">
+    <div class="mgmt-card">
+      <div class="mgmt-title-row">
+        <div>
+          <div class="mgmt-title" id="monthlySheetTitle">Tabel Lunar Comenzi (Ziua 1 → Ultima zi a lunii)</div>
+          <div style="font-size:12px;color:var(--text-secondary);margin-top:3px;">
+            Fiecare zi afișează „DA” pentru clienții care au avut comandă în ziua respectivă
+          </div>
+        </div>
+        <select id="monthSelect" class="select-ctrl" style="max-width:220px;" onchange="renderMonthlyMatrix()"></select>
+      </div>
+
+      <div class="matrix-scroll">
+        <table class="matrix-table" id="monthlyMatrixTable"></table>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 4: MANAGEMENT & HARTĂ -->
+  <section class="view-section" id="tab-management">
+    <div class="mgmt-card">
+      <div class="mgmt-title">Sinteză Management pe Categorii de Oraș (Luna Curentă • Luna Trecută • Total General)</div>
+      <div style="overflow-x:auto;">
+        <table class="city-summary-table" id="citySummaryTable">
+          <thead>
+            <tr>
+              <th>Oraș (Coloana G)</th>
+              <th>Clienți</th>
+              <th>Luna Curentă</th>
+              <th>Luna Trecută</th>
+              <th>Total General</th>
+              <th>Stele medii</th>
+            </tr>
+          </thead>
+          <tbody id="citySummaryBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="mgmt-card">
+      <div class="mgmt-title">Hartă România — Distribuție clienți după status</div>
+      <div id="mgmtMap"></div>
+    </div>
+  </section>
+</main>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbwpgSay-TcwgATir5HFTN3WbPyox1JAPTs6nOJ2AXfqBZ45-182Si8pbh_gL-LQDteJ6Q/exec";
+
+const EMPTY_CITY_KEY = "__EMPTY_CITY__";
+const EMPTY_CITY_LABEL = "Fără oraș (Coloana G goală)";
+const WEEKDAYS_RO = ["Luni", "Marți", "Miercuri", "Joi", "Vineri", "Sâmbătă", "Duminică"];
+
+let clients = [];
+let clientPatterns = {};
+let selectedCityCategory = "ALL";
+let statusFilter = "ALL";
+let selectedClientKey = "";
+let collapsedCities = new Set();
+let mapObj = null;
+let pinsLayer = null;
+
+function norm(v) {
+  return String(v || "")
+    .toLowerCase()
+    .replace(/[șş]/g, "s")
+    .replace(/[țţ]/g, "t")
+    .replace(/[ăâ]/g, "a")
+    .replace(/[îí]/g, "i")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function getCityCategoryKey(rawCity) {
+  const clean = String(rawCity || "").trim();
+  return clean ? clean : EMPTY_CITY_KEY;
+}
+
+function getCityCategoryLabel(catKey) {
+  return catKey === EMPTY_CITY_KEY ? EMPTY_CITY_LABEL : catKey;
+}
+
+function getStatusInfo(c) {
+  if (!c.isActive || c.grayPct >= 100 || (c.stars === 1 && c.score <= -3)) {
+    return { code: "INACTIVE", label: "Client inactiv", pillClass: "pill-inactive", pinClass: "s-inactive" };
+  }
+  if (c.stars >= 4 || c.score >= 2) {
+    return { code: "ACTIVE", label: "Client activ", pillClass: "pill-active", pinClass: "s-active" };
+  }
+  return { code: "LOW", label: "Client puțin activ", pillClass: "pill-low", pinClass: "s-low" };
+}
+
+function starIcons(stars) {
+  const n = Math.max(1, Math.min(5, Number(stars) || 1));
+  return "★".repeat(n) + "☆".repeat(5 - n);
+}
+
+function parseCoords(loc) {
+  if (!loc) return null;
+  let lat = parseFloat(String(loc.lat ?? "").replace(",", "."));
+  let lng = parseFloat(String(loc.lng ?? "").replace(",", "."));
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+  if (Math.abs(lat) > 90 && Math.abs(lng) <= 90) {
+    const t = lat; lat = lng; lng = t;
+  }
+  if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return null;
+  return [lat, lng];
+}
+
+function getWeekdayRoFromDateStr(dateStr) {
+  const dt = new Date(String(dateStr) + "T12:00:00");
+  if (isNaN(dt.getTime())) return "";
+  const idx = (dt.getDay() + 6) % 7;
+  return WEEKDAYS_RO[idx] || "";
+}
+
+function getYearMonthKeys() {
+  const now = new Date();
+  const curYear = now.getFullYear();
+  const curMonthIdx = now.getMonth();
+  const curYm = `${curYear}-${String(curMonthIdx + 1).padStart(2, "0")}`;
+
+  const prevDate = new Date(curYear, curMonthIdx - 1, 1);
+  const prevYm = `${prevDate.getFullYear()}-${String(prevDate.getMonth() + 1).padStart(2, "0")}`;
+
+  return { curYm, prevYm };
+}
+
+function getClientStats(client) {
+  const rawPat = clientPatterns[client.key] || {};
+  const dates = Array.isArray(rawPat.orderDates) ? rawPat.orderDates.slice().sort() : [];
+  const { curYm, prevYm } = getYearMonthKeys();
+
+  let curMonthCount = 0;
+  let prevMonthCount = 0;
+  const freq = { Luni: 0, Marți: 0, Miercuri: 0, Joi: 0, Vineri: 0, Sâmbătă: 0, Duminică: 0 };
+
+  dates.forEach(ds => {
+    const s = String(ds || "").trim();
+    if (s.startsWith(curYm + "-")) curMonthCount++;
+    if (s.startsWith(prevYm + "-")) prevMonthCount++;
+    const wd = getWeekdayRoFromDateStr(s);
+    if (freq[wd] !== undefined) freq[wd]++;
+  });
+
+  if (rawPat.weekdayFrequency && typeof rawPat.weekdayFrequency === "object" && dates.length === 0) {
+    WEEKDAYS_RO.forEach(wd => {
+      freq[wd] = Number(rawPat.weekdayFrequency[wd]) || 0;
+    });
+  }
+
+  // Total general: dacă există date în istoric folosim lungimea lor, altfelfallback la valoarea din tabel dacă există
+  const recordedCount = Number(rawPat.totalOrdersRecorded) || 0;
+  const allTotalCount = Math.max(dates.length, recordedCount);
+
+  const preferredDays = Array.isArray(rawPat.preferredDays) && rawPat.preferredDays.length
+    ? rawPat.preferredDays
+    : WEEKDAYS_RO.filter(wd => freq[wd] > 0).sort((a, b) => freq[b] - freq[a]);
+
+  return {
+    curYm,
+    prevYm,
+    curMonthCount,
+    prevMonthCount,
+    allTotalCount,
+    diffMonth: curMonthCount - prevMonthCount,
+    orderDates: dates,
+    weekdayFrequency: freq,
+    preferredDays
+  };
+}
+
+function initMap() {
+  try {
+    if (typeof L === "undefined") return;
+    mapObj = L.map("mgmtMap", { zoomControl: true, scrollWheelZoom: true }).setView([45.9432, 24.9668], 6);
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+      attribution: "&copy; OpenStreetMap &copy; CARTO",
+      subdomains: "abcd",
+      maxZoom: 19
+    }).addTo(mapObj);
+    pinsLayer = L.layerGroup().addTo(mapObj);
+  } catch (e) {}
+}
+
+function updateMgmtMap(list) {
+  if (!pinsLayer || !mapObj) return;
+  pinsLayer.clearLayers();
+  const pts = [];
+
+  list.forEach(c => {
+    if (!c.coords) return;
+    pts.push(c.coords);
+    const st = getStatusInfo(c);
+    const icon = L.divIcon({
+      className: "pin-wrap",
+      html: `<div class="pin-dot ${st.pinClass}"></div>`,
+      iconSize: [22, 22],
+      iconAnchor: [11, 22],
+      popupAnchor: [0, -20]
+    });
+    const marker = L.marker(c.coords, { icon }).addTo(pinsLayer);
+    marker.bindPopup(`
+      <div style="min-width:170px;">
+        <div style="font-weight:700;font-size:13px;margin-bottom:3px;">${esc(c.name)}</div>
+        <div style="color:#94a3b8;font-size:11.5px;margin-bottom:4px;">Oraș: ${esc(getCityCategoryLabel(c.cityKey))}</div>
+        <div style="font-weight:700;color:#facc15;">${starIcons(c.stars)} (${c.stars}/5)</div>
+      </div>
+    `);
+  });
+
+  if (pts.length > 0) {
+    mapObj.fitBounds(L.latLngBounds(pts), { padding: [20, 20], maxZoom: 13 });
+  }
+}
+
+async function loadData() {
+  const btn = document.getElementById("syncBtn");
+  btn.classList.add("spinning");
+  document.getElementById("statusSub").textContent = "Se sincronizează cu CLASAMENT_CLIENTI...";
+
+  try {
+    const res = await fetch(API_URL + "?t=" + Date.now(), { cache: "no-store" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+
+    const rankings = data.rankings || {};
+    const courses = Array.isArray(data.courses) ? data.courses : [];
+    clientPatterns = data.clientPatterns || {};
+
+    const locByClient = new Map();
+    courses.forEach(course => {
+      (course.customers || []).forEach(cu => {
+        const k = norm(cu.name);
+        if (k && cu.location && !locByClient.has(k)) {
+          locByClient.set(k, cu.location);
+        }
+      });
+    });
+
+    const mapClients = new Map();
+
+    Object.values(rankings).forEach(r => {
+      if (!r || !r.name) return;
+      const k = norm(r.name);
+      const loc = locByClient.get(k) || null;
+      const rawCity = r.colG !== undefined ? String(r.colG).trim() : (loc && loc.colG ? String(loc.colG).trim() : "");
+      const cityKey = getCityCategoryKey(rawCity);
+      const stars = Math.max(1, Math.min(5, Math.round(Number(r.stars) || 1)));
+      const grayPct = typeof r.grayPct === "number" ? r.grayPct : (stars === 1 ? 100 : (5 - stars) * 20);
+      const score = typeof r.score === "number" ? r.score : (stars === 1 ? -3 : stars - 2);
+      const isActive = typeof r.isActive === "boolean" ? r.isActive : (grayPct < 100);
+
+      mapClients.set(k, {
+        key: k,
+        name: String(r.name).trim(),
+        cityKey,
+        stars,
+        grayPct,
+        score,
+        isActive,
+        lastOrderDate: r.lastOrderDate || "-",
+        coords: parseCoords(loc)
+      });
+    });
+
+    courses.forEach(course => {
+      (course.customers || []).forEach(cu => {
+        const k = norm(cu.name);
+        if (!k || mapClients.has(k)) return;
+        const rawCity = cu.location && cu.location.colG ? String(cu.location.colG).trim() : "";
+        const cityKey = getCityCategoryKey(rawCity);
+        const stars = cu.status === "Complet" ? 3 : 1;
+        const grayPct = stars === 1 ? 100 : 40;
+        mapClients.set(k, {
+          key: k,
+          name: String(cu.name).trim(),
+          cityKey,
+          stars,
+          grayPct,
+          score: stars === 1 ? -3 : 1,
+          isActive: stars > 1,
+          lastOrderDate: "-",
+          coords: parseCoords(cu.location)
+        });
+      });
+    });
+
+    clients = Array.from(mapClients.values()).sort((a, b) => a.name.localeCompare(b.name, "ro"));
+    if (!selectedClientKey && clients.length > 0) {
+      selectedClientKey = clients[0].key;
+    }
+
+    initMonthSelector();
+    populateClientSelect();
+    document.getElementById("statusSub").textContent = "Actualizat: " + new Date().toLocaleTimeString("ro-RO");
+    renderViews();
+    renderClientReport();
+    renderMonthlyMatrix();
+  } catch (err) {
+    document.getElementById("statusSub").textContent = "Eroare la încărcarea datelor";
+    document.getElementById("citiesListContainer").innerHTML = `<div class="empty-box">Nu s-au putut încărca datele. Verificați că Web App este publicat ca "Anyone" și URL-ul este corect.</div>`;
+  } finally {
+    btn.classList.remove("spinning");
+  }
+}
+
+function renderCityCategoryBar() {
+  const counts = new Map();
+  clients.forEach(c => {
+    counts.set(c.cityKey, (counts.get(c.cityKey) || 0) + 1);
+  });
+
+  const sortedKeys = Array.from(counts.keys()).sort((a, b) => {
+    if (norm(a).includes("bucuresti")) return -1;
+    if (norm(b).includes("bucuresti")) return 1;
+    if (a === EMPTY_CITY_KEY) return 1;
+    if (b === EMPTY_CITY_KEY) return -1;
+    return counts.get(b) - counts.get(a) || a.localeCompare(b, "ro");
+  });
+
+  if (selectedCityCategory !== "ALL" && !counts.has(selectedCityCategory)) {
+    selectedCityCategory = "ALL";
+  }
+
+  const bar = document.getElementById("cityCategoryBar");
+  const allBtn = `
+    <button class="city-pill-btn ${selectedCityCategory === "ALL" ? "active" : ""}" onclick="selectCityCategory('ALL')">
+      <span>Toate orașele</span>
+      <span class="cnt-tag">${clients.length}</span>
+    </button>
+  `;
+
+  const catBtns = sortedKeys.map(k => {
+    const label = getCityCategoryLabel(k);
+    const activeClass = selectedCityCategory === k ? "active" : "";
+    return `
+      <button class="city-pill-btn ${activeClass}" onclick="selectCityCategory('${escJs(k)}')">
+        <span>${esc(label)}</span>
+        <span class="cnt-tag">${counts.get(k)}</span>
+      </button>
+    `;
+  }).join("");
+
+  bar.innerHTML = allBtn + catBtns;
+}
+
+function selectCityCategory(catKey) {
+  selectedCityCategory = catKey;
+  renderViews();
+}
+
+function toggleCityCollapse(catKey, ev) {
+  if (ev) ev.stopPropagation();
+  if (collapsedCities.has(catKey)) {
+    collapsedCities.delete(catKey);
+  } else {
+    collapsedCities.add(catKey);
+  }
+  renderViews();
+}
+
+function setStatusFilter(st, el) {
+  statusFilter = st;
+  document.querySelectorAll("#statusChips .chip-btn").forEach(b => b.classList.remove("active"));
+  el.classList.add("active");
+  renderViews();
+}
+
+function switchTab(tabName, el) {
+  document.querySelectorAll(".nav-tab").forEach(b => b.classList.remove("active"));
+  if (el) el.classList.add("active");
+  document.querySelectorAll(".view-section").forEach(s => s.classList.remove("active"));
+  document.getElementById("tab-" + tabName).classList.add("active");
+
+  if (tabName === "management" && mapObj) {
+    setTimeout(() => mapObj.invalidateSize(), 80);
+  } else if (tabName === "client-report") {
+    renderClientReport();
+  } else if (tabName === "monthly-matrix") {
+    renderMonthlyMatrix();
+  }
+}
+
+function openClientReport(clientKey) {
+  selectedClientKey = clientKey;
+  const tabBtn = document.querySelector('.nav-tab[data-tab="client-report"]');
+  switchTab("client-report", tabBtn);
+  const sel = document.getElementById("clientReportSelect");
+  if (sel) sel.value = clientKey;
+  renderClientReport();
+}
+
+function populateClientSelect() {
+  const q = norm(document.getElementById("clientReportSearch")?.value || "");
+  const sel = document.getElementById("clientReportSelect");
+  if (!sel) return;
+
+  const list = clients.filter(c => {
+    if (!q) return true;
+    return norm(c.name + " " + getCityCategoryLabel(c.cityKey)).includes(q);
+  });
+
+  if (!list.length) {
+    sel.innerHTML = `<option value="">Niciun client găsit</option>`;
+    return;
+  }
+
+  if (!list.some(c => c.key === selectedClientKey)) {
+    selectedClientKey = list[0].key;
+  }
+
+  sel.innerHTML = list.map(c =>
+    `<option value="${esc(c.key)}" ${c.key === selectedClientKey ? "selected" : ""}>${esc(c.name)} (${esc(getCityCategoryLabel(c.cityKey))})</option>`
+  ).join("");
+}
+
+function renderClientReport() {
+  const container = document.getElementById("clientReportContainer");
+  const allBody = document.getElementById("allClientsCompareBody");
+  if (!container) return;
+
+  const sel = document.getElementById("clientReportSelect");
+  if (sel && sel.value) {
+    selectedClientKey = sel.value;
+  }
+
+  const client = clients.find(c => c.key === selectedClientKey) || clients[0];
+  if (!client) {
+    container.innerHTML = `<div class="empty-box">Nu există clienți disponibili pentru raport.</div>`;
+  } else {
+    const st = getStatusInfo(client);
+    const cityLabel = getCityCategoryLabel(client.cityKey);
+    const stats = getClientStats(client);
+    const daysSummary = stats.preferredDays.length ? stats.preferredDays.join(", ") : "Nicio zi înregistrată încă";
+
+    const diffText = stats.diffMonth > 0
+      ? `+${stats.diffMonth} față de luna trecută`
+      : stats.diffMonth < 0
+      ? `${stats.diffMonth} față de luna trecută`
+      : `Egal cu luna trecută (0)`;
+    const diffClass = stats.diffMonth > 0 ? "delta-up" : stats.diffMonth < 0 ? "delta-down" : "delta-flat";
+
+    container.innerHTML = `
+      <div class="mgmt-card">
+        <div class="mgmt-title-row">
+          <div>
+            <div class="mgmt-title" style="font-size:18px;">${esc(client.name)}</div>
+            <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:6px;">
+              <span class="pill ${st.pillClass}">${esc(st.label)}</span>
+              <span class="pill pill-neutral">Oraș: ${esc(cityLabel)}</span>
+              <span class="pill pill-day">Zile săptămână: ${esc(daysSummary)}</span>
+            </div>
+          </div>
+          <div class="star-box ${st.code === "INACTIVE" ? "gray" : "gold"}">
+            <div class="star-icons">${starIcons(client.stars)}</div>
+            <div class="star-num">${client.stars} / 5 stele</div>
+            <div class="star-meta">${client.grayPct}% gri</div>
+          </div>
+        </div>
+
+        <div class="compare-grid">
+          <div class="cmp-box cur">
+            <div class="cmp-label">Luna Curentă (${esc(stats.curYm)})</div>
+            <div class="cmp-val" style="color:var(--c-active);">${stats.curMonthCount}</div>
+            <div class="cmp-sub">comenzi în luna curentă</div>
+            <span class="delta-badge ${diffClass}">${esc(diffText)}</span>
+          </div>
+
+          <div class="cmp-box prev">
+            <div class="cmp-label">Luna Trecută (${esc(stats.prevYm)})</div>
+            <div class="cmp-val" style="color:var(--c-low);">${stats.prevMonthCount}</div>
+            <div class="cmp-sub">comenzi în luna anterioară</div>
+          </div>
+
+          <div class="cmp-box all">
+            <div class="cmp-label">Total General (Toate lunile)</div>
+            <div class="cmp-val" style="color:var(--accent);">${stats.allTotalCount}</div>
+            <div class="cmp-sub">total comenzi înregistrate</div>
+          </div>
+        </div>
+
+        <div style="margin-top:16px;">
+          <div style="font-size:13.5px;font-weight:700;color:var(--text-secondary);">Frecvența comenzilor pe zilele săptămânii</div>
+          <div class="weekday-grid">
+            ${WEEKDAYS_RO.map(wd => {
+              const cnt = stats.weekdayFrequency[wd] || 0;
+              return `
+                <div class="wd-box ${cnt > 0 ? "has-orders" : ""}">
+                  <div class="wd-name">${esc(wd)}</div>
+                  <div class="wd-count">${cnt}</div>
+                  <div class="wd-sub">${cnt === 1 ? "comandă" : "comenzi"}</div>
+                </div>
+              `;
+            }).join("")}
+          </div>
+        </div>
+
+        <div style="margin-top:18px;">
+          <div style="font-size:13.5px;font-weight:700;color:var(--text-secondary);">Istoric date în care a comandat (${stats.orderDates.length} date)</div>
+          ${
+            stats.orderDates.length
+              ? `<div class="dates-list">${stats.orderDates.map(d => {
+                  const wd = getWeekdayRoFromDateStr(d);
+                  return `<span class="date-chip">${esc(d)}${wd ? " (" + esc(wd) + ")" : ""}</span>`;
+                }).join("")}</div>`
+              : `<div style="margin-top:8px;font-size:13px;color:var(--text-muted);">Nu există încă date salvate în istoric.</div>`
+          }
+        </div>
+      </div>
+    `;
+  }
+
+  if (allBody) {
+    allBody.innerHTML = clients.map(c => {
+      const s = getClientStats(c);
+      const diffStr = s.diffMonth > 0 ? `+${s.diffMonth}` : `${s.diffMonth}`;
+      const diffCol = s.diffMonth > 0 ? "var(--c-active)" : s.diffMonth < 0 ? "var(--c-inactive)" : "var(--text-secondary)";
+      return `
+        <tr class="clickable-row" onclick="openClientReport('${escJs(c.key)}')">
+          <td><b>${esc(c.name)}</b></td>
+          <td>${esc(getCityCategoryLabel(c.cityKey))}</td>
+          <td style="color:var(--c-active);font-weight:700;">${s.curMonthCount}</td>
+          <td style="color:var(--c-low);font-weight:700;">${s.prevMonthCount}</td>
+          <td style="color:${diffCol};font-weight:700;">${diffStr}</td>
+          <td style="color:var(--accent);font-weight:800;">${s.allTotalCount}</td>
+          <td>${esc(s.preferredDays.join(", ") || "-")}</td>
+        </tr>
+      `;
+    }).join("") || `<tr><td colspan="7" style="text-align:center;">Fără date</td></tr>`;
+  }
+}
+
+function initMonthSelector() {
+  const sel = document.getElementById("monthSelect");
+  if (!sel) return;
+  const now = new Date();
+  const options = [];
+  for (let offset = 0; offset < 6; offset++) {
+    const dt = new Date(now.getFullYear(), now.getMonth() - offset, 1);
+    const y = dt.getFullYear();
+    const m = String(dt.getMonth() + 1).padStart(2, "0");
+    options.push({
+      val: `${y}-${m}`,
+      label: `RAPORT_${y}_${m}`
+    });
+  }
+  const prevVal = sel.value;
+  sel.innerHTML = options.map(o => `<option value="${o.val}">${o.label}</option>`).join("");
+  if (prevVal && options.some(o => o.val === prevVal)) {
+    sel.value = prevVal;
+  }
+}
+
+function renderMonthlyMatrix() {
+  const table = document.getElementById("monthlyMatrixTable");
+  const titleEl = document.getElementById("monthlySheetTitle");
+  const sel = document.getElementById("monthSelect");
+  if (!table || !sel) return;
+
+  const [yStr, mStr] = (sel.value || "").split("-");
+  const year = parseInt(yStr, 10) || new Date().getFullYear();
+  const monthIdx = (parseInt(mStr, 10) || (new Date().getMonth() + 1)) - 1;
+  const mm = String(monthIdx + 1).padStart(2, "0");
+  const daysInMonth = new Date(year, monthIdx + 1, 0).getDate();
+  const prefix = `${year}-${mm}-`;
+
+  if (titleEl) {
+    titleEl.textContent = `Tabel Lunar RAPORT_${year}_${mm} (Ziua 1 → Ziua ${daysInMonth})`;
+  }
+
+  let headHtml = `<tr><th>Client</th><th>Oraș</th>`;
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dt = new Date(year, monthIdx, d);
+    const wdShort = WEEKDAYS_RO[(dt.getDay() + 6) % 7].slice(0, 2);
+    headHtml += `<th>Z${d}<br><span style="font-weight:500;opacity:0.75;">${wdShort}</span></th>`;
+  }
+  headHtml += `<th>Total Lună</th><th>Total General</th></tr>`;
+
+  const bodyHtml = clients.map(c => {
+    const stats = getClientStats(c);
+    const orderedDays = new Set();
+    stats.orderDates.forEach(ds => {
+      if (ds.startsWith(prefix)) {
+        const dayNum = parseInt(ds.slice(8, 10), 10);
+        if (dayNum >= 1 && dayNum <= daysInMonth) orderedDays.add(dayNum);
+      }
+    });
+
+    let cells = `<td>${esc(c.name)}</td><td>${esc(getCityCategoryLabel(c.cityKey))}</td>`;
+    for (let d = 1; d <= daysInMonth; d++) {
+      const hasOrder = orderedDays.has(d);
+      cells += `<td>${hasOrder ? `<span class="day-yes">DA</span>` : `<span style="color:var(--text-muted);">·</span>`}</td>`;
+    }
+    cells += `<td style="font-weight:800;color:var(--c-active);">${orderedDays.size}</td>`;
+    cells += `<td style="font-weight:800;color:var(--accent);">${stats.allTotalCount}</td>`;
+    return `<tr>${cells}</tr>`;
+  }).join("");
+
+  table.innerHTML = `<thead>${headHtml}</thead><tbody>${bodyHtml || `<tr><td colspan="${daysInMonth + 4}">Fără date</td></tr>`}</tbody>`;
+}
+
+function sortClients(list, mode) {
+  const arr = list.slice();
+  switch (mode) {
+    case "cur_month_desc":
+      return arr.sort((a, b) => getClientStats(b).curMonthCount - getClientStats(a).curMonthCount || b.stars - a.stars);
+    case "all_total_desc":
+      return arr.sort((a, b) => getClientStats(b).allTotalCount - getClientStats(a).allTotalCount || b.stars - a.stars);
+    case "prev_month_desc":
+      return arr.sort((a, b) => getClientStats(b).prevMonthCount - getClientStats(a).prevMonthCount || b.stars - a.stars);
+    case "name_asc":
+      return arr.sort((a, b) => a.name.localeCompare(b.name, "ro"));
+    case "stars_desc":
+    default:
+      return arr.sort((a, b) => b.stars - a.stars || b.score - a.score || a.name.localeCompare(b.name, "ro"));
+  }
+}
+
+function getFilteredClients() {
+  const q = norm(document.getElementById("searchInput").value);
+
+  return clients.filter(c => {
+    const st = getStatusInfo(c).code;
+    if (statusFilter !== "ALL" && st !== statusFilter) return false;
+    if (selectedCityCategory !== "ALL" && c.cityKey !== selectedCityCategory) return false;
+    if (q) {
+      const cityLabel = getCityCategoryLabel(c.cityKey);
+      const hay = norm(c.name + " " + cityLabel + " " + getStatusInfo(c).label);
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+}
+
+function renderViews() {
+  renderCityCategoryBar();
+
+  const filtered = getFilteredClients();
+  const sortMode = document.getElementById("sortSelect").value;
+
+  let sumCurMonth = 0;
+  let sumPrevMonth = 0;
+  let sumAllTotal = 0;
+
+  filtered.forEach(c => {
+    const st = getClientStats(c);
+    sumCurMonth += st.curMonthCount;
+    sumPrevMonth += st.prevMonthCount;
+    sumAllTotal += st.allTotalCount;
+  });
+
+  document.getElementById("kpiTotal").textContent = filtered.length;
+  document.getElementById("kpiCurMonth").textContent = sumCurMonth;
+  document.getElementById("kpiPrevMonth").textContent = sumPrevMonth;
+  document.getElementById("kpiAllTotal").textContent = sumAllTotal;
+
+  const grouped = new Map();
+  filtered.forEach(c => {
+    if (!grouped.has(c.cityKey)) grouped.set(c.cityKey, []);
+    grouped.get(c.cityKey).push(c);
+  });
+
+  const sortedCityKeys = Array.from(grouped.keys()).sort((a, b) => {
+    if (norm(a).includes("bucuresti")) return -1;
+    if (norm(b).includes("bucuresti")) return 1;
+    if (a === EMPTY_CITY_KEY) return 1;
+    if (b === EMPTY_CITY_KEY) return -1;
+    return grouped.get(b).length - grouped.get(a).length || a.localeCompare(b, "ro");
+  });
+
+  const container = document.getElementById("citiesListContainer");
+  if (!sortedCityKeys.length) {
+    container.innerHTML = `<div class="empty-box">Niciun client nu corespunde criteriilor de căutare sau filtrare.</div>`;
+  } else {
+    container.innerHTML = sortedCityKeys.map(cityKey => {
+      const cityLabel = getCityCategoryLabel(cityKey);
+      const items = sortClients(grouped.get(cityKey), sortMode);
+      const cityAvg = (items.reduce((s, x) => s + x.stars, 0) / items.length).toFixed(1);
+      const isCollapsed = collapsedCities.has(cityKey);
+
+      return `
+        <div class="city-block">
+          <div class="city-header" onclick="toggleCityCollapse('${escJs(cityKey)}', event)">
+            <div class="city-title-wrap">
+              <div class="city-name">${esc(cityLabel)}</div>
+              <span class="city-badge">${items.length} clienți</span>
+            </div>
+            <div class="city-right-meta">
+              <div class="city-avg">Medie: ${cityAvg} ★</div>
+              <button type="button" class="collapse-btn" onclick="toggleCityCollapse('${escJs(cityKey)}', event)">
+                ${isCollapsed ? "Extinde +" : "Restrânge −"}
+              </button>
+            </div>
+          </div>
+
+          <div class="city-clients-wrap ${isCollapsed ? "collapsed" : ""}">
+            ${items.map(c => {
+              const st = getStatusInfo(c);
+              const isGray = st.code === "INACTIVE";
+              const stats = getClientStats(c);
+              const daysTag = stats.preferredDays.length ? stats.preferredDays.join(", ") : "Fără zile salvate";
+              return `
+                <div class="client-card">
+                  <div class="client-left">
+                    <div class="client-name-row">
+                      <span class="client-name">${esc(c.name)}</span>
+                      <button type="button" class="btn-detail-mini" onclick="openClientReport('${escJs(c.key)}')">Comparație lunară & zile</button>
+                    </div>
+                    <div class="client-tags">
+                      <span class="pill ${st.pillClass}">${esc(st.label)}</span>
+                      <span class="pill pill-neutral">${esc(cityLabel)}</span>
+                      <span class="pill pill-month">Luna curentă: ${stats.curMonthCount}</span>
+                      <span class="pill pill-neutral">Luna trecută: ${stats.prevMonthCount}</span>
+                      <span class="pill pill-day">Total general: ${stats.allTotalCount}</span>
+                      <span class="pill pill-day">${esc(daysTag)}</span>
+                    </div>
+                  </div>
+
+                  <div class="star-box ${isGray ? "gray" : "gold"}">
+                    <div class="star-icons">${starIcons(c.stars)}</div>
+                    <div class="star-num">${c.stars} / 5 stele</div>
+                    <div class="star-meta">${c.grayPct}% gri</div>
+                  </div>
+                </div>
+              `;
+            }).join("")}
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  const tbody = document.getElementById("citySummaryBody");
+  tbody.innerHTML = sortedCityKeys.map(cityKey => {
+    const cityLabel = getCityCategoryLabel(cityKey);
+    const items = grouped.get(cityKey);
+    let cCur = 0, cPrev = 0, cAll = 0;
+    items.forEach(x => {
+      const s = getClientStats(x);
+      cCur += s.curMonthCount;
+      cPrev += s.prevMonthCount;
+      cAll += s.allTotalCount;
+    });
+    const avg = (items.reduce((s, x) => s + x.stars, 0) / items.length).toFixed(1);
+    return `
+      <tr class="clickable-row" onclick="selectCityCategoryFromMgmt('${escJs(cityKey)}')">
+        <td><b>${esc(cityLabel)}</b></td>
+        <td>${items.length}</td>
+        <td style="color:var(--c-active);font-weight:700;">${cCur}</td>
+        <td style="color:var(--c-low);font-weight:700;">${cPrev}</td>
+        <td style="color:var(--accent);font-weight:800;">${cAll}</td>
+        <td style="color:var(--gold);font-weight:700;">${avg} ★</td>
+      </tr>
+    `;
+  }).join("") || `<tr><td colspan="6" style="text-align:center;color:var(--text-secondary);">Fără date</td></tr>`;
+
+  updateMgmtMap(filtered);
+}
+
+function selectCityCategoryFromMgmt(cityKey) {
+  selectedCityCategory = cityKey;
+  const tabBtn = document.querySelector('.nav-tab[data-tab="cities"]');
+  if (tabBtn) switchTab("cities", tabBtn);
+  renderViews();
+}
+
+function exportCsv() {
+  const list = sortClients(getFilteredClients(), document.getElementById("sortSelect").value);
+  const rows = [["Categorie Oras", "Nume Client", "Luna Curenta", "Luna Trecuta", "Total General", "Stele", "Zile Saptamana"]];
+  list.forEach(c => {
+    const s = getClientStats(c);
+    rows.push([
+      getCityCategoryLabel(c.cityKey),
+      c.name,
+      s.curMonthCount,
+      s.prevMonthCount,
+      s.allTotalCount,
+      c.stars,
+      s.preferredDays.join(" | ")
+    ]);
+  });
+
+  const csv = "\uFEFF" + rows.map(r => r.map(v => `"${String(v ?? "").replace(/"/g, '""')}"`).join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "clasament-clienti-comparatie-lunara-si-total.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function esc(s) {
+  return String(s || "").replace(/[&<>"']/g, m => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[m]));
+}
+
+function escJs(s) {
+  return String(s || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+}
+
+initMap();
+loadData();
+</script>
+</body>
+</html>
