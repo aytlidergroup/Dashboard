@@ -2,64 +2,36 @@
 <html lang="ro"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#3e2a1e">
+<meta name="theme-color" content="#b88954">
+<link rel="icon" type="image/jpeg" href="logo.jpg">
+<link rel="apple-touch-icon" href="logo.jpg">
 <title>Clasament Clienți</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
-:root{
-  --bg:#f4efe6;
-  --glass:rgba(240,230,210,.6);
-  --glass2:rgba(240,230,210,.85);
-  --stroke:rgba(160,120,70,.3);
-  --shadow:0 8px 32px rgba(62,42,30,.13);
-  --tx:#3e2a1e;
-  --tx2:#7a5a4a;
-  --ac:#c8965a;
-  --ok:#6a8a5a;
-  --lo:#d4a04a;
-  --bad:#b85a4a;
-  --gray:#c4c8d4;
-  --gold:#c8965a;
-  --row:rgba(120,100,80,.14)
-}
-@media(prefers-color-scheme:dark){
-  :root{
-    --bg:#1a1410;
-    --glass:rgba(40,32,24,.5);
-    --glass2:rgba(55,44,34,.65);
-    --stroke:rgba(200,160,110,.2);
-    --shadow:0 10px 40px rgba(0,0,0,.5);
-    --tx:#f0e6d2;
-    --tx2:#a89078;
-    --gray:#4b4238;
-    --row:rgba(255,240,210,.08);
-    --ac:#d4a86a;
-    --ok:#7a9a68;
-    --lo:#e0b060;
-    --bad:#c86a5a;
-  }
-}
+:root{--bg:#f6f1eb;--glass:rgba(255,250,244,.68);--glass2:rgba(255,252,248,.9);--stroke:rgba(184,137,84,.28);--shadow:0 8px 32px rgba(45,27,10,.12);--tx:#1e1309;--tx2:#6d5844;--ac:#b88954;--ok:#2fb355;--lo:#e5941c;--bad:#e04338;--gray:#cfc5b8;--gold:#e6a93c;--row:rgba(184,137,84,.14)}
+@media(prefers-color-scheme:dark){:root{--bg:#120b06;--glass:rgba(43,28,16,.58);--glass2:rgba(62,41,24,.72);--stroke:rgba(184,137,84,.24);--shadow:0 10px 40px rgba(0,0,0,.55);--tx:#fbf6ef;--tx2:#b9a48e;--gray:#574434;--row:rgba(184,137,84,.13)}}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;font:15px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",system-ui,sans-serif;color:var(--tx);background:var(--bg);min-height:100vh;padding:env(safe-area-inset-top) 0 calc(112px + env(safe-area-inset-bottom))}
-body:before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(60vmax 60vmax at 5% -10%,rgba(200,150,90,.3),transparent 60%),radial-gradient(50vmax 50vmax at 100% 5%,rgba(160,110,60,.25),transparent 60%),radial-gradient(60vmax 60vmax at 60% 115%,rgba(120,140,100,.2),transparent 60%)}
+body:before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(60vmax 60vmax at 5% -10%,rgba(184,137,84,.28),transparent 60%),radial-gradient(50vmax 50vmax at 100% 5%,rgba(138,86,44,.22),transparent 60%),radial-gradient(60vmax 60vmax at 60% 115%,rgba(184,137,84,.16),transparent 60%)}
 .wrap{max-width:1100px;margin:0 auto;padding:0 16px}
-.glass{background:var(--glass);-webkit-backdrop-filter:blur(28px) saturate(180%);backdrop-filter:blur(28px) saturate(180%);border:1px solid var(--stroke);border-radius:26px;box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.15)}
-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:26px 0 14px}
-.logo-container{display:flex;align-items:center;gap:12px}
-.logo-container img{width:52px;height:52px;border-radius:14px;object-fit:cover;border:2px solid var(--stroke)}
-h1{margin:0;font-size:34px;letter-spacing:-.8px;font-weight:800}
+.glass{background:var(--glass);-webkit-backdrop-filter:blur(28px) saturate(180%);backdrop-filter:blur(28px) saturate(180%);border:1px solid var(--stroke);border-radius:26px;box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.25)}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:22px 0 14px}
+.brand{display:flex;align-items:center;gap:12px}
+#appLogo{width:50px;height:50px;border-radius:15px;object-fit:cover;border:1px solid var(--stroke);box-shadow:0 6px 18px rgba(0,0,0,.22);background:#2d1c0c}
+h1{margin:0;font-size:32px;letter-spacing:-.8px;font-weight:800}
 #sub{color:var(--tx2);font-size:13px;margin-top:2px}
-.btn{border:0;font:inherit;font-weight:600;color:var(--ac);padding:10px 16px;border-radius:999px;cursor:pointer;background:var(--glass2);border:1px solid var(--stroke)}
+.btn{border:0;font:inherit;font-weight:600;color:var(--tx);padding:10px 16px;border-radius:999px;cursor:pointer;background:var(--glass2);border:1px solid var(--stroke)}
 .btn.spin{opacity:.5;pointer-events:none}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:14px}
-.kpi{padding:16px 18px}.kpi b{display:block;font-size:30px;letter-spacing:-1px}.kpi span{color:var(--tx2);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.kpi{padding:16px 18px}.kpi b{display:block;font-size:30px;letter-spacing:-1px;color:var(--ac)}.kpi span{color:var(--tx2);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
 .panel{padding:14px;margin-bottom:14px}
 input,select{font:inherit;color:var(--tx);background:var(--row);border:0;border-radius:14px;padding:11px 14px;outline:0;width:100%}
+select option{background:#24160b;color:#fbf6ef}
 .row{display:grid;grid-template-columns:2fr 1fr;gap:10px}
 .chips{display:flex;gap:8px;overflow-x:auto;padding:10px 0 2px;scrollbar-width:none}
 .chip{flex:none;border:0;font:inherit;font-size:13px;font-weight:600;color:var(--tx);background:var(--row);padding:8px 14px;border-radius:999px;cursor:pointer}
-.chip.on{background:var(--ac);color:#fff}
+.chip.on{background:var(--ac);color:#170e06}
 details{margin-bottom:12px}summary{list-style:none;cursor:pointer;padding:6px 6px 10px;font-weight:700;font-size:17px;display:flex;justify-content:space-between;align-items:center}
 summary::-webkit-details-marker{display:none}summary small{color:var(--tx2);font-weight:500;font-size:12px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
@@ -73,10 +45,10 @@ summary::-webkit-details-marker{display:none}summary small{color:var(--tx2);font
 .tbl{overflow:auto;border-radius:18px}table{border-collapse:collapse;width:100%;font-size:13px}
 th,td{padding:9px 10px;text-align:left;white-space:nowrap;border-bottom:1px solid var(--row)}th{color:var(--tx2);font-size:11px;text-transform:uppercase;position:sticky;top:0;background:var(--glass2)}
 .mx td,.mx th{text-align:center;padding:6px 5px;min-width:30px}.mx td:first-child,.mx th:first-child{text-align:left;position:sticky;left:0;background:var(--glass2);z-index:1;min-width:140px}
-.dot{display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--ok)}.today{background:rgba(200,150,90,.18)}
+.dot{display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--ok)}.today{background:rgba(184,137,84,.22)}
 .h{font-weight:700;font-size:17px;margin:2px 4px 12px}
-.bars{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;align-items:end;height:110px;margin:8px 0}.bars div{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;font-size:11px;color:var(--tx2)}.bars i{display:block;width:100%;border-radius:8px;background:linear-gradient(var(--ac),#8a6a4a);min-height:4px}
-.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;text-align:center;font-size:12px;max-width:320px}.cal span{padding:7px 0;border-radius:10px;background:var(--row)}.cal span.y{background:var(--ok);color:#fff;font-weight:700}.cal span.e{background:none}
+.bars{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;align-items:end;height:110px;margin:8px 0}.bars div{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;font-size:11px;color:var(--tx2)}.bars i{display:block;width:100%;border-radius:8px;background:linear-gradient(var(--ac),#855829);min-height:4px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;text-align:center;font-size:12px;max-width:320px}.cal span{padding:7px 0;border-radius:10px;background:var(--row)}.cal span.y{background:var(--ac);color:#170e06;font-weight:700}.cal span.e{background:none}
 .two{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
 #map{height:440px;border-radius:20px;overflow:hidden;z-index:0}#mnote{color:var(--tx2);font-size:12px;margin:10px 4px 0}
 .err{padding:22px;text-align:center;color:var(--bad);font-weight:600}
@@ -87,13 +59,9 @@ nav button i{font-style:normal;font-size:19px}nav button.on{background:var(--gla
 </style></head><body>
 <div class="wrap">
 <header>
-  <div class="logo-container">
-    <!-- آدرس تصویر لوگوی خود را اینجا قرار دهید -->
-    <img src="URL_عکس_لوگو_شما" alt="Logo">
-    <div>
-      <h1>Clienți</h1>
-      <div id="sub">Se încarcă…</div>
-    </div>
+  <div class="brand">
+    <img id="appLogo" src="logo.jpg" alt="AYT Clienți" onerror="this.style.display='none'">
+    <div><h1>Clienți</h1><div id="sub">Se încarcă…</div></div>
   </div>
   <button class="btn" id="sync" onclick="load()">↻ Actualizează</button>
 </header>
@@ -221,14 +189,14 @@ function drawMap(){
   if(typeof L==="undefined"){note.textContent="Leaflet nu s-a încărcat (verifică internetul / blocarea unpkg.com).";return}
   if(!map){
     map=L.map("map").setView([45.94,24.97],6);
-    // استفاده از OpenStreetMap بدون نیاز به کلید API
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      maxZoom: 19
-    }).addTo(map);
+    const osm=L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"&copy; OpenStreetMap contributors",maxZoom:19});
+    const esri=L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",{attribution:"Tiles &copy; Esri",maxZoom:19});
+    let tileErr=0;
+    osm.on("tileerror",()=>{tileErr++;if(tileErr>=4&&!map.hasLayer(esri)){map.removeLayer(osm);esri.addTo(map);note.textContent="S-a comutat automat pe harta alternativă (Esri)."}});
+    osm.addTo(map);
     pins=L.layerGroup().addTo(map);
   }
-  setTimeout(()=>{map.invalidateSize();pins.clearLayers();const pts=[],miss=[],col={ok:"#6a8a5a",lo:"#d4a04a",bad:"#b85a4a"};
+  setTimeout(()=>{map.invalidateSize();pins.clearLayers();const pts=[],miss=[],col={ok:"#2fb355",lo:"#e5941c",bad:"#e04338"};
     clients.forEach(c=>{if(!c.coords){miss.push(c.name);return}pts.push(c.coords);const[,l,k]=status(c);
       L.circleMarker(c.coords,{radius:9,color:"#fff",weight:2,fillColor:col[k],fillOpacity:.95}).addTo(pins).bindPopup(`<b>${esc(c.name)}</b><br>${esc(c.city)}<br>${l} • ${c.stars}/5<br>Luna asta: ${c.cur}`)});
     if(pts.length)map.fitBounds(L.latLngBounds(pts),{padding:[30,30],maxZoom:12});
