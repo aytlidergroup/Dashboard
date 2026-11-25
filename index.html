@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ro"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0b0d14">
+<title>Clasament Clienți</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{--bg:#eef1f8;--glass:rgba(255,255,255,.6);--glass2:rgba(255,255,255,.85);--stroke:rgba(255,255,255,.75);--shadow:0 8px 32px rgba(30,40,90,.13);--tx:#0b1020;--tx2:#5b6479;--ac:#0a84ff;--ok:#30d158;--lo:#ff9f0a;--bad:#ff453a;--gray:#c4c8d4;--gold:#ffcc00;--row:rgba(120,130,160,.14)}
+@media(prefers-color-scheme:dark){:root{--bg:#06070d;--glass:rgba(40,44,66,.5);--glass2:rgba(62,68,96,.65);--stroke:rgba(255,255,255,.14);--shadow:0 10px 40px rgba(0,0,0,.5);--tx:#f5f6fb;--tx2:#9aa2b8;--gray:#4b5062;--row:rgba(255,255,255,.08)}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font:15px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",system-ui,sans-serif;color:var(--tx);background:var(--bg);min-height:100vh;padding:env(safe-area-inset-top) 0 calc(112px + env(safe-area-inset-bottom))}
+body:before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(60vmax 60vmax at 5% -10%,rgba(10,132,255,.38),transparent 60%),radial-gradient(50vmax 50vmax at 100% 5%,rgba(191,90,242,.3),transparent 60%),radial-gradient(60vmax 60vmax at 60% 115%,rgba(48,209,88,.24),transparent 60%)}
+.wrap{max-width:1100px;margin:0 auto;padding:0 16px}
+.glass{background:var(--glass);-webkit-backdrop-filter:blur(28px) saturate(180%);backdrop-filter:blur(28px) saturate(180%);border:1px solid var(--stroke);border-radius:26px;box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.35)}
+header{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:26px 0 14px}
+h1{margin:0;font-size:34px;letter-spacing:-.8px;font-weight:800}
+#sub{color:var(--tx2);font-size:13px;margin-top:2px}
+.btn{border:0;font:inherit;font-weight:600;color:var(--ac);padding:10px 16px;border-radius:999px;cursor:pointer;background:var(--glass2);border:1px solid var(--stroke)}
+.btn.spin{opacity:.5;pointer-events:none}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:14px}
+.kpi{padding:16px 18px}.kpi b{display:block;font-size:30px;letter-spacing:-1px}.kpi span{color:var(--tx2);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.panel{padding:14px;margin-bottom:14px}
+input,select{font:inherit;color:var(--tx);background:var(--row);border:0;border-radius:14px;padding:11px 14px;outline:0;width:100%}
+.row{display:grid;grid-template-columns:2fr 1fr;gap:10px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:10px 0 2px;scrollbar-width:none}
+.chip{flex:none;border:0;font:inherit;font-size:13px;font-weight:600;color:var(--tx);background:var(--row);padding:8px 14px;border-radius:999px;cursor:pointer}
+.chip.on{background:var(--ac);color:#fff}
+details{margin-bottom:12px}summary{list-style:none;cursor:pointer;padding:6px 6px 10px;font-weight:700;font-size:17px;display:flex;justify-content:space-between;align-items:center}
+summary::-webkit-details-marker{display:none}summary small{color:var(--tx2);font-weight:500;font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+.card{padding:16px;cursor:pointer;transition:transform .2s}.card:active{transform:scale(.97)}
+.card h3{margin:0 0 4px;font-size:16px}.card .m{display:flex;justify-content:space-between;align-items:center;color:var(--tx2);font-size:12px}
+.stars{letter-spacing:2px;font-size:19px;background:linear-gradient(90deg,var(--gold) var(--p),var(--gray) var(--p));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+.pill{font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;color:#fff}.pill.ok{background:var(--ok)}.pill.lo{background:var(--lo)}.pill.bad{background:var(--bad)}
+.nums{display:flex;gap:6px;margin:10px 0 8px}.nums div{flex:1;background:var(--row);border-radius:12px;padding:7px 4px;text-align:center}.nums b{display:block;font-size:17px}.nums span{font-size:10px;color:var(--tx2)}
+.tag{display:inline-block;font-size:11px;background:var(--row);padding:2px 8px;border-radius:8px;margin:2px 2px 0 0}
+.sec{display:none}.sec.on{display:block}
+.tbl{overflow:auto;border-radius:18px}table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{padding:9px 10px;text-align:left;white-space:nowrap;border-bottom:1px solid var(--row)}th{color:var(--tx2);font-size:11px;text-transform:uppercase;position:sticky;top:0;background:var(--glass2)}
+.mx td,.mx th{text-align:center;padding:6px 5px;min-width:30px}.mx td:first-child,.mx th:first-child{text-align:left;position:sticky;left:0;background:var(--glass2);z-index:1;min-width:140px}
+.dot{display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--ok)}.today{background:rgba(10,132,255,.14)}
+.h{font-weight:700;font-size:17px;margin:2px 4px 12px}
+.bars{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;align-items:end;height:110px;margin:8px 0}.bars div{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;font-size:11px;color:var(--tx2)}.bars i{display:block;width:100%;border-radius:8px;background:linear-gradient(var(--ac),#5e5ce6);min-height:4px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;text-align:center;font-size:12px;max-width:320px}.cal span{padding:7px 0;border-radius:10px;background:var(--row)}.cal span.y{background:var(--ok);color:#fff;font-weight:700}.cal span.e{background:none}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+#map{height:440px;border-radius:20px;overflow:hidden;z-index:0}#mnote{color:var(--tx2);font-size:12px;margin:10px 4px 0}
+.err{padding:22px;text-align:center;color:var(--bad);font-weight:600}
+nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom));z-index:999;display:flex;gap:4px;padding:6px;border-radius:999px;max-width:calc(100% - 20px)}
+nav button{border:0;background:none;font:inherit;font-size:11px;font-weight:600;color:var(--tx2);padding:8px 14px;border-radius:999px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px}
+nav button i{font-style:normal;font-size:19px}nav button.on{background:var(--glass2);color:var(--ac)}
+@media(max-width:560px){h1{font-size:28px}.row{grid-template-columns:1fr}nav button{padding:8px 10px}}
+</style></head><body>
+<div class="wrap">
+<header><div><h1>Clienți</h1><div id="sub">Se încarcă…</div></div><button class="btn" id="sync" onclick="load()">↻ Actualizează</button></header>
+
+<section class="sec on" id="t-cities">
+<div class="kpis" id="kpis"></div>
+<div class="glass panel"><div class="row"><input id="q" type="search" placeholder="Caută client sau oraș…" oninput="drawCities()">
+<select id="sort" onchange="drawCities()"><option value="stars">Stele</option><option value="cur">Luna curentă</option><option value="total">Total</option><option value="name">Nume A–Z</option></select></div>
+<div class="chips" id="stChips"></div><div class="chips" id="cityChips"></div></div>
+<div id="cities"></div></section>
+
+<section class="sec" id="t-report">
+<div class="glass panel"><select id="clSel" onchange="drawReport()"></select></div>
+<div id="report"></div>
+<div class="glass panel"><div class="h">Comparație toți clienții</div><div class="tbl"><table><thead><tr><th>Client</th><th>Oraș</th><th>Luna curentă</th><th>Luna trecută</th><th>Diferență</th><th>Total</th><th>Zile preferate</th></tr></thead><tbody id="cmp"></tbody></table></div></div></section>
+
+<section class="sec" id="t-month">
+<div class="glass panel"><div class="row"><div class="h" style="margin:8px 4px">Tabel lunar pe zile</div><select id="mSel" onchange="drawMonth()"></select></div>
+<div class="tbl" style="max-height:70vh"><table class="mx" id="mx"></table></div></div></section>
+
+<section class="sec" id="t-map">
+<div class="glass panel"><div class="h">Hartă clienți</div><div id="map"></div><div id="mnote"></div></div>
+<div class="glass panel"><div class="h">Sinteză pe orașe</div><div class="tbl"><table><thead><tr><th>Oraș</th><th>Clienți</th><th>Luna curentă</th><th>Luna trecută</th><th>Total</th><th>Stele medii</th></tr></thead><tbody id="citySum"></tbody></table></div></div></section>
+</div>
+
+<nav class="glass" id="nav">
+<button class="on" data-t="cities"><i>★</i>Clasament</button><button data-t="report"><i>◔</i>Raport</button><button data-t="month"><i>▦</i>Lunar</button><button data-t="map"><i>◉</i>Hartă</button></nav>
+
+<script>
+const API_URL="https://script.google.com/macros/s/AKfycbwpgSay-TcwgATir5HFTN3WbPyox1JAPTs6nOJ2AXfqBZ45-182Si8pbh_gL-LQDteJ6Q/exec";
+const WD=["Luni","Marți","Miercuri","Joi","Vineri","Sâmbătă","Duminică"],NOCITY="Fără oraș";
+const CITY={"bucuresti":[44.4268,26.1025],"popesti-leordeni":[44.3806,26.1714],"voluntari":[44.4906,26.1539],"pantelimon":[44.45,26.2],"buftea":[44.5667,25.95],"otopeni":[44.55,26.075],"chiajna":[44.4583,25.9833],"bragadiru":[44.3711,25.9756],"cluj-napoca":[46.7712,23.6236],"timisoara":[45.7489,21.2087],"iasi":[47.1585,27.6014],"constanta":[44.1598,28.6348],"brasov":[45.6579,25.6012],"craiova":[44.3302,23.7949],"galati":[45.4353,28.008],"ploiesti":[44.9462,26.0254],"oradea":[47.0465,21.9189],"braila":[45.2692,27.9575],"arad":[46.1866,21.3123],"pitesti":[44.8565,24.8692],"sibiu":[45.7983,24.1256],"bacau":[46.567,26.9146],"targu mures":[46.5424,24.5575],"baia mare":[47.6567,23.585],"buzau":[45.15,26.8333],"botosani":[47.7486,26.6694],"satu mare":[47.79,22.8857],"suceava":[47.6514,26.2555],"focsani":[45.6969,27.1833],"targu jiu":[45.0378,23.2747],"tulcea":[45.1667,28.8],"alba iulia":[46.0733,23.58],"giurgiu":[43.9037,25.9699],"deva":[45.8833,22.9],"slobozia":[44.5639,27.3661],"alexandria":[43.97,25.3333]};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const norm=v=>String(v||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/\s+/g," ").trim();
+const p2=n=>String(n).padStart(2,"0"),ymOf=(y,m)=>y+"-"+p2(m+1);
+const NOW=new Date(),CUR=ymOf(NOW.getFullYear(),NOW.getMonth()),PD=new Date(NOW.getFullYear(),NOW.getMonth()-1,1),PREV=ymOf(PD.getFullYear(),PD.getMonth());
+let clients=[],pat={},months={},city="ALL",stF="ALL",map,pins,tab="cities";
+
+function dstr(r){if(!r)return"";const s=String(r).trim();let m=s.match(/^\d{4}-\d{2}-\d{2}/);if(m)return m[0];m=s.match(/^(\d{1,2})[./-](\d{1,2})[./-](\d{4})/);return m?`${m[3]}-${p2(m[2])}-${p2(m[1])}`:""}
+const wdOf=ds=>WD[(new Date(ds+"T12:00:00").getDay()+6)%7];
+function status(c){if(!c.isActive||c.grayPct>=100)return["INACTIVE","Inactiv","bad"];if(c.stars>=4||c.score>=2)return["ACTIVE","Activ","ok"];return["LOW","Puțin activ","lo"]}
+const stars=c=>`<span class="stars" style="--p:${100-c.grayPct}%">★★★★★</span>`;
+function coords(loc,cty){
+  if(loc){let a=parseFloat(String(loc.lat).replace(",",".")),b=parseFloat(String(loc.lng).replace(",","."));
+    if(isFinite(a)&&isFinite(b)){if((a<43||a>49)&&b>=43&&b<=49)[a,b]=[b,a];return[a,b]}}
+  const n=norm(cty);if(CITY[n])return CITY[n];const k=Object.keys(CITY).find(k=>n&&n.includes(k));return k?CITY[k]:null}
+
+async function load(){
+  $("sync").classList.add("spin");$("sub").textContent="Se sincronizează…";
+  try{
+    const r=await fetch(API_URL+"?t="+Date.now(),{cache:"no-store"});
+    const txt=await r.text();let d;
+    try{d=JSON.parse(txt)}catch(e){throw new Error("Răspunsul nu e JSON. Re-publică Web App-ul (Execute as: Me, Access: Anyone) și autorizează scriptul.")}
+    if(d.status==="error")throw new Error(d.message);
+    pat={};Object.entries(d.clientPatterns||{}).forEach(([k,v])=>pat[norm(k)]=v);
+    months={};Object.entries(d.monthlyReports||{}).forEach(([n,v])=>{const m=n.match(/(\d{4})[_-](\d{2})/);if(!m)return;const rows={};(v.rows||[]).forEach(x=>rows[norm(x.name)]=(x.days||[]).map(Number));months[m[1]+"-"+m[2]]={days:v.daysInMonth||new Date(+m[1],+m[2],0).getDate(),rows}});
+    const loc={};Object.entries(d.allLocations||{}).forEach(([k,v])=>loc[norm(k)]=v);
+    (d.courses||[]).forEach(co=>(co.customers||[]).forEach(cu=>{const k=norm(cu.name);if(k&&cu.location&&!loc[k])loc[k]=cu.location}));
+    const mp=new Map();
+    Object.values(d.rankings||{}).forEach(r=>{if(!r||!r.name)return;const k=norm(r.name),l=loc[k]||null;
+      const ct=String(r.colG??(l&&l.colG)??"").trim()||NOCITY,st=Math.max(1,Math.min(5,Math.round(+r.stars||1)));
+      mp.set(k,{key:k,name:String(r.name).trim(),city:ct,stars:st,grayPct:typeof r.grayPct==="number"?r.grayPct:100-(st-1)*25,score:+r.score||0,isActive:r.isActive!==false,coords:coords(l,ct)})});
+    (d.courses||[]).forEach(co=>(co.customers||[]).forEach(cu=>{const k=norm(cu.name);if(!k||mp.has(k))return;const l=loc[k]||null,ct=String(l&&l.colG||"").trim()||NOCITY,ok=cu.status==="Complet";
+      mp.set(k,{key:k,name:String(cu.name).trim(),city:ct,stars:ok?3:1,grayPct:ok?50:100,score:ok?1:-3,isActive:ok,coords:coords(l,ct)})}));
+    clients=[...mp.values()].sort((a,b)=>a.name.localeCompare(b.name,"ro"));
+    derive();$("sub").textContent="Actualizat "+NOW.toLocaleDateString("ro-RO")+" • "+new Date().toLocaleTimeString("ro-RO",{hour:"2-digit",minute:"2-digit"});
+    fillSelects();drawAll();
+  }catch(e){$("sub").textContent="Eroare la încărcare";$("cities").innerHTML=`<div class="glass err">${esc(e.message)}<br><br><button class="btn" onclick="load()">Reîncearcă</button></div>`}
+  $("sync").classList.remove("spin")}
+
+function derive(){clients.forEach(c=>{
+  const s=new Set(((pat[c.key]||{}).orderDates||[]).map(dstr).filter(Boolean));
+  Object.entries(months).forEach(([ym,mo])=>(mo.rows[c.key]||[]).forEach(d=>s.add(ym+"-"+p2(d))));
+  c.dates=[...s].sort();c.cur=c.dates.filter(d=>d.startsWith(CUR)).length;c.prev=c.dates.filter(d=>d.startsWith(PREV)).length;
+  c.total=Math.max(c.dates.length,+(pat[c.key]||{}).totalOrdersRecorded||0);
+  c.freq=Object.fromEntries(WD.map(w=>[w,0]));c.dates.forEach(d=>c.freq[wdOf(d)]++);
+  c.pref=WD.filter(w=>c.freq[w]).sort((a,b)=>c.freq[b]-c.freq[a]);c.last=c.dates[c.dates.length-1]||"-"})}
+
+function fillSelects(){
+  const cur=$("clSel").value;$("clSel").innerHTML=clients.map(c=>`<option value="${esc(c.key)}">${esc(c.name)}</option>`).join("");if(cur)$("clSel").value=cur;
+  const ks=new Set([CUR,PREV,...Object.keys(months)]);clients.forEach(c=>c.dates.forEach(d=>ks.add(d.slice(0,7))));
+  const old=$("mSel").value||CUR;$("mSel").innerHTML=[...ks].sort().reverse().map(k=>`<option value="${k}">${k}</option>`).join("");$("mSel").value=ks.has(old)?old:CUR}
+function drawAll(){drawCities();drawReport();drawMonth();drawSummary();if(tab==="map")drawMap()}
+
+function drawCities(){
+  const act=clients.filter(c=>status(c)[0]!=="INACTIVE").length;
+  $("kpis").innerHTML=[["Clienți",clients.length],["Activi",act],["Luna curentă",sum("cur")],["Luna trecută",sum("prev")]].map(k=>`<div class="glass kpi"><b>${k[1]}</b><span>${k[0]}</span></div>`).join("");
+  const cities=[...new Set(clients.map(c=>c.city))].sort((a,b)=>a.localeCompare(b,"ro"));
+  $("stChips").innerHTML=[["ALL","Toate"],["ACTIVE","Activ"],["LOW","Puțin activ"],["INACTIVE","Inactiv"]].map(s=>`<button class="chip ${stF===s[0]?"on":""}" data-st="${s[0]}">${s[1]}</button>`).join("");
+  $("cityChips").innerHTML=`<button class="chip ${city==="ALL"?"on":""}" data-c="ALL">Toate orașele</button>`+cities.map(c=>`<button class="chip ${city===c?"on":""}" data-c="${esc(c)}">${esc(c)}</button>`).join("");
+  const q=norm($("q").value),so=$("sort").value;
+  const list=clients.filter(c=>(city==="ALL"||c.city===city)&&(stF==="ALL"||status(c)[0]===stF)&&(!q||norm(c.name+" "+c.city).includes(q)));
+  list.sort((a,b)=>so==="name"?a.name.localeCompare(b.name,"ro"):so==="cur"?b.cur-a.cur:so==="total"?b.total-a.total:(b.stars-a.stars)||(b.score-a.score));
+  const g={};list.forEach(c=>(g[c.city]=g[c.city]||[]).push(c));
+  $("cities").innerHTML=Object.keys(g).sort((a,b)=>a.localeCompare(b,"ro")).map(k=>`<details open><summary>${esc(k)}<small>${g[k].length} clienți • ${g[k].reduce((s,c)=>s+c.cur,0)} comenzi luna aceasta</small></summary><div class="grid">${g[k].map(card).join("")}</div></details>`).join("")||`<div class="glass err" style="color:var(--tx2)">Niciun client găsit.</div>`}
+const sum=f=>clients.reduce((s,c)=>s+c[f],0);
+function card(c){const[,l,k]=status(c);return`<div class="glass card" data-k="${esc(c.key)}"><div class="m"><h3>${esc(c.name)}</h3><span class="pill ${k}">${l}</span></div>${stars(c)} <span class="m" style="display:inline">${c.stars}/5</span>
+<div class="nums"><div><b>${c.cur}</b><span>Luna asta</span></div><div><b>${c.prev}</b><span>Trecută</span></div><div><b>${c.total}</b><span>Total</span></div></div>
+${c.pref.slice(0,3).map(w=>`<span class="tag">${w}</span>`).join("")||'<span class="tag">fără istoric</span>'}<div class="m" style="margin-top:6px">Ultima comandă: ${c.last}</div></div>`}
+
+function cal(c,ym){const[y,m]=ym.split("-").map(Number),n=new Date(y,m,0).getDate(),off=(new Date(y,m-1,1).getDay()+6)%7,days=new Set(c.dates.filter(d=>d.startsWith(ym)).map(d=>+d.slice(8)));
+  return`<div class="cal">${WD.map(w=>`<b style="font-size:10px;color:var(--tx2)">${w.slice(0,2)}</b>`).join("")}${'<span class="e"></span>'.repeat(off)}${Array.from({length:n},(_,i)=>`<span class="${days.has(i+1)?"y":""}">${i+1}</span>`).join("")}</div>`}
+function drawReport(){
+  const c=clients.find(x=>x.key===$("clSel").value);
+  if(c){const df=c.cur-c.prev,mx=Math.max(1,...WD.map(w=>c.freq[w])),[,l,k]=status(c);
+    $("report").innerHTML=`<div class="glass panel"><div class="m" style="display:flex;justify-content:space-between;align-items:center"><div><div class="h" style="margin:0">${esc(c.name)}</div><span style="color:var(--tx2)">${esc(c.city)}</span></div><span class="pill ${k}">${l}</span></div>${stars(c)}
+<div class="nums" style="margin-top:12px"><div><b>${c.cur}</b><span>${CUR}</span></div><div><b>${c.prev}</b><span>${PREV}</span></div><div><b style="color:var(--${df>=0?"ok":"bad"})">${df>0?"+":""}${df}</b><span>Diferență</span></div><div><b>${c.total}</b><span>Total</span></div></div>
+<div class="h" style="margin-top:14px">Zilele din săptămână</div><div class="bars">${WD.map(w=>`<div>${c.freq[w]}<i style="height:${c.freq[w]/mx*80}%"></i>${w.slice(0,2)}</div>`).join("")}</div></div>
+<div class="two"><div class="glass panel"><div class="h">${CUR}</div>${cal(c,CUR)}</div><div class="glass panel"><div class="h">${PREV}</div>${cal(c,PREV)}</div></div>`}
+  $("cmp").innerHTML=[...clients].sort((a,b)=>b.cur-a.cur).map(c=>{const d=c.cur-c.prev;return`<tr data-k="${esc(c.key)}"><td><b>${esc(c.name)}</b></td><td>${esc(c.city)}</td><td>${c.cur}</td><td>${c.prev}</td><td style="color:var(--${d>=0?"ok":"bad"})">${d>0?"+":""}${d}</td><td>${c.total}</td><td>${c.pref.slice(0,3).join(", ")||"-"}</td></tr>`}).join("")}
+
+function drawMonth(){
+  const ym=$("mSel").value||CUR,[y,m]=ym.split("-").map(Number),n=(months[ym]||{}).days||new Date(y,m,0).getDate(),td=ym===CUR?NOW.getDate():0,col=Array(n+1).fill(0);
+  let h=`<thead><tr><th>Client</th>${Array.from({length:n},(_,i)=>`<th class="${i+1===td?"today":""}">${i+1}<br>${WD[(new Date(y,m-1,i+1).getDay()+6)%7].slice(0,2)}</th>`).join("")}<th>Total</th></tr></thead><tbody>`;
+  clients.forEach(c=>{const s=new Set(c.dates.filter(d=>d.startsWith(ym)).map(d=>+d.slice(8)));s.forEach(d=>col[d]++);
+    h+=`<tr><td>${esc(c.name)}</td>${Array.from({length:n},(_,i)=>`<td class="${i+1===td?"today":""}">${s.has(i+1)?'<span class="dot"></span>':""}</td>`).join("")}<td><b>${s.size}</b></td></tr>`});
+  $("mx").innerHTML=h+`<tr><td><b>Total zi</b></td>${col.slice(1).map(v=>`<td><b>${v||""}</b></td>`).join("")}<td><b>${col.reduce((a,b)=>a+b,0)}</b></td></tr></tbody>`}
+
+function drawSummary(){const g={};clients.forEach(c=>(g[c.city]=g[c.city]||[]).push(c));
+  $("citySum").innerHTML=Object.entries(g).sort((a,b)=>b[1].length-a[1].length).map(([k,l])=>`<tr><td><b>${esc(k)}</b></td><td>${l.length}</td><td>${l.reduce((s,c)=>s+c.cur,0)}</td><td>${l.reduce((s,c)=>s+c.prev,0)}</td><td>${l.reduce((s,c)=>s+c.total,0)}</td><td>${(l.reduce((s,c)=>s+c.stars,0)/l.length).toFixed(1)} ★</td></tr>`).join("")}
+
+function drawMap(){
+  const note=$("mnote");
+  if(typeof L==="undefined"){note.textContent="Leaflet nu s-a încărcat (verifică internetul / blocarea unpkg.com).";return}
+  if(!map){map=L.map("map").setView([45.94,24.97],6);const dk=matchMedia("(prefers-color-scheme:dark)").matches;
+    L.tileLayer(`https://{s}.basemaps.cartocdn.com/${dk?"dark_all":"rastertiles/voyager"}/{z}/{x}/{y}{r}.png`,{attribution:"&copy; OpenStreetMap, &copy; CARTO",maxZoom:19}).addTo(map);pins=L.layerGroup().addTo(map)}
+  setTimeout(()=>{map.invalidateSize();pins.clearLayers();const pts=[],miss=[],col={ok:"#30d158",lo:"#ff9f0a",bad:"#ff453a"};
+    clients.forEach(c=>{if(!c.coords){miss.push(c.name);return}pts.push(c.coords);const[,l,k]=status(c);
+      L.circleMarker(c.coords,{radius:9,color:"#fff",weight:2,fillColor:col[k],fillOpacity:.95}).addTo(pins).bindPopup(`<b>${esc(c.name)}</b><br>${esc(c.city)}<br>${l} • ${c.stars}/5<br>Luna asta: ${c.cur}`)});
+    if(pts.length)map.fitBounds(L.latLngBounds(pts),{padding:[30,30],maxZoom:12});
+    note.textContent=`${pts.length} clienți pe hartă`+(miss.length?` • ${miss.length} fără coordonate: ${miss.slice(0,5).join(", ")}${miss.length>5?"…":""}`:"")},120)}
+
+function show(t){tab=t;document.querySelectorAll(".sec").forEach(s=>s.classList.toggle("on",s.id==="t-"+t));document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.t===t));scrollTo({top:0});if(t==="map")drawMap()}
+document.addEventListener("click",e=>{
+  const n=e.target.closest("#nav button");if(n)return show(n.dataset.t);
+  const s=e.target.closest("[data-st]");if(s){stF=s.dataset.st;return drawCities()}
+  const c=e.target.closest("[data-c]");if(c){city=c.dataset.c;return drawCities()}
+  const k=e.target.closest("[data-k]");if(k){$("clSel").value=k.dataset.k;drawReport();show("report")}});
+load();
+</script></body></html>
