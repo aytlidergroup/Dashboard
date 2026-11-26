@@ -2,936 +2,494 @@
 <html lang="ro">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Raport Cumpărări Clienți — iOS 27</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Calendar Cumpărări Client</title>
   <style>
     :root {
-      --bg-top: #edf3fb;
-      --bg-mid: #f6f8fc;
-      --bg-bot: #eef2f9;
-      --glass-bg: rgba(255, 255, 255, 0.72);
-      --glass-strong: rgba(255, 255, 255, 0.88);
-      --glass-border: rgba(255, 255, 255, 0.9);
-      --glass-shadow: 0 18px 40px -12px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
-      --text-primary: #0f172a;
-      --text-secondary: #475569;
-      --text-muted: #64748b;
-      --accent: #007aff;
-      --accent-soft: rgba(0, 122, 255, 0.12);
-      --green: #16a34a;
-      --green-soft: rgba(22, 163, 74, 0.12);
-      --orange: #ea580c;
-      --orange-soft: rgba(234, 88, 12, 0.12);
-      --red: #dc2626;
-      --red-soft: rgba(220, 38, 38, 0.12);
-      --radius-xl: 26px;
-      --radius-lg: 18px;
-      --radius-md: 13px;
+      --bg: #eef3fa;
+      --glass: rgba(255, 255, 255, 0.78);
+      --glass-border: rgba(255, 255, 255, 0.95);
+      --text: #0f172a;
+      --muted: #64748b;
+      --blue: #007aff;
+      --blue-soft: rgba(0, 122, 255, 0.12);
+      --shadow: 0 12px 30px -10px rgba(15, 23, 42, 0.08);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif;
-      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
       background:
-        radial-gradient(900px 520px at 8% -5%, rgba(56, 189, 248, 0.22), transparent 60%),
-        radial-gradient(850px 500px at 95% 4%, rgba(99, 102, 241, 0.16), transparent 60%),
-        linear-gradient(180deg, var(--bg-top) 0%, var(--bg-mid) 50%, var(--bg-bot) 100%);
+        radial-gradient(600px 350px at 10% 0%, rgba(56, 189, 248, 0.22), transparent 60%),
+        radial-gradient(600px 350px at 90% 5%, rgba(99, 102, 241, 0.16), transparent 60%),
+        var(--bg);
+      color: var(--text);
       min-height: 100vh;
-      padding: 20px 18px 48px;
-      -webkit-font-smoothing: antialiased;
+      padding: 14px 12px 40px;
     }
 
-    .container {
-      max-width: 1380px;
+    .app {
+      max-width: 540px;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 12px;
     }
 
-    .glass {
-      background: var(--glass-bg);
-      backdrop-filter: blur(26px) saturate(180%);
-      -webkit-backdrop-filter: blur(26px) saturate(180%);
+    .box {
+      background: var(--glass);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
       border: 1px solid var(--glass-border);
-      box-shadow: var(--glass-shadow);
-      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      border-radius: 22px;
+      padding: 14px;
     }
 
-    .header {
-      padding: 18px 24px;
+    .top {
       display: flex;
-      flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
-      gap: 14px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .app-icon {
-      width: 46px;
-      height: 46px;
-      border-radius: 14px;
-      background: linear-gradient(135deg, #007aff, #38bdf8);
-      display: grid;
-      place-items: center;
-      color: #fff;
-      font-weight: 800;
-      font-size: 18px;
-      box-shadow: 0 10px 20px -6px rgba(0, 122, 255, 0.5);
-    }
-
-    .brand h1 {
-      font-size: 1.25rem;
-      font-weight: 750;
-      letter-spacing: -0.02em;
-    }
-
-    .brand p {
-      font-size: 0.84rem;
-      color: var(--text-secondary);
-      margin-top: 2px;
-    }
-
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .status-pill {
-      display: inline-flex;
-      align-items: center;
       gap: 8px;
-      padding: 8px 14px;
-      border-radius: 999px;
-      background: var(--glass-strong);
-      border: 1px solid rgba(15, 23, 42, 0.06);
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--text-secondary);
     }
 
-    .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--green);
-      box-shadow: 0 0 0 4px var(--green-soft);
-    }
+    .title { font-size: 1.1rem; font-weight: 800; }
+    .status { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
 
-    .dot.loading { background: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
-    .dot.error { background: var(--red); box-shadow: 0 0 0 4px var(--red-soft); }
-
-    .btn {
+    .btn-reload {
       border: none;
-      cursor: pointer;
-      font-family: inherit;
-      font-weight: 600;
-      font-size: 0.84rem;
-      padding: 9px 15px;
+      background: var(--blue);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.82rem;
+      padding: 8px 13px;
       border-radius: 999px;
-      transition: all 0.18s ease;
-      display: inline-flex;
+      cursor: pointer;
+    }
+
+    select {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(15, 23, 42, 0.12);
+      background: #fff;
+      font-size: 0.96rem;
+      font-weight: 600;
+      color: var(--text);
+      outline: none;
+    }
+
+    .summary-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .stat {
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 16px;
+      padding: 12px;
+      border: 1px solid rgba(15, 23, 42, 0.05);
+    }
+
+    .stat-lbl { font-size: 0.75rem; color: var(--muted); font-weight: 600; }
+    .stat-val { font-size: 1.25rem; font-weight: 800; margin-top: 4px; color: var(--blue); }
+
+    /* Calendar */
+    .cal-head {
+      display: flex;
       align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .cal-month { font-size: 1rem; font-weight: 800; }
+
+    .cal-nav {
+      display: flex;
       gap: 6px;
     }
 
-    .btn-primary {
-      background: var(--accent);
-      color: #fff;
-      box-shadow: 0 8px 18px -6px rgba(0, 122, 255, 0.55);
-    }
-    .btn-primary:hover { transform: translateY(-1px); filter: brightness(1.05); }
-
-    .btn-soft {
-      background: var(--glass-strong);
-      color: var(--text-primary);
-      border: 1px solid rgba(15, 23, 42, 0.08);
-    }
-    .btn-soft:hover { background: #fff; }
-
-    .filters {
-      padding: 16px 20px;
-      display: grid;
-      grid-template-columns: 1.3fr 1.3fr 1fr 1fr auto;
-      gap: 12px;
-      align-items: end;
-    }
-
-    @media (max-width: 1024px) { .filters { grid-template-columns: 1fr 1fr; } }
-    @media (max-width: 600px) { .filters { grid-template-columns: 1fr; } }
-
-    .field label {
-      display: block;
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: var(--text-muted);
-      margin-bottom: 6px;
-    }
-
-    .input, .select {
-      width: 100%;
-      padding: 10px 13px;
-      border-radius: var(--radius-md);
+    .cal-nav button {
       border: 1px solid rgba(15, 23, 42, 0.1);
-      background: var(--glass-strong);
-      color: var(--text-primary);
-      font-family: inherit;
-      font-size: 0.9rem;
-      font-weight: 500;
-      outline: none;
-      transition: border-color 0.15s, box-shadow 0.15s;
-    }
-
-    .input:focus, .select:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-soft);
-    }
-
-    .segment-wrap {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .segmented {
-      display: inline-flex;
-      padding: 4px;
-      border-radius: 999px;
-      background: rgba(15, 23, 42, 0.06);
-      gap: 4px;
-    }
-
-    .seg-btn {
-      border: none;
-      background: transparent;
-      padding: 8px 16px;
-      border-radius: 999px;
-      font-family: inherit;
-      font-size: 0.85rem;
-      font-weight: 650;
-      color: var(--text-secondary);
-      cursor: pointer;
-      transition: all 0.18s ease;
-    }
-
-    .seg-btn.active {
       background: #fff;
-      color: var(--text-primary);
-      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.09);
-    }
-
-    .kpis {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-    }
-
-    @media (max-width: 960px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 520px) { .kpis { grid-template-columns: 1fr; } }
-
-    .kpi-card { padding: 18px 20px; border-radius: var(--radius-lg); }
-    .kpi-label { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); }
-    .kpi-val { font-size: 1.55rem; font-weight: 800; letter-spacing: -0.02em; margin-top: 6px; }
-    .kpi-sub { font-size: 0.78rem; color: var(--text-secondary); margin-top: 4px; }
-
-    .main-grid {
-      display: grid;
-      grid-template-columns: 1fr 1.55fr;
-      gap: 18px;
-      align-items: start;
-    }
-
-    @media (max-width: 1120px) { .main-grid { grid-template-columns: 1fr; } }
-
-    .card { padding: 20px 22px; }
-    .card-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-
-    .card-title { font-size: 1.02rem; font-weight: 750; letter-spacing: -0.01em; }
-    .card-subtitle { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
-
-    .badge {
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 0.75rem;
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      font-size: 1rem;
       font-weight: 700;
-      white-space: nowrap;
+      cursor: pointer;
     }
 
-    .badge-red { background: var(--red-soft); color: var(--red); }
-    .badge-orange { background: var(--orange-soft); color: var(--orange); }
-    .badge-green { background: var(--green-soft); color: var(--green); }
-    .badge-blue { background: var(--accent-soft); color: var(--accent); }
+    .weekdays, .days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+      text-align: center;
+    }
 
-    .alert-list {
+    .wd {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--muted);
+      padding-bottom: 4px;
+    }
+
+    .day {
+      min-height: 52px;
+      border-radius: 13px;
+      background: rgba(255, 255, 255, 0.55);
+      border: 1px solid transparent;
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      max-height: 540px;
-      overflow-y: auto;
-      padding-right: 4px;
-    }
-
-    .alert-item {
-      padding: 14px 15px;
-      border-radius: var(--radius-lg);
-      background: var(--glass-strong);
-      border: 1px solid rgba(15, 23, 42, 0.06);
+      align-items: center;
+      justify-content: center;
+      padding: 4px 2px;
       cursor: pointer;
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      transition: 0.12s;
     }
 
-    .alert-item:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 8px 20px -8px rgba(15, 23, 42, 0.14);
+    .day.empty { background: transparent; cursor: default; }
+
+    .day.has-buy {
+      background: var(--blue-soft);
+      border-color: rgba(0, 122, 255, 0.35);
     }
 
-    .alert-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-    .alert-client { font-weight: 700; font-size: 0.92rem; }
-    .alert-meta { display: flex; flex-wrap: wrap; gap: 10px; font-size: 0.8rem; color: var(--text-secondary); margin-top: 8px; }
-    .alert-note { font-size: 0.79rem; color: var(--text-muted); margin-top: 6px; }
+    .day.selected {
+      background: var(--blue);
+      color: #fff;
+      border-color: var(--blue);
+    }
 
-    .table-wrap {
-      overflow-x: auto;
-      border-radius: var(--radius-lg);
-      background: var(--glass-strong);
+    .day-num { font-size: 0.85rem; font-weight: 700; }
+    .day-kg { font-size: 0.68rem; font-weight: 800; color: var(--blue); margin-top: 2px; }
+    .day.selected .day-kg { color: #fff; }
+
+    /* Selected Day Detail */
+    .sec-title {
+      font-size: 0.92rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .item-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 11px 12px;
+      margin-bottom: 8px;
       border: 1px solid rgba(15, 23, 42, 0.06);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
     }
 
-    table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
-
-    th {
-      text-align: left;
-      padding: 11px 13px;
-      font-size: 0.74rem;
-      font-weight: 750;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: var(--text-muted);
-      background: rgba(248, 250, 252, 0.9);
-      border-bottom: 1px solid rgba(15, 23, 42, 0.07);
+    .item-card:last-child { margin-bottom: 0; }
+    .prod-name { font-weight: 700; font-size: 0.9rem; }
+    .client-sub { font-size: 0.76rem; color: var(--muted); margin-top: 2px; }
+    .kg-pill {
+      background: var(--blue-soft);
+      color: var(--blue);
+      font-weight: 800;
+      font-size: 0.88rem;
+      padding: 6px 10px;
+      border-radius: 10px;
       white-space: nowrap;
     }
 
-    td {
-      padding: 11px 13px;
-      border-bottom: 1px solid rgba(15, 23, 42, 0.05);
-      vertical-align: middle;
+    .empty-msg {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      padding: 16px 8px;
     }
 
-    tr:last-child td { border-bottom: none; }
-    tr:hover td { background: rgba(0, 122, 255, 0.03); }
-
-    .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
-    .bold { font-weight: 700; }
-    .muted { color: var(--text-muted); font-size: 0.78rem; }
-
-    .empty-state { padding: 36px 20px; text-align: center; color: var(--text-muted); font-size: 0.9rem; }
+    .history-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 9px 10px;
+      background: rgba(255, 255, 255, 0.75);
+      border-radius: 12px;
+      margin-bottom: 6px;
+      font-size: 0.84rem;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="app">
 
-    <header class="glass header">
-      <div class="brand">
-        <div class="app-icon">KG</div>
-        <div>
-          <h1>Raport Cumpărări Clienți</h1>
-          <p>Evidență cantități (kg), produse pe zile, rapoarte periodice și alerte scădere clienți</p>
-        </div>
-      </div>
-
-      <div class="header-actions">
-        <div class="status-pill" id="statusPill">
-          <span class="dot loading" id="statusDot"></span>
-          <span id="statusText">Se încarcă datele...</span>
-        </div>
-        <button class="btn btn-soft" onclick="loadData()">↻ Reîncarcă</button>
-        <button class="btn btn-primary" onclick="exportCSV()">⬇ Export CSV</button>
-      </div>
-    </header>
-
-    <section class="glass filters">
-      <div class="field">
-        <label for="clientSelect">Client (Denumire client)</label>
-        <select id="clientSelect" class="select" onchange="applyFilters()">
-          <option value="">Toți clienții</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label for="productSelect">Produs (Denumire / Cod)</label>
-        <select id="productSelect" class="select" onchange="applyFilters()">
-          <option value="">Toate produsele</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label for="dateFrom">De la data</label>
-        <input type="date" id="dateFrom" class="input" onchange="applyFilters()" />
-      </div>
-
-      <div class="field">
-        <label for="dateTo">Până la data</label>
-        <input type="date" id="dateTo" class="input" onchange="applyFilters()" />
-      </div>
-
+    <!-- Header -->
+    <div class="box top">
       <div>
-        <button class="btn btn-soft" onclick="resetFilters()" style="height: 41px;">Resetează</button>
+        <div class="title">Calendar Cumpărări</div>
+        <div class="status" id="statusText">Se încarcă...</div>
       </div>
-    </section>
-
-    <div class="segment-wrap">
-      <div class="segmented" role="tablist">
-        <button class="seg-btn active" data-period="day" onclick="setPeriod('day', this)">Zilnic</button>
-        <button class="seg-btn" data-period="week" onclick="setPeriod('week', this)">Săptămânal</button>
-        <button class="seg-btn" data-period="month" onclick="setPeriod('month', this)">Lunar</button>
-        <button class="seg-btn" data-period="year" onclick="setPeriod('year', this)">Anual</button>
-      </div>
-      <div class="muted" id="tabsLoadedInfo"></div>
+      <button class="btn-reload" onclick="loadData()">↻ Actualizează</button>
     </div>
 
-    <section class="kpis">
-      <div class="glass kpi-card">
-        <div class="kpi-label">Cantitate Totală (kg)</div>
-        <div class="kpi-val" id="kpiKg">0 kg</div>
-        <div class="kpi-sub" id="kpiKgSplit">Avize: 0 kg · Facturi: 0 kg</div>
+    <!-- Client Selector -->
+    <div class="box">
+      <select id="clientSelect" onchange="onFilterChange()">
+        <option value="">Toți clienții</option>
+      </select>
+    </div>
+
+    <!-- Total kg & days -->
+    <div class="summary-row">
+      <div class="stat">
+        <div class="stat-lbl">Total cumpărat (în luna calendarului)</div>
+        <div class="stat-val" id="monthKg">0 kg</div>
       </div>
-
-      <div class="glass kpi-card">
-        <div class="kpi-label">Valoare Totală fără TVA</div>
-        <div class="kpi-val" id="kpiValFara">0,00</div>
-        <div class="kpi-sub" id="kpiValCu">Cu TVA: 0,00</div>
+      <div class="stat">
+        <div class="stat-lbl">Zile cu cumpărări (în lună)</div>
+        <div class="stat-val" id="monthDays">0 zile</div>
       </div>
+    </div>
 
-      <div class="glass kpi-card">
-        <div class="kpi-label">Clienți Activi / Produse</div>
-        <div class="kpi-val" id="kpiEntities">0 / 0</div>
-        <div class="kpi-sub" id="kpiOrders">0 înregistrări filtrate</div>
-      </div>
-
-      <div class="glass kpi-card">
-        <div class="kpi-label">Clienți cu Scădere sau Inactivi</div>
-        <div class="kpi-val" id="kpiAlertsCount" style="color: var(--red);">0</div>
-        <div class="kpi-sub">Necesită atenție comercială</div>
-      </div>
-    </section>
-
-    <section class="main-grid">
-
-      <div class="glass card">
-        <div class="card-head">
-          <div>
-            <div class="card-title">Analiză Scădere & Inactivitate Clienți</div>
-            <div class="card-subtitle">Comparație ultimele 30 zile vs. media anterioară (kg)</div>
-          </div>
-          <span class="badge badge-red" id="alertBadge">0 alerte</span>
-        </div>
-
-        <div class="alert-list" id="alertList">
-          <div class="empty-state">Se analizează istoricul clienților...</div>
+    <!-- Calendar -->
+    <div class="box">
+      <div class="cal-head">
+        <div class="cal-month" id="calMonthLabel">-</div>
+        <div class="cal-nav">
+          <button onclick="changeMonth(-1)">‹</button>
+          <button onclick="changeMonth(1)">›</button>
         </div>
       </div>
-
-      <div class="glass card">
-        <div class="card-head">
-          <div>
-            <div class="card-title" id="periodTableTitle">Sumar Zilnic — Client & Produs</div>
-            <div class="card-subtitle">Cantitate (kg), Avize, Facturi și Valoare pe perioadă</div>
-          </div>
-          <span class="badge badge-blue" id="periodRowCount">0 rânduri</span>
-        </div>
-
-        <div class="table-wrap" style="max-height: 540px; overflow-y: auto;">
-          <table>
-            <thead>
-              <tr>
-                <th>Perioadă</th>
-                <th>Client</th>
-                <th>Produs</th>
-                <th class="num">Avize (kg)</th>
-                <th class="num">Facturi (kg)</th>
-                <th class="num">Total (kg)</th>
-                <th class="num">Val. fără TVA</th>
-                <th class="num">Val. cu TVA</th>
-              </tr>
-            </thead>
-            <tbody id="periodTableBody">
-              <tr><td colspan="8" class="empty-state">Se încarcă...</td></tr>
-            </tbody>
-          </table>
-        </div>
+      <div class="weekdays">
+        <div class="wd">Lu</div>
+        <div class="wd">Ma</div>
+        <div class="wd">Mi</div>
+        <div class="wd">Jo</div>
+        <div class="wd">Vi</div>
+        <div class="wd">Sâ</div>
+        <div class="wd">Du</div>
       </div>
+      <div class="days" id="calendarDays"></div>
+    </div>
 
-    </section>
-
-    <section class="glass card">
-      <div class="card-head">
-        <div>
-          <div class="card-title">Istoric Detaliat Cumpărări (Toate Coloanele A – R)</div>
-          <div class="card-subtitle">Vezi exact în ce zi, ce produs, câte kg și la ce preț a cumpărat fiecare client</div>
-        </div>
-        <span class="badge badge-green" id="detailRowCount">0 înregistrări</span>
+    <!-- Selected Day Details -->
+    <div class="box">
+      <div class="sec-title" id="dayDetailTitle">Selectează o zi din calendar</div>
+      <div id="dayDetailList">
+        <div class="empty-msg">Apasă pe o zi marcată pentru a vedea produsele și cantitatea (kg).</div>
       </div>
+    </div>
 
-      <div class="table-wrap" style="max-height: 520px; overflow-y: auto;">
-        <table>
-          <thead>
-            <tr>
-              <th>Data</th>
-              <th>Client</th>
-              <th>Produs (Cod)</th>
-              <th class="num">Cant. Avize</th>
-              <th class="num">Preț Avize</th>
-              <th class="num">Cant. Facturi</th>
-              <th class="num">Preț Facturi</th>
-              <th class="num">Preț Curent</th>
-              <th class="num">Total (kg)</th>
-              <th class="num">Total fără TVA</th>
-              <th class="num">Total cu TVA</th>
-              <th class="num">Zile Plată / Blocare</th>
-            </tr>
-          </thead>
-          <tbody id="detailTableBody">
-            <tr><td colspan="12" class="empty-state">Se încarcă...</td></tr>
-          </tbody>
-        </table>
+    <!-- Simple List of Purchase Days for Selected Client -->
+    <div class="box">
+      <div class="sec-title">Zilele în care a cumpărat</div>
+      <div id="purchaseDaysList">
+        <div class="empty-msg">-</div>
       </div>
-    </section>
+    </div>
 
   </div>
 
   <script>
-    // لینک Web App گوگل اسکریپت خودتان را اینجا بگذارید (ختم به /exec)
-    const API_URL = "https://script.google.com/macros/s/AKfycbz702-Ol0LT4wueNBOQBujelSA2HwThZJSilv3BouJuEXKfOS0OrtSddJQEcJOgCmeK/exec";
+    // لینک Web App گوگل اسکریپت خودتان را اینجا بگذارید
+    const API_URL = "https://script.google.com/macros/s/AKfycbwLadGAuZNN9GOou-yFXxVQoHTNYs9u6dQkY8lLq8UMNvygxluivFgBKiYlAIGhoCvd/exec";
 
-    let ALL_RECORDS = [];
-    let FILTERED_RECORDS = [];
-    let CURRENT_PERIOD = "day";
+    let ALL_DATA = [];
+    let CURRENT_YEAR = new Date().getFullYear();
+    let CURRENT_MONTH = new Date().getMonth(); // 0..11
+    let SELECTED_DATE = null;
 
-    const fmtNum = (n, dec = 2) =>
-      Number(n || 0).toLocaleString("ro-RO", {
-        minimumFractionDigits: dec,
-        maximumFractionDigits: dec
-      });
+    const MONTH_NAMES = [
+      "Ianuarie", "Februarie", "Martie", "Aprilie", "Mai", "Iunie",
+      "Iulie", "August", "Septembrie", "Octombrie", "Noiembrie", "Decembrie"
+    ];
 
     const fmtKg = (n) =>
-      Number(n || 0).toLocaleString("ro-RO", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2
-      });
-
-    function setStatus(type, text) {
-      document.getElementById("statusDot").className = "dot " + type;
-      document.getElementById("statusText").textContent = text;
-    }
+      Number(n || 0).toLocaleString("ro-RO", { maximumFractionDigits: 2 }) + " kg";
 
     async function loadData() {
-      if (!API_URL || API_URL.includes("AKfycbz...")) {
-        setStatus("error", "Puneți link-ul Web App în variabila API_URL din cod.");
-        return;
-      }
-
-      setStatus("loading", "Se încarcă datele din Google Sheets...");
-
+      document.getElementById("statusText").textContent = "Se încarcă din Google Sheets...";
       try {
         const res = await fetch(API_URL, { redirect: "follow" });
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        const data = await res.json();
+        const json = await res.json();
+        ALL_DATA = (json.records || []).map(r => ({
+          date: r.date,
+          client: r.client || "",
+          produs: r.produs || "",
+          kg: Number(r.cant_totala) || (Number(r.cant_avize || 0) + Number(r.cant_facturi || 0))
+        })).filter(r => r.date && r.kg > 0);
 
-        if (!data || data.status === "error") {
-          throw new Error(data ? data.message : "Răspuns invalid.");
+        if (ALL_DATA.length > 0) {
+          ALL_DATA.sort((a, b) => b.date.localeCompare(a.date));
+          const latest = ALL_DATA[0].date.split("-");
+          CURRENT_YEAR = parseInt(latest[0], 10);
+          CURRENT_MONTH = parseInt(latest[1], 10) - 1;
         }
 
-        ALL_RECORDS = (data.records || []).map(r => {
-          const cantTotala = r.cant_totala || (r.cant_avize + r.cant_facturi);
-          const valFara = r.val_totala_fara || (r.val_avize_fara + r.val_facturi_fara);
-          const valCu = r.val_totala_cu || (r.val_avize_cu + r.val_facturi_cu);
-          return {
-            ...r,
-            cant_totala: cantTotala,
-            val_totala_fara: valFara,
-            val_totala_cu: valCu
-          };
-        });
-
-        ALL_RECORDS.sort((a, b) => b.date.localeCompare(a.date));
-
-        document.getElementById("tabsLoadedInfo").textContent =
-          (data.tabs && data.tabs.length) ? "Tab-uri încărcate: " + data.tabs.join(", ") : "";
-
-        populateDropdowns();
-        applyFilters();
-        analyzeCustomerDrops();
-
-        setStatus("", `Conectat · ${ALL_RECORDS.length.toLocaleString("ro-RO")} înregistrări`);
-      } catch (err) {
-        setStatus("error", "Eroare conectare: " + err.message);
+        fillClients();
+        onFilterChange();
+        document.getElementById("statusText").textContent = `Actualizat (${ALL_DATA.length} rânduri)`;
+      } catch (e) {
+        document.getElementById("statusText").textContent = "Eroare la încărcare";
       }
     }
 
-    function populateDropdowns() {
-      const clientSel = document.getElementById("clientSelect");
-      const prodSel = document.getElementById("productSelect");
-      const currentClient = clientSel.value;
-      const currentProd = prodSel.value;
-
-      const clients = [...new Set(ALL_RECORDS.map(r => r.client).filter(Boolean))].sort((a, b) => a.localeCompare(b, "ro"));
-      const products = [...new Set(ALL_RECORDS.map(r => r.produs).filter(Boolean))].sort((a, b) => a.localeCompare(b, "ro"));
-
-      clientSel.innerHTML = '<option value="">Toți clienții (' + clients.length + ')</option>' +
-        clients.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join("");
-
-      prodSel.innerHTML = '<option value="">Toate produsele (' + products.length + ')</option>' +
-        products.map(p => `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`).join("");
-
-      clientSel.value = currentClient;
-      prodSel.value = currentProd;
+    function fillClients() {
+      const sel = document.getElementById("clientSelect");
+      const prev = sel.value;
+      const clients = [...new Set(ALL_DATA.map(r => r.client).filter(Boolean))].sort((a, b) => a.localeCompare(b, "ro"));
+      sel.innerHTML = '<option value="">Toți clienții</option>' +
+        clients.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join("");
+      sel.value = prev;
     }
 
-    function applyFilters() {
+    function getClientRecords() {
       const client = document.getElementById("clientSelect").value;
-      const prod = document.getElementById("productSelect").value;
-      const from = document.getElementById("dateFrom").value;
-      const to = document.getElementById("dateTo").value;
-
-      FILTERED_RECORDS = ALL_RECORDS.filter(r => {
-        if (client && r.client !== client) return false;
-        if (prod && r.produs !== prod) return false;
-        if (from && r.date < from) return false;
-        if (to && r.date > to) return false;
-        return true;
-      });
-
-      updateKPIs();
-      renderPeriodicTable();
-      renderDetailTable();
+      return client ? ALL_DATA.filter(r => r.client === client) : ALL_DATA;
     }
 
-    function resetFilters() {
-      document.getElementById("clientSelect").value = "";
-      document.getElementById("productSelect").value = "";
-      document.getElementById("dateFrom").value = "";
-      document.getElementById("dateTo").value = "";
-      applyFilters();
+    function onFilterChange() {
+      SELECTED_DATE = null;
+      renderCalendar();
+      renderPurchaseDaysList();
+      document.getElementById("dayDetailTitle").textContent = "Selectează o zi din calendar";
+      document.getElementById("dayDetailList").innerHTML =
+        '<div class="empty-msg">Apasă pe o zi cu cantitate pentru detalii.</div>';
     }
 
-    function setPeriod(period, btn) {
-      CURRENT_PERIOD = period;
-      document.querySelectorAll(".seg-btn").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-
-      const titles = {
-        day: "Sumar Zilnic — Client & Produs",
-        week: "Sumar Săptămânal — Client & Produs",
-        month: "Sumar Lunar — Client & Produs",
-        year: "Sumar Anual — Client & Produs"
-      };
-      document.getElementById("periodTableTitle").textContent = titles[period];
-      renderPeriodicTable();
-    }
-
-    function getPeriodKey(dateStr, period) {
-      if (!dateStr) return "-";
-      if (period === "day") return dateStr;
-      if (period === "month") return dateStr.slice(0, 7);
-      if (period === "year") return dateStr.slice(0, 4);
-
-      const d = new Date(dateStr + "T00:00:00");
-      if (isNaN(d.getTime())) return dateStr;
-      const dayNum = d.getUTCDay() || 7;
-      d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-      const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-      const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-      return `${d.getUTCFullYear()}-S${String(weekNo).padStart(2, "0")}`;
-    }
-
-    function formatPeriodDisplay(key, period) {
-      if (period === "day") {
-        const p = key.split("-");
-        return p.length === 3 ? `${p[2]}.${p[1]}.${p[0]}` : key;
+    function changeMonth(delta) {
+      CURRENT_MONTH += delta;
+      if (CURRENT_MONTH < 0) {
+        CURRENT_MONTH = 11;
+        CURRENT_YEAR--;
+      } else if (CURRENT_MONTH > 11) {
+        CURRENT_MONTH = 0;
+        CURRENT_YEAR++;
       }
-      if (period === "month") {
-        const p = key.split("-");
-        return p.length === 2 ? `${p[1]}.${p[0]}` : key;
-      }
-      return key;
+      renderCalendar();
     }
 
-    function updateKPIs() {
-      let totalKg = 0, avizeKg = 0, facturiKg = 0;
-      let totalFara = 0, totalCu = 0;
-      const clients = new Set();
-      const products = new Set();
+    function renderCalendar() {
+      const recs = getClientRecords();
+      const ym = `${CURRENT_YEAR}-${String(CURRENT_MONTH + 1).padStart(2, "0")}`;
+      document.getElementById("calMonthLabel").textContent = `${MONTH_NAMES[CURRENT_MONTH]} ${CURRENT_YEAR}`;
 
-      FILTERED_RECORDS.forEach(r => {
-        totalKg += r.cant_totala;
-        avizeKg += r.cant_avize;
-        facturiKg += r.cant_facturi;
-        totalFara += r.val_totala_fara;
-        totalCu += r.val_totala_cu;
-        if (r.client) clients.add(r.client);
-        if (r.produs) products.add(r.produs);
-      });
+      const dayTotals = {};
+      let monthKg = 0;
+      let daysSet = new Set();
 
-      document.getElementById("kpiKg").textContent = `${fmtKg(totalKg)} kg`;
-      document.getElementById("kpiKgSplit").textContent = `Avize: ${fmtKg(avizeKg)} kg · Facturi: ${fmtKg(facturiKg)} kg`;
-      document.getElementById("kpiValFara").textContent = fmtNum(totalFara);
-      document.getElementById("kpiValCu").textContent = `Cu TVA: ${fmtNum(totalCu)}`;
-      document.getElementById("kpiEntities").textContent = `${clients.size} / ${products.size}`;
-      document.getElementById("kpiOrders").textContent = `${FILTERED_RECORDS.length.toLocaleString("ro-RO")} înregistrări filtrate`;
-    }
-
-    function renderPeriodicTable() {
-      const tbody = document.getElementById("periodTableBody");
-      if (!FILTERED_RECORDS.length) {
-        tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Nu există date pentru filtrele selectate.</td></tr>';
-        document.getElementById("periodRowCount").textContent = "0 rânduri";
-        return;
-      }
-
-      const map = new Map();
-      FILTERED_RECORDS.forEach(r => {
-        const pKey = getPeriodKey(r.date, CURRENT_PERIOD);
-        const key = `${pKey}||${r.client}||${r.produs}`;
-        if (!map.has(key)) {
-          map.set(key, {
-            periodKey: pKey,
-            client: r.client,
-            produs: r.produs,
-            avizeKg: 0,
-            facturiKg: 0,
-            totalKg: 0,
-            valFara: 0,
-            valCu: 0
-          });
+      recs.forEach(r => {
+        if (r.date.startsWith(ym)) {
+          dayTotals[r.date] = (dayTotals[r.date] || 0) + r.kg;
+          monthKg += r.kg;
+          daysSet.add(r.date);
         }
-        const item = map.get(key);
-        item.avizeKg += r.cant_avize;
-        item.facturiKg += r.cant_facturi;
-        item.totalKg += r.cant_totala;
-        item.valFara += r.val_totala_fara;
-        item.valCu += r.val_totala_cu;
       });
 
-      const rows = [...map.values()].sort((a, b) =>
-        b.periodKey.localeCompare(a.periodKey) || b.totalKg - a.totalKg
-      );
+      document.getElementById("monthKg").textContent = fmtKg(monthKg);
+      document.getElementById("monthDays").textContent = `${daysSet.size} zile`;
 
-      document.getElementById("periodRowCount").textContent = `${rows.length} rânduri`;
+      const firstDay = new Date(CURRENT_YEAR, CURRENT_MONTH, 1);
+      let startWeekday = firstDay.getDay() - 1; // Monday = 0
+      if (startWeekday < 0) startWeekday = 6;
 
-      tbody.innerHTML = rows.slice(0, 400).map(row => `
-        <tr>
-          <td class="bold">${escapeHtml(formatPeriodDisplay(row.periodKey, CURRENT_PERIOD))}</td>
-          <td>${escapeHtml(row.client)}</td>
-          <td>${escapeHtml(row.produs)}</td>
-          <td class="num">${fmtKg(row.avizeKg)}</td>
-          <td class="num">${fmtKg(row.facturiKg)}</td>
-          <td class="num bold">${fmtKg(row.totalKg)} kg</td>
-          <td class="num">${fmtNum(row.valFara)}</td>
-          <td class="num">${fmtNum(row.valCu)}</td>
-        </tr>
-      `).join("");
-    }
+      const totalDays = new Date(CURRENT_YEAR, CURRENT_MONTH + 1, 0).getDate();
+      const container = document.getElementById("calendarDays");
+      let html = "";
 
-    function renderDetailTable() {
-      const tbody = document.getElementById("detailTableBody");
-      document.getElementById("detailRowCount").textContent = `${FILTERED_RECORDS.length} înregistrări`;
-
-      if (!FILTERED_RECORDS.length) {
-        tbody.innerHTML = '<tr><td colspan="12" class="empty-state">Nu există înregistrări de afișat.</td></tr>';
-        return;
+      for (let i = 0; i < startWeekday; i++) {
+        html += `<div class="day empty"></div>`;
       }
 
-      tbody.innerHTML = FILTERED_RECORDS.slice(0, 500).map(r => {
-        const dParts = r.date.split("-");
-        const dRo = dParts.length === 3 ? `${dParts[2]}.${dParts[1]}.${dParts[0]}` : r.date;
-        const codTag = r.cod_produs ? `<span class="muted">(${escapeHtml(r.cod_produs)})</span>` : "";
+      for (let d = 1; d <= totalDays; d++) {
+        const dateStr = `${ym}-${String(d).padStart(2, "0")}`;
+        const kg = dayTotals[dateStr] || 0;
+        const isSel = SELECTED_DATE === dateStr;
+        const cls = ["day", kg > 0 ? "has-buy" : "", isSel ? "selected" : ""].filter(Boolean).join(" ");
 
-        return `
-          <tr>
-            <td class="bold">${escapeHtml(dRo)}</td>
-            <td>${escapeHtml(r.client)}</td>
-            <td>${escapeHtml(r.produs)} ${codTag}</td>
-            <td class="num">${fmtKg(r.cant_avize)}</td>
-            <td class="num">${fmtNum(r.pret_avize)}</td>
-            <td class="num">${fmtKg(r.cant_facturi)}</td>
-            <td class="num">${fmtNum(r.pret_facturi)}</td>
-            <td class="num">${fmtNum(r.pret_curent)}</td>
-            <td class="num bold">${fmtKg(r.cant_totala)} kg</td>
-            <td class="num">${fmtNum(r.val_totala_fara)}</td>
-            <td class="num bold">${fmtNum(r.val_totala_cu)}</td>
-            <td class="num">${r.zile_plata} / ${r.zile_blocare} zile</td>
-          </tr>
+        html += `
+          <div class="${cls}" onclick="selectDay('${dateStr}')">
+            <div class="day-num">${d}</div>
+            ${kg > 0 ? `<div class="day-kg">${Number(kg.toFixed(1))}kg</div>` : ""}
+          </div>
         `;
-      }).join("");
+      }
+
+      container.innerHTML = html;
     }
 
-    function analyzeCustomerDrops() {
-      const container = document.getElementById("alertList");
-      if (!ALL_RECORDS.length) {
-        container.innerHTML = '<div class="empty-state">Nu există date suficiente pentru analiză.</div>';
+    function selectDay(dateStr) {
+      SELECTED_DATE = dateStr;
+      renderCalendar();
+
+      const recs = getClientRecords().filter(r => r.date === dateStr);
+      const parts = dateStr.split("-");
+      const roDate = `${parts[2]}.${parts[1]}.${parts[0]}`;
+      document.getElementById("dayDetailTitle").textContent = `Cumpărări pe ${roDate}`;
+
+      if (!recs.length) {
+        document.getElementById("dayDetailList").innerHTML =
+          '<div class="empty-msg">Nu există cumpărări în această zi.</div>';
         return;
       }
 
-      const maxDateStr = ALL_RECORDS[0].date;
-      const refDate = new Date(maxDateStr + "T00:00:00");
-      const dayMs = 86400000;
-
-      const byClient = new Map();
-      ALL_RECORDS.forEach(r => {
-        if (!r.client) return;
-        if (!byClient.has(r.client)) byClient.set(r.client, []);
-        byClient.get(r.client).push(r);
-      });
-
-      const alerts = [];
-
-      byClient.forEach((recs, client) => {
-        let last30Kg = 0;
-        let prev60Kg = 0;
-        let totalKg = 0;
-        let lastOrderDate = recs[0].date;
-        let maxBlocare = 0;
-
-        recs.forEach(r => {
-          totalKg += r.cant_totala;
-          if (r.zile_blocare > maxBlocare) maxBlocare = r.zile_blocare;
-          const d = new Date(r.date + "T00:00:00");
-          const diffDays = Math.floor((refDate - d) / dayMs);
-
-          if (diffDays <= 30) {
-            last30Kg += r.cant_totala;
-          } else if (diffDays <= 90) {
-            prev60Kg += r.cant_totala;
-          }
-        });
-
-        const lastDateObj = new Date(lastOrderDate + "T00:00:00");
-        const daysSinceLast = Math.floor((refDate - lastDateObj) / dayMs);
-        const prevMonthlyAvg = prev60Kg / 2;
-
-        if (daysSinceLast >= 21 && totalKg > 0) {
-          alerts.push({
-            client,
-            severity: daysSinceLast >= 45 ? "red" : "orange",
-            badgeText: `Inactiv de ${daysSinceLast} zile`,
-            last30Kg,
-            prevAvg: prevMonthlyAvg,
-            dropPct: prevMonthlyAvg > 0 ? Math.round(((last30Kg - prevMonthlyAvg) / prevMonthlyAvg) * 100) : -100,
-            note: maxBlocare > 0
-              ? `Atenție: Nr. zile blocare = ${maxBlocare}. Ultima comandă: ${formatPeriodDisplay(lastOrderDate, "day")}.`
-              : `Ultima achiziție a fost pe ${formatPeriodDisplay(lastOrderDate, "day")}.`
-          });
-        } else if (prevMonthlyAvg > 0 && last30Kg < prevMonthlyAvg * 0.75) {
-          const dropPct = Math.round(((last30Kg - prevMonthlyAvg) / prevMonthlyAvg) * 100);
-          alerts.push({
-            client,
-            severity: dropPct <= -50 ? "red" : "orange",
-            badgeText: `Scădere ${dropPct}% (kg)`,
-            last30Kg,
-            prevAvg: prevMonthlyAvg,
-            dropPct,
-            note: `Ultimele 30 zile: ${fmtKg(last30Kg)} kg față de media anterioară de ${fmtKg(prevMonthlyAvg)} kg / lună.`
-          });
-        }
-      });
-
-      alerts.sort((a, b) => a.dropPct - b.dropPct);
-
-      document.getElementById("kpiAlertsCount").textContent = alerts.length;
-      document.getElementById("alertBadge").textContent = `${alerts.length} alerte`;
-
-      if (!alerts.length) {
-        container.innerHTML = '<div class="empty-state">Toți clienții au un ritm normal de cumpărare.</div>';
-        return;
-      }
-
-      container.innerHTML = alerts.map(a => `
-        <div class="alert-item" onclick="selectClientFromAlert('${escapeJs(a.client)}')">
-          <div class="alert-top">
-            <div class="alert-client">${escapeHtml(a.client)}</div>
-            <span class="badge ${a.severity === 'red' ? 'badge-red' : 'badge-orange'}">${escapeHtml(a.badgeText)}</span>
+      document.getElementById("dayDetailList").innerHTML = recs.map(r => `
+        <div class="item-card">
+          <div>
+            <div class="prod-name">${esc(r.produs || "Produs")}</div>
+            <div class="client-sub">${esc(r.client)}</div>
           </div>
-          <div class="alert-meta">
-            <span>Ultimele 30 zile: <strong>${fmtKg(a.last30Kg)} kg</strong></span>
-            <span>Medie anterioară: <strong>${fmtKg(a.prevAvg)} kg</strong></span>
-          </div>
-          <div class="alert-note">${escapeHtml(a.note)} (Click pentru filtrare)</div>
+          <div class="kg-pill">${fmtKg(r.kg)}</div>
         </div>
       `).join("");
     }
 
-    function selectClientFromAlert(clientName) {
-      document.getElementById("clientSelect").value = clientName;
-      applyFilters();
-    }
+    function renderPurchaseDaysList() {
+      const recs = getClientRecords();
+      const map = new Map();
 
-    function exportCSV() {
-      if (!FILTERED_RECORDS.length) return;
-      const headers = [
-        "Data", "Denumire client", "Denumire produs", "Cod produs",
-        "Cantitate avize", "Valoare avize fara TVA", "Valoare avize cu TVA", "Ultimul pret avize",
-        "Cantitate facturi", "Valoare facturi fara TVA", "Valoare facturi cu TVA", "Ultimul pret facturi",
-        "Pret curent", "Cantitate totala", "Valoare totala fara TVA", "Valoare totala cu TVA",
-        "Nr zile plata", "Nr zile blocare"
-      ];
-
-      const lines = [headers.join(";")];
-      FILTERED_RECORDS.forEach(r => {
-        lines.push([
-          r.date, r.client, r.produs, r.cod_produs,
-          r.cant_avize, r.val_avize_fara, r.val_avize_cu, r.pret_avize,
-          r.cant_facturi, r.val_facturi_fara, r.val_facturi_cu, r.pret_facturi,
-          r.pret_curent, r.cant_totala, r.val_totala_fara, r.val_totala_cu,
-          r.zile_plata, r.zile_blocare
-        ].map(v => `"${String(v ?? "").replace(/"/g, '""')}"`).join(";"));
+      recs.forEach(r => {
+        if (!map.has(r.date)) map.set(r.date, { date: r.date, kg: 0, items: [] });
+        const entry = map.get(r.date);
+        entry.kg += r.kg;
+        entry.items.push(`${r.produs} (${Number(r.kg.toFixed(1))} kg)`);
       });
 
-      const blob = new Blob(["\uFEFF" + lines.join("\n")], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `raport_clienti_${new Date().toISOString().slice(0, 10)}.csv`;
-      a.click();
-      URL.revokeObjectURL(url);
+      const list = [...map.values()].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 40);
+      const container = document.getElementById("purchaseDaysList");
+
+      if (!list.length) {
+        container.innerHTML = '<div class="empty-msg">Nu există cumpărări.</div>';
+        return;
+      }
+
+      container.innerHTML = list.map(row => {
+        const p = row.date.split("-");
+        const roDate = `${p[2]}.${p[1]}.${p[0]}`;
+        return `
+          <div class="history-row" onclick="jumpToDate('${row.date}')">
+            <div>
+              <strong>${roDate}</strong>
+              <div class="client-sub">${esc(row.items.join(" · "))}</div>
+            </div>
+            <div class="kg-pill">${fmtKg(row.kg)}</div>
+          </div>
+        `;
+      }).join("");
     }
 
-    function escapeHtml(str) {
-      return String(str || "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;");
+    function jumpToDate(dateStr) {
+      const p = dateStr.split("-");
+      CURRENT_YEAR = parseInt(p[0], 10);
+      CURRENT_MONTH = parseInt(p[1], 10) - 1;
+      selectDay(dateStr);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
-    function escapeJs(str) {
-      return String(str || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+    function esc(s) {
+      return String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
     }
 
-    window.addEventListener("DOMContentLoaded", loadData);
+    loadData();
   </script>
 </body>
 </html>
