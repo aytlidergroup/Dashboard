@@ -1,217 +1,1636 @@
 <!DOCTYPE html>
-<html lang="ro"><head><meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#b88954">
-<link rel="icon" type="image/jpeg" href="logo.jpg">
-<link rel="apple-touch-icon" href="logo.jpg">
-<title>Clasament Clienți</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<style>
-:root{--bg:#f6f1eb;--glass:rgba(255,250,244,.68);--glass2:rgba(255,252,248,.9);--stroke:rgba(184,137,84,.28);--shadow:0 8px 32px rgba(45,27,10,.12);--tx:#1e1309;--tx2:#6d5844;--ac:#b88954;--ok:#2fb355;--lo:#e5941c;--bad:#e04338;--gray:#cfc5b8;--gold:#e6a93c;--row:rgba(184,137,84,.14)}
-@media(prefers-color-scheme:dark){:root{--bg:#120b06;--glass:rgba(43,28,16,.58);--glass2:rgba(62,41,24,.72);--stroke:rgba(184,137,84,.24);--shadow:0 10px 40px rgba(0,0,0,.55);--tx:#fbf6ef;--tx2:#b9a48e;--gray:#574434;--row:rgba(184,137,84,.13)}}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;font:15px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",system-ui,sans-serif;color:var(--tx);background:var(--bg);min-height:100vh;padding:env(safe-area-inset-top) 0 calc(112px + env(safe-area-inset-bottom))}
-body:before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(60vmax 60vmax at 5% -10%,rgba(184,137,84,.28),transparent 60%),radial-gradient(50vmax 50vmax at 100% 5%,rgba(138,86,44,.22),transparent 60%),radial-gradient(60vmax 60vmax at 60% 115%,rgba(184,137,84,.16),transparent 60%)}
-.wrap{max-width:1100px;margin:0 auto;padding:0 16px}
-.glass{background:var(--glass);-webkit-backdrop-filter:blur(28px) saturate(180%);backdrop-filter:blur(28px) saturate(180%);border:1px solid var(--stroke);border-radius:26px;box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.25)}
-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:22px 0 14px}
-.brand{display:flex;align-items:center;gap:12px}
-#appLogo{width:50px;height:50px;border-radius:15px;object-fit:cover;border:1px solid var(--stroke);box-shadow:0 6px 18px rgba(0,0,0,.22);background:#2d1c0c}
-h1{margin:0;font-size:32px;letter-spacing:-.8px;font-weight:800}
-#sub{color:var(--tx2);font-size:13px;margin-top:2px}
-.btn{border:0;font:inherit;font-weight:600;color:var(--tx);padding:10px 16px;border-radius:999px;cursor:pointer;background:var(--glass2);border:1px solid var(--stroke)}
-.btn.spin{opacity:.5;pointer-events:none}
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:14px}
-.kpi{padding:16px 18px}.kpi b{display:block;font-size:30px;letter-spacing:-1px;color:var(--ac)}.kpi span{color:var(--tx2);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
-.panel{padding:14px;margin-bottom:14px}
-input,select{font:inherit;color:var(--tx);background:var(--row);border:0;border-radius:14px;padding:11px 14px;outline:0;width:100%}
-select option{background:#24160b;color:#fbf6ef}
-.row{display:grid;grid-template-columns:2fr 1fr;gap:10px}
-.chips{display:flex;gap:8px;overflow-x:auto;padding:10px 0 2px;scrollbar-width:none}
-.chip{flex:none;border:0;font:inherit;font-size:13px;font-weight:600;color:var(--tx);background:var(--row);padding:8px 14px;border-radius:999px;cursor:pointer}
-.chip.on{background:var(--ac);color:#170e06}
-details{margin-bottom:12px}summary{list-style:none;cursor:pointer;padding:6px 6px 10px;font-weight:700;font-size:17px;display:flex;justify-content:space-between;align-items:center}
-summary::-webkit-details-marker{display:none}summary small{color:var(--tx2);font-weight:500;font-size:12px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
-.card{padding:16px;cursor:pointer;transition:transform .2s}.card:active{transform:scale(.97)}
-.card h3{margin:0 0 4px;font-size:16px}.card .m{display:flex;justify-content:space-between;align-items:center;color:var(--tx2);font-size:12px}
-.stars{letter-spacing:2px;font-size:19px;background:linear-gradient(90deg,var(--gold) var(--p),var(--gray) var(--p));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
-.pill{font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;color:#fff}.pill.ok{background:var(--ok)}.pill.lo{background:var(--lo)}.pill.bad{background:var(--bad)}
-.nums{display:flex;gap:6px;margin:10px 0 8px}.nums div{flex:1;background:var(--row);border-radius:12px;padding:7px 4px;text-align:center}.nums b{display:block;font-size:17px}.nums span{font-size:10px;color:var(--tx2)}
-.tag{display:inline-block;font-size:11px;background:var(--row);padding:2px 8px;border-radius:8px;margin:2px 2px 0 0}
-.sec{display:none}.sec.on{display:block}
-.tbl{overflow:auto;border-radius:18px}table{border-collapse:collapse;width:100%;font-size:13px}
-th,td{padding:9px 10px;text-align:left;white-space:nowrap;border-bottom:1px solid var(--row)}th{color:var(--tx2);font-size:11px;text-transform:uppercase;position:sticky;top:0;background:var(--glass2)}
-.mx td,.mx th{text-align:center;padding:6px 5px;min-width:30px}.mx td:first-child,.mx th:first-child{text-align:left;position:sticky;left:0;background:var(--glass2);z-index:1;min-width:140px}
-.dot{display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--ok)}.today{background:rgba(184,137,84,.22)}
-.kg{font-weight:700;font-size:11px;color:var(--ok)}
-.h{font-weight:700;font-size:17px;margin:2px 4px 12px}
-.bars{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;align-items:end;height:110px;margin:8px 0}.bars div{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;font-size:11px;color:var(--tx2)}.bars i{display:block;width:100%;border-radius:8px;background:linear-gradient(var(--ac),#855829);min-height:4px}
-.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;text-align:center;font-size:12px;max-width:320px}.cal span{padding:7px 0;border-radius:10px;background:var(--row)}.cal span.y{background:var(--ac);color:#170e06;font-weight:700}.cal span.e{background:none}
-.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
-#map{height:440px;border-radius:20px;overflow:hidden;z-index:0}#mnote{color:var(--tx2);font-size:12px;margin:10px 4px 0}
-.err{padding:22px;text-align:center;color:var(--bad);font-weight:600}
-nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom));z-index:999;display:flex;gap:4px;padding:6px;border-radius:999px;max-width:calc(100% - 20px)}
-nav button{border:0;background:none;font:inherit;font-size:11px;font-weight:600;color:var(--tx2);padding:8px 14px;border-radius:999px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px}
-nav button i{font-style:normal;font-size:19px}nav button.on{background:var(--glass2);color:var(--ac)}
-@media(max-width:560px){h1{font-size:28px}.row{grid-template-columns:1fr}nav button{padding:8px 10px}}
-</style></head><body>
-<div class="wrap">
-<header>
-  <div class="brand">
-    <img id="appLogo" src="logo.jpg" alt="AYT Clienți" onerror="this.style.display='none'">
-    <div><h1>Clienți</h1><div id="sub">Se încarcă…</div></div>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SalesPulse iOS 27 • Analiză Clienți & Vânzări</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Inter & SF-style Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Inter', 'sans-serif'],
+          },
+          borderRadius: {
+            'ios': '26px',
+            'ios-lg': '32px',
+            'ios-sm': '18px',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --bg-mesh-1: #e0e7ff;
+      --bg-mesh-2: #fce7f3;
+      --bg-mesh-3: #dbeafe;
+      --bg-mesh-4: #f3e8ff;
+      --glass-bg: rgba(255, 255, 255, 0.58);
+      --glass-bg-strong: rgba(255, 255, 255, 0.78);
+      --glass-border: rgba(255, 255, 255, 0.75);
+      --glass-shadow: 0 20px 45px -15px rgba(15, 23, 42, 0.12), inset 0 1px 1px rgba(255, 255, 255, 0.9);
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --pill-bg: rgba(15, 23, 42, 0.06);
+      --pill-active: #ffffff;
+    }
+
+    html.dark {
+      --bg-mesh-1: #090d16;
+      --bg-mesh-2: #13182b;
+      --bg-mesh-3: #0f1c2e;
+      --bg-mesh-4: #1b132b;
+      --glass-bg: rgba(24, 31, 48, 0.56);
+      --glass-bg-strong: rgba(28, 36, 56, 0.82);
+      --glass-border: rgba(255, 255, 255, 0.14);
+      --glass-shadow: 0 24px 50px -12px rgba(0, 0, 0, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.16);
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --pill-bg: rgba(255, 255, 255, 0.08);
+      --pill-active: rgba(255, 255, 255, 0.18);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
+      color: var(--text-primary);
+      background-color: var(--bg-mesh-1);
+      background-image:
+        radial-gradient(at 10% 10%, var(--bg-mesh-2) 0px, transparent 50%),
+        radial-gradient(at 90% 15%, var(--bg-mesh-3) 0px, transparent 50%),
+        radial-gradient(at 80% 85%, var(--bg-mesh-4) 0px, transparent 50%),
+        radial-gradient(at 15% 85%, var(--bg-mesh-3) 0px, transparent 50%);
+      background-attachment: fixed;
+      min-height: 100vh;
+      transition: background-color 0.4s ease, color 0.3s ease;
+      overflow-x: hidden;
+    }
+
+    /* Ambient floating orbs for iOS 27 Spatial Depth */
+    .ambient-orb {
+      position: fixed;
+      border-radius: 9999px;
+      filter: blur(90px);
+      z-index: -1;
+      opacity: 0.55;
+      pointer-events: none;
+      animation: floatOrb 18s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatOrb {
+      0% { transform: translate(0px, 0px) scale(1); }
+      100% { transform: translate(35px, -25px) scale(1.08); }
+    }
+
+    /* iOS 27 Frosted Glass Material */
+    .ios-glass {
+      background: var(--glass-bg);
+      backdrop-filter: blur(28px) saturate(185%);
+      -webkit-backdrop-filter: blur(28px) saturate(185%);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      border-radius: 28px;
+      transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease;
+    }
+
+    .ios-glass-hover:hover {
+      transform: translateY(-2px);
+    }
+
+    .ios-glass-strong {
+      background: var(--glass-bg-strong);
+      backdrop-filter: blur(36px) saturate(200%);
+      -webkit-backdrop-filter: blur(36px) saturate(200%);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+    }
+
+    /* iOS Segmented Control */
+    .ios-segmented {
+      background: var(--pill-bg);
+      padding: 4px;
+      border-radius: 16px;
+      display: inline-flex;
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .ios-seg-btn {
+      padding: 7px 14px;
+      border-radius: 12px;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      transition: all 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+      white-space: nowrap;
+    }
+
+    .ios-seg-btn.active {
+      background: var(--pill-active);
+      color: var(--text-primary);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.35);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(148, 163, 184, 0.55);
+    }
+
+    /* Select & Input Glass Styling */
+    .ios-input {
+      background: rgba(255, 255, 255, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.65);
+      border-radius: 16px;
+      color: var(--text-primary);
+      transition: all 0.2s ease;
+    }
+    html.dark .ios-input {
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+    }
+    .ios-input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.22);
+    }
+  </style>
+</head>
+
+<body class="antialiased selection:bg-blue-500 selection:text-white">
+  <!-- Ambient Background Orbs -->
+  <div class="ambient-orb w-96 h-96 bg-blue-400/30 dark:bg-blue-600/20 -top-20 -left-20"></div>
+  <div class="ambient-orb w-[28rem] h-[28rem] bg-purple-400/25 dark:bg-indigo-600/20 top-1/3 -right-24" style="animation-delay: -5s;"></div>
+  <div class="ambient-orb w-80 h-80 bg-emerald-300/25 dark:bg-teal-600/15 bottom-10 left-1/4" style="animation-delay: -10s;"></div>
+
+  <!-- Toast Notification Banner (Replaces alert()) -->
+  <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
+
+  <!-- Main Container -->
+  <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-7 space-y-6">
+
+    <!-- Top Dynamic Glass Header (iOS 27 Navigation Bar) -->
+    <header class="ios-glass px-5 py-4 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div class="flex items-center gap-3.5">
+        <div class="w-12 h-12 rounded-[18px] bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/30 shrink-0">
+          <i data-lucide="layers" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2.5 flex-wrap">
+            <h1 class="text-xl sm:text-2xl font-bold tracking-tight">SalesPulse <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/20 align-middle">iOS 27</span></h1>
+            <span id="dataSourceBadge" class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/25">
+              <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+              Mod Demo (Date Simulated)
+            </span>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+            Monitorizare Cantități (kg), Rapoarte Zilnice/Săptămânale/Lunare/Anuale &amp; Alerte Scădere Clienți
+          </p>
+        </div>
+      </div>
+
+      <!-- Header Actions -->
+      <div class="flex flex-wrap items-center gap-2.5">
+        <button onclick="openScriptModal()" class="ios-input px-3.5 py-2.5 text-xs sm:text-sm font-semibold flex items-center gap-2 hover:bg-white/70 dark:hover:bg-slate-800/80 transition cursor-pointer">
+          <i data-lucide="code-2" class="w-4 h-4 text-indigo-500"></i>
+          <span>Cod Apps Script</span>
+        </button>
+
+        <button onclick="openConnectModal()" class="px-4 py-2.5 rounded-[16px] bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-blue-600/25 flex items-center gap-2 transition cursor-pointer">
+          <i data-lucide="sheet" class="w-4 h-4"></i>
+          <span>Conectează Google Sheet</span>
+        </button>
+
+        <button id="refreshBtn" onclick="syncSheetData(true)" title="Reîmprospătează datele" class="ios-input p-2.5 hover:bg-white/70 dark:hover:bg-slate-800/80 transition cursor-pointer">
+          <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+        </button>
+
+        <button onclick="toggleTheme()" title="Schimbă tema Dark / Light" class="ios-input p-2.5 hover:bg-white/70 dark:hover:bg-slate-800/80 transition cursor-pointer">
+          <i id="themeIcon" data-lucide="moon" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Control Center: Filters & Time Granularity -->
+    <section class="ios-glass p-4 sm:p-5 space-y-4">
+      <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+
+        <!-- Segmented Control: Daily / Weekly / Monthly / Yearly -->
+        <div class="flex flex-col sm:flex-row sm:items-center gap-2.5">
+          <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+            <i data-lucide="calendar-clock" class="w-3.5 h-3.5 text-blue-500"></i>
+            Raportare:
+          </span>
+          <div class="ios-segmented self-start" id="granularityControl">
+            <button type="button" data-granularity="daily" class="ios-seg-btn active">Zilnic</button>
+            <button type="button" data-granularity="weekly" class="ios-seg-btn">Săptămânal</button>
+            <button type="button" data-granularity="monthly" class="ios-seg-btn">Lunar</button>
+            <button type="button" data-granularity="yearly" class="ios-seg-btn">Anual</button>
+          </div>
+        </div>
+
+        <!-- Filters Grid: Client, Product, Date Range -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 flex-1 xl:max-w-4xl">
+          <!-- Client Filter (Col B) -->
+          <div class="relative">
+            <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1 ml-1">Client (Col B)</label>
+            <select id="clientFilter" class="ios-input w-full px-3.5 py-2 text-sm font-medium cursor-pointer">
+              <option value="ALL">Toți Clienții</option>
+            </select>
+          </div>
+
+          <!-- Product Filter (Col C) -->
+          <div class="relative">
+            <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1 ml-1">Produs (Col C)</label>
+            <select id="productFilter" class="ios-input w-full px-3.5 py-2 text-sm font-medium cursor-pointer">
+              <option value="ALL">Toate Produsele</option>
+            </select>
+          </div>
+
+          <!-- Start Date -->
+          <div>
+            <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1 ml-1">De la data (Col A)</label>
+            <input type="date" id="dateFrom" class="ios-input w-full px-3.5 py-1.5 text-sm font-medium" />
+          </div>
+
+          <!-- End Date -->
+          <div>
+            <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1 ml-1">Până la data (Col A)</label>
+            <div class="flex items-center gap-1.5">
+              <input type="date" id="dateTo" class="ios-input w-full px-3.5 py-1.5 text-sm font-medium" />
+              <button onclick="resetFilters()" title="Resetează filtrele" class="ios-input p-2 shrink-0 hover:bg-white/80 dark:hover:bg-slate-800 transition cursor-pointer">
+                <i data-lucide="rotate-ccw" class="w-4 h-4 text-slate-500"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- iOS 27 KPI Widgets Row -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
+      <!-- KPI 1: Total Quantity (kg) -->
+      <div class="ios-glass ios-glass-hover p-5 relative overflow-hidden">
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Cantitate Totală (Col M)</p>
+            <h2 id="kpiTotalKg" class="text-2xl sm:text-3xl font-extrabold mt-1.5 tracking-tight">0 kg</h2>
+          </div>
+          <div class="w-11 h-11 rounded-2xl bg-blue-500/15 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+            <i data-lucide="scale" class="w-5 h-5"></i>
+          </div>
+        </div>
+        <div class="mt-3 pt-3 border-t border-slate-200/50 dark:border-slate-700/50 flex items-center justify-between text-xs">
+          <span class="text-slate-500 dark:text-slate-400">Avize: <strong id="kpiAvizeKg" class="text-slate-700 dark:text-slate-200">0 kg</strong></span>
+          <span class="text-slate-500 dark:text-slate-400">Facturi: <strong id="kpiFacturiKg" class="text-slate-700 dark:text-slate-200">0 kg</strong></span>
+        </div>
+      </div>
+
+      <!-- KPI 2: Total Revenue ex VAT & inc VAT -->
+      <div class="ios-glass ios-glass-hover p-5 relative overflow-hidden">
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Valoare Totală fără TVA (Col N)</p>
+            <h2 id="kpiTotalNoVat" class="text-2xl sm:text-3xl font-extrabold mt-1.5 tracking-tight">0 RON</h2>
+          </div>
+          <div class="w-11 h-11 rounded-2xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+            <i data-lucide="banknote" class="w-5 h-5"></i>
+          </div>
+        </div>
+        <div class="mt-3 pt-3 border-t border-slate-200/50 dark:border-slate-700/50 flex items-center justify-between text-xs">
+          <span class="text-slate-500 dark:text-slate-400">Cu TVA (Col O):</span>
+          <strong id="kpiTotalWithVat" class="text-emerald-600 dark:text-emerald-400 font-bold">0 RON</strong>
+        </div>
+      </div>
+
+      <!-- KPI 3: Top Product & Active Customers -->
+      <div class="ios-glass ios-glass-hover p-5 relative overflow-hidden">
+        <div class="flex items-start justify-between">
+          <div class="min-w-0 pr-2">
+            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Produs Principal &amp; Clienți</p>
+            <h2 id="kpiTopProduct" class="text-lg sm:text-xl font-bold mt-1.5 truncate">-</h2>
+          </div>
+          <div class="w-11 h-11 rounded-2xl bg-purple-500/15 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+            <i data-lucide="package-check" class="w-5 h-5"></i>
+          </div>
+        </div>
+        <div class="mt-3 pt-3 border-t border-slate-200/50 dark:border-slate-700/50 flex items-center justify-between text-xs">
+          <span class="text-slate-500 dark:text-slate-400">Clienți activi în selecție:</span>
+          <strong id="kpiActiveClients" class="text-purple-600 dark:text-purple-400 font-bold">0 clienți</strong>
+        </div>
+      </div>
+
+      <!-- KPI 4: Customer Drop Alerts & Payment Status -->
+      <div class="ios-glass ios-glass-hover p-5 relative overflow-hidden">
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Alerte Scădere Achiziții</p>
+            <h2 id="kpiAlertCount" class="text-2xl sm:text-3xl font-extrabold mt-1.5 tracking-tight text-rose-600 dark:text-rose-400">0 alerte</h2>
+          </div>
+          <div class="w-11 h-11 rounded-2xl bg-rose-500/15 text-rose-600 dark:text-rose-400 flex items-center justify-center">
+            <i data-lucide="bell-ring" class="w-5 h-5"></i>
+          </div>
+        </div>
+        <div class="mt-3 pt-3 border-t border-slate-200/50 dark:border-slate-700/50 flex items-center justify-between text-xs">
+          <span class="text-slate-500 dark:text-slate-400">Medie zile plată (Col Q):</span>
+          <strong id="kpiAvgPayDays" class="text-slate-700 dark:text-slate-200 font-bold">0 zile</strong>
+        </div>
+      </div>
+    </section>
+
+    <!-- Charts Section: Time-Series Quantity/Value + Product Mix -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+      <!-- Main Time-Series Chart (8 cols) -->
+      <div class="ios-glass p-5 sm:p-6 lg:col-span-8 flex flex-col justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+          <div>
+            <h3 id="trendChartTitle" class="text-base sm:text-lg font-bold">Evoluție Cantitate (kg) &amp; Valoare — Zilnic</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Vizualizează exact în ce zi / săptămână / lună / an s-au comandat cantitățile</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <select id="chartMetricMode" class="ios-input px-3 py-1.5 text-xs font-semibold cursor-pointer">
+              <option value="both">Cantitate (kg) + Valoare (RON)</option>
+              <option value="kg">Doar Cantitate (kg)</option>
+              <option value="ron">Doar Valoare fără TVA (RON)</option>
+            </select>
+          </div>
+        </div>
+        <div class="relative w-full h-72 sm:h-80">
+          <canvas id="trendChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Product Breakdown Chart (4 cols) -->
+      <div class="ios-glass p-5 sm:p-6 lg:col-span-4 flex flex-col justify-between">
+        <div class="mb-4">
+          <h3 class="text-base sm:text-lg font-bold">Distribuție pe Produse (kg)</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Ponderea fiecărui produs din cantitatea totală</p>
+        </div>
+        <div class="relative w-full h-60 flex items-center justify-center">
+          <canvas id="productChart"></canvas>
+        </div>
+        <div id="topProductsList" class="mt-4 space-y-2 max-h-28 overflow-y-auto pr-1 text-xs"></div>
+      </div>
+    </section>
+
+    <!-- SMART ANALYZER: Customer Purchase Drop & Churn Alerts -->
+    <section class="ios-glass p-5 sm:p-6 space-y-4">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div class="flex items-start sm:items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-rose-500 to-orange-500 text-white flex items-center justify-center shadow-md shadow-rose-500/25 shrink-0">
+            <i data-lucide="trending-down" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <h3 class="text-base sm:text-lg font-bold">Analiză Inteligentă &amp; Alerte Scădere Clienți</h3>
+              <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-rose-500/15 text-rose-600 dark:text-rose-400">Detector Automat</span>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400">
+              Compară ultimele 30 de zile ale fiecărui client cu media lui anterioară (30-90 zile) și verifică frecvența comenzilor + zilele de blocare (Col R).
+            </p>
+          </div>
+        </div>
+
+        <!-- Filter Alert Status -->
+        <div class="ios-segmented self-start" id="alertFilterControl">
+          <button type="button" data-alert-filter="ALL" class="ios-seg-btn active">Toți Clienții</button>
+          <button type="button" data-alert-filter="ALERTS" class="ios-seg-btn">Doar Alerte</button>
+          <button type="button" data-alert-filter="HEALTHY" class="ios-seg-btn">Activi / Creștere</button>
+        </div>
+      </div>
+
+      <!-- Alert Cards Grid -->
+      <div id="customerAlertsGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <!-- Populated dynamically via JS -->
+      </div>
+    </section>
+
+    <!-- Detailed Breakdown Table (Exact Date, Client, Product, Avize, Facturi, Total kg, Values, Payment/Block Days) -->
+    <section class="ios-glass p-5 sm:p-6 space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h3 class="text-base sm:text-lg font-bold">Registru Detaliat Tranzacții (Coloanele A – R)</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Vezi exact în ce zi, ce client, ce produs și câte kg a cumpărat (Avize vs. Facturi)</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2.5">
+          <div class="relative flex-1 sm:flex-initial">
+            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+            <input type="text" id="tableSearch" placeholder="Caută client, produs, cod..." class="ios-input pl-9 pr-3.5 py-2 text-xs sm:text-sm w-full sm:w-64" />
+          </div>
+          <button onclick="exportFilteredCSV()" class="ios-input px-3.5 py-2 text-xs sm:text-sm font-semibold flex items-center gap-1.5 hover:bg-white/80 dark:hover:bg-slate-800 transition cursor-pointer">
+            <i data-lucide="download" class="w-4 h-4 text-blue-500"></i>
+            <span>Export CSV</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto rounded-2xl border border-slate-200/60 dark:border-slate-700/60">
+        <table class="w-full text-left border-collapse text-xs sm:text-sm">
+          <thead>
+            <tr class="bg-slate-900/5 dark:bg-white/5 text-slate-600 dark:text-slate-300 border-b border-slate-200/60 dark:border-slate-700/60 whitespace-nowrap">
+              <th class="py-3 px-3.5 font-semibold">Data (A)</th>
+              <th class="py-3 px-3.5 font-semibold">Denumire Client (B)</th>
+              <th class="py-3 px-3.5 font-semibold">Produs (C) &amp; Cod (P)</th>
+              <th class="py-3 px-3.5 font-semibold text-right">Avize kg (D)</th>
+              <th class="py-3 px-3.5 font-semibold text-right">Facturi kg (H)</th>
+              <th class="py-3 px-3.5 font-semibold text-right">Total kg (M)</th>
+              <th class="py-3 px-3.5 font-semibold text-right">Val. fără TVA (N)</th>
+              <th class="py-3 px-3.5 font-semibold text-right">Val. cu TVA (O)</th>
+              <th class="py-3 px-3.5 font-semibold text-center">Plată / Blocare (Q/R)</th>
+            </tr>
+          </thead>
+          <tbody id="transactionsTableBody" class="divide-y divide-slate-200/40 dark:divide-slate-700/40">
+            <!-- Populated dynamically -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400">
+        <span id="tableRowCount">Se afișează 0 înregistrări</span>
+        <div class="flex items-center gap-2">
+          <button id="prevPageBtn" onclick="changePage(-1)" class="ios-input px-3 py-1.5 font-semibold disabled:opacity-40 cursor-pointer">Anterior</button>
+          <span id="pageIndicator" class="font-semibold">Pagina 1</span>
+          <button id="nextPageBtn" onclick="changePage(1)" class="ios-input px-3 py-1.5 font-semibold disabled:opacity-40 cursor-pointer">Următor</button>
+        </div>
+      </div>
+    </section>
+
   </div>
-  <button class="btn" id="sync" onclick="load()">↻ Actualizează</button>
-</header>
 
-<section class="sec on" id="t-cities">
-<div class="kpis" id="kpis"></div>
-<div class="glass panel"><div class="row"><input id="q" type="search" placeholder="Caută client sau oraș…" oninput="drawCities()">
-<select id="sort" onchange="drawCities()"><option value="stars">Stele</option><option value="cur">Luna curentă</option><option value="total">Total</option><option value="name">Nume A–Z</option></select></div>
-<div class="chips" id="stChips"></div><div class="chips" id="cityChips"></div></div>
-<div id="cities"></div></section>
+  <!-- MODAL 1: Connect Google Sheets Web App URL -->
+  <div id="connectModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/50 backdrop-blur-md p-4">
+    <div class="ios-glass-strong max-w-lg w-full rounded-[30px] p-6 space-y-5 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-2xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+            <i data-lucide="link" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold">Conectare Google Sheets</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Lipește link-ul Web App obținut din Google Apps Script</p>
+          </div>
+        </div>
+        <button onclick="closeConnectModal()" class="p-2 rounded-full hover:bg-slate-500/10 cursor-pointer">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
 
-<section class="sec" id="t-report">
-<div class="glass panel"><select id="clSel" onchange="drawReport()"></select></div>
-<div id="report"></div>
-<div class="glass panel"><div class="h">Comparație toți clienții</div><div class="tbl"><table><thead><tr><th>Client</th><th>Oraș</th><th>Luna curentă</th><th>Luna trecută</th><th>Diferență</th><th>Total</th><th>Zile preferate</th></tr></thead><tbody id="cmp"></tbody></table></div></div></section>
+      <div class="space-y-3">
+        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">URL Web App (exec)</label>
+        <input type="url" id="sheetUrlInput" placeholder="https://script.google.com/macros/s/AKfycbw8V3HLyJZ3CZF7lMlK37Fs0qtauSuj74CXicz_BN0YsSVLlzP4_ZAhgoBccu-Cpao/exec" class="ios-input w-full px-4 py-3 text-sm" />
+        <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+          Asigură-te că în Google Apps Script ai selectat <strong>Deploy &rarr; New deployment &rarr; Web app</strong> cu acces setat pe <strong>Anyone (Oricine)</strong>.
+        </p>
+      </div>
 
-<section class="sec" id="t-month">
-<div class="glass panel"><div class="row"><div class="h" style="margin:8px 4px">Tabel lunar pe zile</div><select id="mSel" onchange="drawMonth()"></select></div>
-<div class="tbl" style="max-height:70vh"><table class="mx" id="mx"></table></div></div></section>
+      <div class="flex flex-wrap items-center justify-between gap-2 pt-2">
+        <button onclick="loadDemoData(true)" class="ios-input px-4 py-2.5 text-xs font-semibold hover:bg-white/80 dark:hover:bg-slate-800 transition cursor-pointer">
+          Încarcă Date Demo
+        </button>
+        <div class="flex items-center gap-2">
+          <button onclick="closeConnectModal()" class="ios-input px-4 py-2.5 text-xs font-semibold cursor-pointer">Anulează</button>
+          <button onclick="saveAndConnectSheet()" class="px-5 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-lg shadow-blue-600/25 cursor-pointer">
+            Salvează &amp; Sincronizează
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-<section class="sec" id="t-map">
-<div class="glass panel"><div class="h">Hartă clienți</div><div id="map"></div><div id="mnote"></div></div>
-<div class="glass panel"><div class="h">Sinteză pe orașe</div><div class="tbl"><table><thead><tr><th>Oraș</th><th>Clienți</th><th>Luna curentă</th><th>Luna trecută</th><th>Total</th><th>Stele medii</th></tr></thead><tbody id="citySum"></tbody></table></div></div></section>
-</div>
+  <!-- MODAL 2: Google Apps Script Code Viewer -->
+  <div id="scriptModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/50 backdrop-blur-md p-4">
+    <div class="ios-glass-strong max-w-2xl w-full rounded-[30px] p-6 space-y-4 shadow-2xl max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-lg font-bold">Cod Google Apps Script (Backend)</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Copiază acest cod în Google Sheets &rarr; Extensions &rarr; Apps Script</p>
+        </div>
+        <button onclick="closeScriptModal()" class="p-2 rounded-full hover:bg-slate-500/10 cursor-pointer">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
 
-<nav class="glass" id="nav">
-<button class="on" data-t="cities"><i>★</i>Clasament</button><button data-t="report"><i>◔</i>Raport</button><button data-t="month"><i>▦</i>Lunar</button><button data-t="map"><i>◉</i>Hartă</button></nav>
+      <pre id="appsScriptCodeBlock" class="bg-slate-950 text-slate-100 p-4 rounded-2xl text-xs overflow-auto font-mono leading-relaxed flex-1 border border-slate-800"></pre>
 
-<script>
-const API_URL="https://script.google.com/macros/s/AKfycbyH52drifPwLQ3CkPts0aSSzf9n4CTGkjiAAFfZ1sGacMKrSwGXe-_QCANNXE5RQD_Ecg/exec";
-const WD=["Luni","Marți","Miercuri","Joi","Vineri","Sâmbătă","Duminică"],NOCITY="Fără oraș";
-const CITY={"bucuresti":[44.4268,26.1025],"popesti-leordeni":[44.3806,26.1714],"voluntari":[44.4906,26.1539],"pantelimon":[44.45,26.2],"buftea":[44.5667,25.95],"otopeni":[44.55,26.075],"chiajna":[44.4583,25.9833],"bragadiru":[44.3711,25.9756],"cluj-napoca":[46.7712,23.6236],"timisoara":[45.7489,21.2087],"iasi":[47.1585,27.6014],"constanta":[44.1598,28.6348],"brasov":[45.6579,25.6012],"craiova":[44.3302,23.7949],"galati":[45.4353,28.008],"ploiesti":[44.9462,26.0254],"oradea":[47.0465,21.9189],"braila":[45.2692,27.9575],"arad":[46.1866,21.3123],"pitesti":[44.8565,24.8692],"sibiu":[45.7983,24.1256],"bacau":[46.567,26.9146],"targu mures":[46.5424,24.5575],"baia mare":[47.6567,23.585],"buzau":[45.15,26.8333],"botosani":[47.7486,26.6694],"satu mare":[47.79,22.8857],"suceava":[47.6514,26.2555],"focsani":[45.6969,27.1833],"targu jiu":[45.0378,23.2747],"tulcea":[45.1667,28.8],"alba iulia":[46.0733,23.58],"giurgiu":[43.9037,25.9699],"deva":[45.8833,22.9],"slobozia":[44.5639,27.3661],"alexandria":[43.97,25.3333]};
-const $=id=>document.getElementById(id);
-const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const norm=v=>String(v||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/\s+/g," ").trim();
-const p2=n=>String(n).padStart(2,"0"),ymOf=(y,m)=>y+"-"+p2(m+1);
-const fk=v=>v>=100?Math.round(v):Math.round(v*10)/10;
-const NOW=new Date(),CUR=ymOf(NOW.getFullYear(),NOW.getMonth()),PD=new Date(NOW.getFullYear(),NOW.getMonth()-1,1),PREV=ymOf(PD.getFullYear(),PD.getMonth());
-let clients=[],pat={},months={},kg={},city="ALL",stF="ALL",map,pins,tab="cities";
+      <div class="flex items-center justify-between pt-2">
+        <span class="text-xs text-slate-500 dark:text-slate-400">Citește automat coloanele A – R din primul sheet.</span>
+        <button onclick="copyAppsScriptCode()" class="px-4 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center gap-2 shadow-lg shadow-indigo-600/25 cursor-pointer">
+          <i data-lucide="copy" class="w-4 h-4"></i>
+          <span>Copiază Codul</span>
+        </button>
+      </div>
+    </div>
+  </div>
 
-function dstr(r){if(!r)return"";const s=String(r).trim();let m=s.match(/^\d{4}-\d{2}-\d{2}/);if(m)return m[0];m=s.match(/^(\d{1,2})[./-](\d{1,2})[./-](\d{4})/);return m?`${m[3]}-${p2(m[2])}-${p2(m[1])}`:""}
-const wdOf=ds=>WD[(new Date(ds+"T12:00:00").getDay()+6)%7];
-function status(c){if(!c.isActive||c.grayPct>=100)return["INACTIVE","Inactiv","bad"];if(c.stars>=4||c.score>=2)return["ACTIVE","Activ","ok"];return["LOW","Puțin activ","lo"]}
-const stars=c=>`<span class="stars" style="--p:${100-c.grayPct}%">★★★★★</span>`;
-function coords(loc,cty){
-  if(loc){let a=parseFloat(String(loc.lat).replace(",",".")),b=parseFloat(String(loc.lng).replace(",","."));
-    if(isFinite(a)&&isFinite(b)){if((a<43||a>49)&&b>=43&&b<=49)[a,b]=[b,a];return[a,b]}}
-  const n=norm(cty);if(CITY[n])return CITY[n];const k=Object.keys(CITY).find(k=>n&&n.includes(k));return k?CITY[k]:null}
+  <script>
+    // =========================================================================
+    // 1. GOOGLE APPS SCRIPT SOURCE CODE (Embedded for 1-click Copy)
+    // =========================================================================
+    const APPS_SCRIPT_TEMPLATE = `function doGet(e) {
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    // Ia prima foaie sau foaia specificata prin parametru ?sheet=NumeFoaie
+    var sheetName = e && e.parameter && e.parameter.sheet ? e.parameter.sheet : null;
+    var sheet = sheetName ? ss.getSheetByName(sheetName) : ss.getSheets()[0];
+    
+    var data = sheet.getDataRange().getValues();
+    if (data.length <= 1) {
+      return ContentService.createTextOutput(JSON.stringify({ status: "empty", rows: [] }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
 
-async function load(){
-  $("sync").classList.add("spin");$("sub").textContent="Se sincronizează…";
-  try{
-    const r=await fetch(API_URL+"?t="+Date.now(),{cache:"no-store"});
-    const txt=await r.text();let d;
-    try{d=JSON.parse(txt)}catch(e){throw new Error("Răspunsul nu e JSON. Re-publică Web App-ul (Execute as: Me, Access: Anyone) și autorizează scriptul.")}
-    if(d.status==="error")throw new Error(d.message);
-    pat={};Object.entries(d.clientPatterns||{}).forEach(([k,v])=>pat[norm(k)]=v);
-    months={};Object.entries(d.monthlyReports||{}).forEach(([n,v])=>{const m=n.match(/(\d{4})[_-](\d{2})/);if(!m)return;const rows={};(v.rows||[]).forEach(x=>rows[norm(x.name)]=(x.days||[]).map(Number));months[m[1]+"-"+m[2]]={days:v.daysInMonth||new Date(+m[1],+m[2],0).getDate(),rows}});
-    kg={};Object.entries(d.kgReports||{}).forEach(([ym,cl])=>{kg[ym]={};Object.entries(cl).forEach(([n,v])=>{const k=norm(n);kg[ym][k]=kg[ym][k]||{};Object.entries(v).forEach(([day,e])=>{const o=kg[ym][k][day]=kg[ym][k][day]||{kg:0,p:{}};o.kg+=+e.kg||0;Object.entries(e.p||{}).forEach(([p,q])=>o.p[p]=(o.p[p]||0)+(+q||0))})})});
-    const loc={};Object.entries(d.allLocations||{}).forEach(([k,v])=>loc[norm(k)]=v);
-    (d.courses||[]).forEach(co=>(co.customers||[]).forEach(cu=>{const k=norm(cu.name);if(k&&cu.location&&!loc[k])loc[k]=cu.location}));
-    const mp=new Map();
-    Object.values(d.rankings||{}).forEach(r=>{if(!r||!r.name)return;const k=norm(r.name),l=loc[k]||null;
-      const ct=String(r.colG??(l&&l.colG)??"").trim()||NOCITY,st=Math.max(1,Math.min(5,Math.round(+r.stars||1)));
-      mp.set(k,{key:k,name:String(r.name).trim(),city:ct,stars:st,grayPct:typeof r.grayPct==="number"?r.grayPct:100-(st-1)*25,score:+r.score||0,isActive:r.isActive!==false,coords:coords(l,ct)})});
-    (d.courses||[]).forEach(co=>(co.customers||[]).forEach(cu=>{const k=norm(cu.name);if(!k||mp.has(k))return;const l=loc[k]||null,ct=String(l&&l.colG||"").trim()||NOCITY,ok=cu.status==="Complet";
-      mp.set(k,{key:k,name:String(cu.name).trim(),city:ct,stars:ok?3:1,grayPct:ok?50:100,score:ok?1:-3,isActive:ok,coords:coords(l,ct)})}));
-    clients=[...mp.values()].sort((a,b)=>a.name.localeCompare(b.name,"ro"));
-    derive();$("sub").textContent="Actualizat "+NOW.toLocaleDateString("ro-RO")+" • "+new Date().toLocaleTimeString("ro-RO",{hour:"2-digit",minute:"2-digit"});
-    fillSelects();drawAll();
-  }catch(e){$("sub").textContent="Eroare la încărcare";$("cities").innerHTML=`<div class="glass err">${esc(e.message)}<br><br><button class="btn" onclick="load()">Reîncearcă</button></div>`}
-  $("sync").classList.remove("spin")}
+    var rows = [];
+    // Sarim peste randul 1 (antetul tabelului)
+    for (var i = 1; i < data.length; i++) {
+      var r = data[i];
+      if (!r[0] && !r[1]) continue; // Ignora randurile complet goale
 
-function derive(){clients.forEach(c=>{
-  const s=new Set(((pat[c.key]||{}).orderDates||[]).map(dstr).filter(Boolean));
-  Object.entries(months).forEach(([ym,mo])=>(mo.rows[c.key]||[]).forEach(d=>s.add(ym+"-"+p2(d))));
-  c.dates=[...s].sort();c.cur=c.dates.filter(d=>d.startsWith(CUR)).length;c.prev=c.dates.filter(d=>d.startsWith(PREV)).length;
-  c.total=Math.max(c.dates.length,+(pat[c.key]||{}).totalOrdersRecorded||0);
-  c.freq=Object.fromEntries(WD.map(w=>[w,0]));c.dates.forEach(d=>c.freq[wdOf(d)]++);
-  c.pref=WD.filter(w=>c.freq[w]).sort((a,b)=>c.freq[b]-c.freq[a]);c.last=c.dates[c.dates.length-1]||"-"})}
+      // Formatare sigura a datei (Coloana A)
+      var rawDate = r[0];
+      var formattedDate = "";
+      if (rawDate instanceof Date) {
+        formattedDate = Utilities.formatDate(rawDate, ss.getSpreadsheetTimeZone(), "yyyy-MM-dd");
+      } else {
+        formattedDate = String(rawDate).trim();
+      }
 
-function fillSelects(){
-  const cur=$("clSel").value;$("clSel").innerHTML=clients.map(c=>`<option value="${esc(c.key)}">${esc(c.name)}</option>`).join("");if(cur)$("clSel").value=cur;
-  const ks=new Set([CUR,PREV,...Object.keys(months),...Object.keys(kg)]);clients.forEach(c=>c.dates.forEach(d=>ks.add(d.slice(0,7))));
-  const old=$("mSel").value||CUR;$("mSel").innerHTML=[...ks].sort().reverse().map(k=>`<option value="${k}">${k}</option>`).join("");$("mSel").value=ks.has(old)?old:CUR}
-function drawAll(){drawCities();drawReport();drawMonth();drawSummary();if(tab==="map")drawMap()}
+      rows.push({
+        date: formattedDate,                        // A: date
+        client: String(r[1] || "").trim(),          // B: Denumire client
+        product: String(r[2] || "").trim(),         // C: Denumire produs
+        cantAvize: Number(r[3]) || 0,               // D: Cantitate avize
+        valAvizeNoVat: Number(r[4]) || 0,           // E: Valoare avize fara TVA
+        valAvizeVat: Number(r[5]) || 0,             // F: Valoare avize cu TVA
+        lastPriceAvize: Number(r[6]) || 0,          // G: Ultimul pret avize (fara TVA)
+        cantFacturi: Number(r[7]) || 0,             // H: Cantitate facturi
+        valFacturiNoVat: Number(r[8]) || 0,         // I: Valoare facturi fara TVA
+        valFacturiVat: Number(r[9]) || 0,           // J: Valoare facturi cu TVA
+        lastPriceFacturi: Number(r[10]) || 0,       // K: Ultimul pret facturi (fara TVA)
+        currentPrice: Number(r[11]) || 0,           // L: Pret curent (fara TVA)
+        cantTotala: Number(r[12]) || 0,             // M: Cantitate totala (kg)
+        valTotalaNoVat: Number(r[13]) || 0,         // N: Valoare totala fara TVA
+        valTotalaVat: Number(r[14]) || 0,           // O: Valoare totala cu TVA
+        codProdus: String(r[15] || "").trim(),      // P: Cod produs
+        zilePlata: Number(r[16]) || 0,              // Q: Nr. zile plata
+        zileBlocare: Number(r[17]) || 0             // R: Nr. zile blocare
+      });
+    }
 
-function drawCities(){
-  const act=clients.filter(c=>status(c)[0]!=="INACTIVE").length;
-  $("kpis").innerHTML=[["Clienți",clients.length],["Activi",act],["Luna curentă",sum("cur")],["Luna trecută",sum("prev")]].map(k=>`<div class="glass kpi"><b>${k[1]}</b><span>${k[0]}</span></div>`).join("");
-  const cities=[...new Set(clients.map(c=>c.city))].sort((a,b)=>a.localeCompare(b,"ro"));
-  $("stChips").innerHTML=[["ALL","Toate"],["ACTIVE","Activ"],["LOW","Puțin activ"],["INACTIVE","Inactiv"]].map(s=>`<button class="chip ${stF===s[0]?"on":""}" data-st="${s[0]}">${s[1]}</button>`).join("");
-  $("cityChips").innerHTML=`<button class="chip ${city==="ALL"?"on":""}" data-c="ALL">Toate orașele</button>`+cities.map(c=>`<button class="chip ${city===c?"on":""}" data-c="${esc(c)}">${esc(c)}</button>`).join("");
-  const q=norm($("q").value),so=$("sort").value;
-  const list=clients.filter(c=>(city==="ALL"||c.city===city)&&(stF==="ALL"||status(c)[0]===stF)&&(!q||norm(c.name+" "+c.city).includes(q)));
-  list.sort((a,b)=>so==="name"?a.name.localeCompare(b.name,"ro"):so==="cur"?b.cur-a.cur:so==="total"?b.total-a.total:(b.stars-a.stars)||(b.score-a.score));
-  const g={};list.forEach(c=>(g[c.city]=g[c.city]||[]).push(c));
-  $("cities").innerHTML=Object.keys(g).sort((a,b)=>a.localeCompare(b,"ro")).map(k=>`<details open><summary>${esc(k)}<small>${g[k].length} clienți • ${g[k].reduce((s,c)=>s+c.cur,0)} comenzi luna aceasta</small></summary><div class="grid">${g[k].map(card).join("")}</div></details>`).join("")||`<div class="glass err" style="color:var(--tx2)">Niciun client găsit.</div>`}
-const sum=f=>clients.reduce((s,c)=>s+c[f],0);
-function card(c){const[,l,k]=status(c);return`<div class="glass card" data-k="${esc(c.key)}"><div class="m"><h3>${esc(c.name)}</h3><span class="pill ${k}">${l}</span></div>${stars(c)} <span class="m" style="display:inline">${c.stars}/5</span>
-<div class="nums"><div><b>${c.cur}</b><span>Luna asta</span></div><div><b>${c.prev}</b><span>Trecută</span></div><div><b>${c.total}</b><span>Total</span></div></div>
-${c.pref.slice(0,3).map(w=>`<span class="tag">${w}</span>`).join("")||'<span class="tag">fără istoric</span>'}<div class="m" style="margin-top:6px">Ultima comandă: ${c.last}</div></div>`}
+    return ContentService
+      .createTextOutput(JSON.stringify({ status: "ok", count: rows.length, rows: rows }))
+      .setMimeType(ContentService.MimeType.JSON);
 
-function cal(c,ym){const[y,m]=ym.split("-").map(Number),n=new Date(y,m,0).getDate(),off=(new Date(y,m-1,1).getDay()+6)%7,days=new Set(c.dates.filter(d=>d.startsWith(ym)).map(d=>+d.slice(8)));
-  return`<div class="cal">${WD.map(w=>`<b style="font-size:10px;color:var(--tx2)">${w.slice(0,2)}</b>`).join("")}${'<span class="e"></span>'.repeat(off)}${Array.from({length:n},(_,i)=>`<span class="${days.has(i+1)?"y":""}">${i+1}</span>`).join("")}</div>`}
-function drawReport(){
-  const c=clients.find(x=>x.key===$("clSel").value);
-  if(c){const df=c.cur-c.prev,mx=Math.max(1,...WD.map(w=>c.freq[w])),[,l,k]=status(c);
-    $("report").innerHTML=`<div class="glass panel"><div class="m" style="display:flex;justify-content:space-between;align-items:center"><div><div class="h" style="margin:0">${esc(c.name)}</div><span style="color:var(--tx2)">${esc(c.city)}</span></div><span class="pill ${k}">${l}</span></div>${stars(c)}
-<div class="nums" style="margin-top:12px"><div><b>${c.cur}</b><span>${CUR}</span></div><div><b>${c.prev}</b><span>${PREV}</span></div><div><b style="color:var(--${df>=0?"ok":"bad"})">${df>0?"+":""}${df}</b><span>Diferență</span></div><div><b>${c.total}</b><span>Total</span></div></div>
-<div class="h" style="margin-top:14px">Zilele din săptămână</div><div class="bars">${WD.map(w=>`<div>${c.freq[w]}<i style="height:${c.freq[w]/mx*80}%"></i>${w.slice(0,2)}</div>`).join("")}</div></div>
-<div class="two"><div class="glass panel"><div class="h">${CUR}</div>${cal(c,CUR)}</div><div class="glass panel"><div class="h">${PREV}</div>${cal(c,PREV)}</div></div>`}
-  $("cmp").innerHTML=[...clients].sort((a,b)=>b.cur-a.cur).map(c=>{const d=c.cur-c.prev;return`<tr data-k="${esc(c.key)}"><td><b>${esc(c.name)}</b></td><td>${esc(c.city)}</td><td>${c.cur}</td><td>${c.prev}</td><td style="color:var(--${d>=0?"ok":"bad"})">${d>0?"+":""}${d}</td><td>${c.total}</td><td>${c.pref.slice(0,3).join(", ")||"-"}</td></tr>`}).join("")}
-
-function drawMonth(){
-  const ym=$("mSel").value||CUR,[y,m]=ym.split("-").map(Number),n=(months[ym]||{}).days||new Date(y,m,0).getDate(),td=ym===CUR?NOW.getDate():0,K=kg[ym]||{},col=Array(n+1).fill(0);
-  let h=`<thead><tr><th>Client</th>${Array.from({length:n},(_,i)=>`<th class="${i+1===td?"today":""}">${i+1}<br>${WD[(new Date(y,m-1,i+1).getDay()+6)%7].slice(0,2)}</th>`).join("")}<th>Total kg</th></tr></thead><tbody>`;
-  clients.forEach(c=>{const km=K[c.key]||{},s=new Set(c.dates.filter(d=>d.startsWith(ym)).map(d=>+d.slice(8)));let tot=0;
-    h+=`<tr><td>${esc(c.name)}</td>${Array.from({length:n},(_,i)=>{const d=i+1,v=km[d],t=d===td?"today":"";
-      if(v&&v.kg){col[d]+=v.kg;tot+=v.kg;const tip=Object.entries(v.p||{}).map(([p,q])=>p+": "+fk(q)+" kg").join("\n");return`<td class="${t}" title="${esc(tip)}"><span class="kg">${fk(v.kg)}</span></td>`}
-      return`<td class="${t}">${s.has(d)?'<span class="dot"></span>':""}</td>`}).join("")}<td><b>${tot?fk(tot):""}</b></td></tr>`});
-  $("mx").innerHTML=h+`<tr><td><b>Total zi (kg)</b></td>${col.slice(1).map(v=>`<td><b>${v?fk(v):""}</b></td>`).join("")}<td><b>${fk(col.reduce((a,b)=>a+b,0))}</b></td></tr></tbody>`}
-
-function drawSummary(){const g={};clients.forEach(c=>(g[c.city]=g[c.city]||[]).push(c));
-  $("citySum").innerHTML=Object.entries(g).sort((a,b)=>b[1].length-a[1].length).map(([k,l])=>`<tr><td><b>${esc(k)}</b></td><td>${l.length}</td><td>${l.reduce((s,c)=>s+c.cur,0)}</td><td>${l.reduce((s,c)=>s+c.prev,0)}</td><td>${l.reduce((s,c)=>s+c.total,0)}</td><td>${(l.reduce((s,c)=>s+c.stars,0)/l.length).toFixed(1)} ★</td></tr>`).join("")}
-
-function drawMap(){
-  const note=$("mnote");
-  if(typeof L==="undefined"){note.textContent="Leaflet nu s-a încărcat (verifică internetul / blocarea unpkg.com).";return}
-  if(!map){
-    map=L.map("map").setView([45.94,24.97],6);
-    const osm=L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"&copy; OpenStreetMap contributors",maxZoom:19});
-    const esri=L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",{attribution:"Tiles &copy; Esri",maxZoom:19});
-    let tileErr=0;
-    osm.on("tileerror",()=>{tileErr++;if(tileErr>=4&&!map.hasLayer(esri)){map.removeLayer(osm);esri.addTo(map);note.textContent="S-a comutat automat pe harta alternativă (Esri)."}});
-    osm.addTo(map);
-    pins=L.layerGroup().addTo(map);
+  } catch (err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ status: "error", message: err.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
   }
-  setTimeout(()=>{map.invalidateSize();pins.clearLayers();const pts=[],miss=[],col={ok:"#2fb355",lo:"#e5941c",bad:"#e04338"};
-    clients.forEach(c=>{if(!c.coords){miss.push(c.name);return}pts.push(c.coords);const[,l,k]=status(c);
-      L.circleMarker(c.coords,{radius:9,color:"#fff",weight:2,fillColor:col[k],fillOpacity:.95}).addTo(pins).bindPopup(`<b>${esc(c.name)}</b><br>${esc(c.city)}<br>${l} • ${c.stars}/5<br>Luna asta: ${c.cur}`)});
-    if(pts.length)map.fitBounds(L.latLngBounds(pts),{padding:[30,30],maxZoom:12});
-    note.textContent=`${pts.length} clienți pe hartă`+(miss.length?` • ${miss.length} fără coordonate: ${miss.slice(0,5).join(", ")}${miss.length>5?"…":""}`:"")},120)}
+}`;
 
-function show(t){tab=t;document.querySelectorAll(".sec").forEach(s=>s.classList.toggle("on",s.id==="t-"+t));document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.t===t));scrollTo({top:0});if(t==="map")drawMap()}
-document.addEventListener("click",e=>{
-  const n=e.target.closest("#nav button");if(n)return show(n.dataset.t);
-  const s=e.target.closest("[data-st]");if(s){stF=s.dataset.st;return drawCities()}
-  const c=e.target.closest("[data-c]");if(c){city=c.dataset.c;return drawCities()}
-  const k=e.target.closest("[data-k]");if(k){$("clSel").value=k.dataset.k;drawReport();show("report")}});
-load();
-</script></body></html>
+    // =========================================================================
+    // 2. APPLICATION STATE & INITIALIZATION
+    // =========================================================================
+    let allRows = [];
+    let filteredRows = [];
+    let currentGranularity = 'daily'; // 'daily' | 'weekly' | 'monthly' | 'yearly'
+    let currentAlertFilter = 'ALL';   // 'ALL' | 'ALERTS' | 'HEALTHY'
+    let currentPage = 1;
+    const rowsPerPage = 15;
+
+    let trendChartInstance = null;
+    let productChartInstance = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      document.getElementById('appsScriptCodeBlock').textContent = APPS_SCRIPT_TEMPLATE;
+
+      // Initialize Theme from localStorage or System
+      const savedTheme = localStorage.getItem('salespulse_theme');
+      if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+        document.getElementById('themeIcon').setAttribute('data-lucide', 'sun');
+        lucide.createIcons();
+      }
+
+      // Bind Segmented Controls
+      document.querySelectorAll('#granularityControl .ios-seg-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#granularityControl .ios-seg-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentGranularity = btn.dataset.granularity;
+          updateDashboard();
+        });
+      });
+
+      document.querySelectorAll('#alertFilterControl .ios-seg-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#alertFilterControl .ios-seg-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentAlertFilter = btn.dataset.alertFilter;
+          renderCustomerAlerts();
+        });
+      });
+
+      // Bind Filters
+      ['clientFilter', 'productFilter', 'dateFrom', 'dateTo'].forEach(id => {
+        document.getElementById(id).addEventListener('change', () => {
+          currentPage = 1;
+          applyFiltersAndRender();
+        });
+      });
+
+      document.getElementById('chartMetricMode').addEventListener('change', () => {
+        renderTrendChart();
+      });
+
+      document.getElementById('tableSearch').addEventListener('input', () => {
+        currentPage = 1;
+        renderTable();
+      });
+
+      // Load saved Google Sheet URL or start with realistic demo dataset
+      const savedUrl = localStorage.getItem('salespulse_sheet_url');
+      if (savedUrl) {
+        document.getElementById('sheetUrlInput').value = savedUrl;
+        syncSheetData(false);
+      } else {
+        loadDemoData(false);
+      }
+    });
+
+    // =========================================================================
+    // 3. REALISTIC DEMO DATA GENERATOR (Simulates A-R columns over 14 months)
+    // =========================================================================
+    function generateRealisticDemoData() {
+      const clients = [
+        { name: 'SC Brutăria Artizanală SRL', pattern: 'dropping', payDays: 30, blockDays: 45 },
+        { name: 'Patiseria La Cuptorul de Aur', pattern: 'healthy', payDays: 15, blockDays: 30 },
+        { name: 'Distribuție HoReCa Nord SA', pattern: 'critical_drop', payDays: 45, blockDays: 60 },
+        { name: 'Supermarket FreshMarket SRL', pattern: 'growing', payDays: 30, blockDays: 45 },
+        { name: 'Cofetăria Sweet Velvet', pattern: 'inactive', payDays: 30, blockDays: 35 },
+        { name: 'Panificație Muntenia Grup', pattern: 'healthy', payDays: 21, blockDays: 30 }
+      ];
+
+      const products = [
+        { code: 'FA-001', name: 'Făină Albă Superioară 000 (kg)', price: 2.85 },
+        { code: 'FA-650', name: 'Făină Panificație Tip 650 (kg)', price: 2.45 },
+        { code: 'ZA-010', name: 'Zahăr Cristal Rafinat (kg)', price: 4.20 },
+        { code: 'UL-025', name: 'Ulei Floarea Soarelui Rafinat (kg)', price: 6.90 },
+        { code: 'DR-005', name: 'Drojdie Proaspătă Panificație (kg)', price: 9.50 },
+        { code: 'UN-820', name: 'Unt 82% Grăsime Calup (kg)', price: 34.00 }
+      ];
+
+      const rows = [];
+      const today = new Date();
+      const totalDays = 400; // Covers > 1 year for Yearly/Monthly/Weekly/Daily views
+
+      for (let d = totalDays; d >= 0; d--) {
+        const currentDate = new Date(today);
+        currentDate.setDate(today.getDate() - d);
+        const dayOfWeek = currentDate.getDay();
+        if (dayOfWeek === 0) continue; // Skip Sundays
+
+        const isoDate = currentDate.toISOString().split('T')[0];
+
+        clients.forEach((client, cIdx) => {
+          // Determine order probability based on client behavior pattern
+          let orderChance = 0.22;
+          let qtyMultiplier = 1.0;
+
+          if (client.pattern === 'dropping') {
+            // Bought 450kg regularly, dropped by ~55% in last 30 days
+            orderChance = d <= 30 ? 0.14 : 0.28;
+            qtyMultiplier = d <= 30 ? 0.45 : 1.15;
+          } else if (client.pattern === 'critical_drop') {
+            // Dropped by >75% recently
+            orderChance = d <= 30 ? 0.08 : 0.30;
+            qtyMultiplier = d <= 30 ? 0.25 : 1.3;
+          } else if (client.pattern === 'inactive') {
+            // Stopped buying 38 days ago
+            if (d <= 38) return;
+            orderChance = 0.26;
+          } else if (client.pattern === 'growing') {
+            qtyMultiplier = d <= 30 ? 1.35 : 0.95;
+          }
+
+          // Deterministic pseudo-random so data looks natural & consistent
+          const seed = (d * 31 + cIdx * 17) % 100;
+          if (seed / 100 < orderChance) {
+            const prod = products[(d + cIdx) % products.length];
+            const baseKg = (120 + ((d * 13 + cIdx * 29) % 380)) * qtyMultiplier;
+            const totalKg = Math.round(baseKg);
+
+            // Split between Avize (D) and Facturi (H)
+            const isAvizOnly = (d + cIdx) % 4 === 0;
+            const cantAvize = isAvizOnly ? totalKg : Math.round(totalKg * 0.3);
+            const cantFacturi = totalKg - cantAvize;
+
+            const price = prod.price;
+            const valAvizeNoVat = +(cantAvize * price).toFixed(2);
+            const valAvizeVat = +(valAvizeNoVat * 1.09).toFixed(2); // 9% food VAT in RO
+            const valFacturiNoVat = +(cantFacturi * price).toFixed(2);
+            const valFacturiVat = +(valFacturiNoVat * 1.09).toFixed(2);
+
+            rows.push({
+              date: isoDate,
+              client: client.name,
+              product: prod.name,
+              cantAvize,
+              valAvizeNoVat,
+              valAvizeVat,
+              lastPriceAvize: price,
+              cantFacturi,
+              valFacturiNoVat,
+              valFacturiVat,
+              lastPriceFacturi: price,
+              currentPrice: price,
+              cantTotala: totalKg,
+              valTotalaNoVat: +(valAvizeNoVat + valFacturiNoVat).toFixed(2),
+              valTotalaVat: +(valAvizeVat + valFacturiVat).toFixed(2),
+              codProdus: prod.code,
+              zilePlata: client.payDays,
+              zileBlocare: client.blockDays
+            });
+          }
+        });
+      }
+
+      return rows.sort((a, b) => b.date.localeCompare(a.date));
+    }
+
+    function loadDemoData(showNotification = true) {
+      localStorage.removeItem('salespulse_sheet_url');
+      document.getElementById('sheetUrlInput').value = '';
+      allRows = generateRealisticDemoData();
+      updateSourceBadge(false);
+      populateDropdowns();
+      setDefaultDateRange();
+      applyFiltersAndRender();
+      closeConnectModal();
+      if (showNotification) {
+        showToast('Date demo încărcate cu succes (6 clienți, 14 luni istoric).', 'info');
+      }
+    }
+
+    // =========================================================================
+    // 4. GOOGLE SHEETS LIVE SYNC
+    // =========================================================================
+    async function syncSheetData(notify = true) {
+      const url = localStorage.getItem('salespulse_sheet_url');
+      if (!url) {
+        loadDemoData(notify);
+        return;
+      }
+
+      const refreshIcon = document.querySelector('#refreshBtn i');
+      if (refreshIcon) refreshIcon.classList.add('animate-spin');
+
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const json = await response.json();
+
+        if (json.status === 'error') {
+          throw new Error(json.message || 'Eroare în Google Apps Script');
+        }
+
+        const rawRows = Array.isArray(json) ? json : (json.rows || []);
+        if (rawRows.length === 0) {
+          showToast('Tabelul Google Sheet este gol sau nu are date după rândul 1.', 'warning');
+          return;
+        }
+
+        // Normalize incoming rows & fallback if cantTotala wasn't pre-summed
+        allRows = rawRows.map(r => {
+          const cAvize = Number(r.cantAvize) || 0;
+          const cFact = Number(r.cantFacturi) || 0;
+          const cTot = Number(r.cantTotala) || (cAvize + cFact);
+          const vNoVat = Number(r.valTotalaNoVat) || ((Number(r.valAvizeNoVat) || 0) + (Number(r.valFacturiNoVat) || 0));
+          const vVat = Number(r.valTotalaVat) || ((Number(r.valAvizeVat) || 0) + (Number(r.valFacturiVat) || 0));
+
+          return {
+            date: normalizeDateString(r.date),
+            client: String(r.client || 'Client Necunoscut').trim(),
+            product: String(r.product || 'Produs Necunoscut').trim(),
+            cantAvize: cAvize,
+            valAvizeNoVat: Number(r.valAvizeNoVat) || 0,
+            valAvizeVat: Number(r.valAvizeVat) || 0,
+            lastPriceAvize: Number(r.lastPriceAvize) || 0,
+            cantFacturi: cFact,
+            valFacturiNoVat: Number(r.valFacturiNoVat) || 0,
+            valFacturiVat: Number(r.valFacturiVat) || 0,
+            lastPriceFacturi: Number(r.lastPriceFacturi) || 0,
+            currentPrice: Number(r.currentPrice) || 0,
+            cantTotala: cTot,
+            valTotalaNoVat: vNoVat,
+            valTotalaVat: vVat,
+            codProdus: String(r.codProdus || '-').trim(),
+            zilePlata: Number(r.zilePlata) || 0,
+            zileBlocare: Number(r.zileBlocare) || 0
+          };
+        }).filter(r => r.date).sort((a, b) => b.date.localeCompare(a.date));
+
+        updateSourceBadge(true, allRows.length);
+        populateDropdowns();
+        setDefaultDateRange();
+        applyFiltersAndRender();
+
+        if (notify) {
+          showToast(`Sincronizat cu succes: ${allRows.length} înregistrări din Google Sheets!`, 'success');
+        }
+      } catch (err) {
+        console.error('Sync error:', err);
+        showToast(`Eroare la conectarea cu Google Sheets: ${err.message}`, 'error');
+      } finally {
+        if (refreshIcon) refreshIcon.classList.remove('animate-spin');
+      }
+    }
+
+    function normalizeDateString(val) {
+      if (!val) return '';
+      const str = String(val).trim();
+      if (/^\d{4}-\d{2}-\d{2}/.test(str)) return str.slice(0, 10);
+      // Handle DD.MM.YYYY or DD/MM/YYYY
+      const parts = str.match(/^(\d{1,2})[./-](\d{1,2})[./-](\d{4})/);
+      if (parts) {
+        return `${parts[3]}-${parts[2].padStart(2, '0')}-${parts[1].padStart(2, '0')}`;
+      }
+      const parsed = new Date(str);
+      if (!isNaN(parsed.getTime())) {
+        return parsed.toISOString().split('T')[0];
+      }
+      return '';
+    }
+
+    function saveAndConnectSheet() {
+      const url = document.getElementById('sheetUrlInput').value.trim();
+      if (!url || !url.startsWith('https://script.google.com/')) {
+        showToast('Te rog introdu un URL valid de Google Apps Script (https://script.google.com/...).', 'error');
+        return;
+      }
+      localStorage.setItem('salespulse_sheet_url', url);
+      closeConnectModal();
+      syncSheetData(true);
+    }
+
+    function updateSourceBadge(isLive, count = 0) {
+      const badge = document.getElementById('dataSourceBadge');
+      if (isLive) {
+        badge.className = 'inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25';
+        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Live Google Sheet (${count} rânduri)`;
+      } else {
+        badge.className = 'inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/25';
+        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> Mod Demo (Date Simulate)`;
+      }
+    }
+
+    // =========================================================================
+    // 5. FILTERS & DROPDOWNS
+    // =========================================================================
+    function populateDropdowns() {
+      const clientSelect = document.getElementById('clientFilter');
+      const productSelect = document.getElementById('productFilter');
+
+      const clients = [...new Set(allRows.map(r => r.client))].sort((a, b) => a.localeCompare(b));
+      const products = [...new Set(allRows.map(r => r.product))].sort((a, b) => a.localeCompare(b));
+
+      clientSelect.innerHTML = `<option value="ALL">Toți Clienții (${clients.length})</option>` +
+        clients.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+
+      productSelect.innerHTML = `<option value="ALL">Toate Produsele (${products.length})</option>` +
+        products.map(p => `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`).join('');
+    }
+
+    function setDefaultDateRange() {
+      if (allRows.length === 0) return;
+      const dates = allRows.map(r => r.date).sort();
+      const maxDate = dates[dates.length - 1];
+      const minDate = dates[0];
+
+      // Default to last 90 days if dataset spans more, so daily chart is crisp & readable
+      const maxObj = new Date(maxDate);
+      const ninetyAgo = new Date(maxObj);
+      ninetyAgo.setDate(maxObj.getDate() - 90);
+      const ninetyIso = ninetyAgo.toISOString().split('T')[0];
+
+      document.getElementById('dateFrom').value = ninetyIso > minDate ? ninetyIso : minDate;
+      document.getElementById('dateTo').value = maxDate;
+    }
+
+    function resetFilters() {
+      document.getElementById('clientFilter').value = 'ALL';
+      document.getElementById('productFilter').value = 'ALL';
+      document.getElementById('tableSearch').value = '';
+      if (allRows.length > 0) {
+        const dates = allRows.map(r => r.date).sort();
+        document.getElementById('dateFrom').value = dates[0];
+        document.getElementById('dateTo').value = dates[dates.length - 1];
+      }
+      currentPage = 1;
+      applyFiltersAndRender();
+      showToast('Filtrele au fost resetate pe tot istoricul disponibil.', 'info');
+    }
+
+    function applyFiltersAndRender() {
+      const selectedClient = document.getElementById('clientFilter').value;
+      const selectedProduct = document.getElementById('productFilter').value;
+      const dateFrom = document.getElementById('dateFrom').value;
+      const dateTo = document.getElementById('dateTo').value;
+
+      filteredRows = allRows.filter(row => {
+        if (selectedClient !== 'ALL' && row.client !== selectedClient) return false;
+        if (selectedProduct !== 'ALL' && row.product !== selectedProduct) return false;
+        if (dateFrom && row.date < dateFrom) return false;
+        if (dateTo && row.date > dateTo) return false;
+        return true;
+      });
+
+      updateDashboard();
+    }
+
+    function updateDashboard() {
+      updateKPIs();
+      renderTrendChart();
+      renderProductChart();
+      renderCustomerAlerts();
+      renderTable();
+    }
+
+    // =========================================================================
+    // 6. KPI CALCULATIONS
+    // =========================================================================
+    function updateKPIs() {
+      let totalKg = 0;
+      let avizeKg = 0;
+      let facturiKg = 0;
+      let totalNoVat = 0;
+      let totalVat = 0;
+      let payDaysSum = 0;
+      let payDaysCount = 0;
+
+      const clientSet = new Set();
+      const productKgMap = {};
+
+      filteredRows.forEach(r => {
+        totalKg += r.cantTotala;
+        avizeKg += r.cantAvize;
+        facturiKg += r.cantFacturi;
+        totalNoVat += r.valTotalaNoVat;
+        totalVat += r.valTotalaVat;
+        clientSet.add(r.client);
+
+        productKgMap[r.product] = (productKgMap[r.product] || 0) + r.cantTotala;
+
+        if (r.zilePlata > 0) {
+          payDaysSum += r.zilePlata;
+          payDaysCount++;
+        }
+      });
+
+      // Top product
+      let topProd = '-';
+      let topProdKg = 0;
+      Object.entries(productKgMap).forEach(([prod, kg]) => {
+        if (kg > topProdKg) {
+          topProdKg = kg;
+          topProd = prod;
+        }
+      });
+
+      document.getElementById('kpiTotalKg').textContent = `${formatNumber(totalKg)} kg`;
+      document.getElementById('kpiAvizeKg').textContent = `${formatNumber(avizeKg)} kg`;
+      document.getElementById('kpiFacturiKg').textContent = `${formatNumber(facturiKg)} kg`;
+      document.getElementById('kpiTotalNoVat').textContent = `${formatNumber(totalNoVat, 2)} RON`;
+      document.getElementById('kpiTotalWithVat').textContent = `${formatNumber(totalVat, 2)} RON`;
+      document.getElementById('kpiTopProduct').textContent = topProd !== '-' ? `${topProd} (${formatNumber(topProdKg)} kg)` : '-';
+      document.getElementById('kpiActiveClients').textContent = `${clientSet.size} clienți`;
+
+      const avgPay = payDaysCount > 0 ? Math.round(payDaysSum / payDaysCount) : 0;
+      document.getElementById('kpiAvgPayDays').textContent = `${avgPay} zile`;
+    }
+
+    // =========================================================================
+    // 7. TIME-SERIES CHART (DAILY / WEEKLY / MONTHLY / YEARLY)
+    // =========================================================================
+    function getPeriodKey(isoDate, granularity) {
+      if (granularity === 'daily') return isoDate;
+      if (granularity === 'monthly') return isoDate.slice(0, 7); // YYYY-MM
+      if (granularity === 'yearly') return isoDate.slice(0, 4);  // YYYY
+
+      // Weekly (ISO Week)
+      const d = new Date(isoDate + 'T00:00:00');
+      const dayNum = d.getUTCDay() || 7;
+      d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+      const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+      const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+      return `${d.getUTCFullYear()}-S${String(weekNo).padStart(2, '0')}`;
+    }
+
+    function formatPeriodLabel(key, granularity) {
+      if (granularity === 'daily') {
+        const [y, m, d] = key.split('-');
+        return `${d}.${m}.${y}`;
+      }
+      if (granularity === 'monthly') {
+        const months = ['Ian', 'Feb', 'Mar', 'Apr', 'Mai', 'Iun', 'Iul', 'Aug', 'Sep', 'Oct', 'Noi', 'Dec'];
+        const [y, m] = key.split('-');
+        return `${months[parseInt(m, 10) - 1]} ${y}`;
+      }
+      return key;
+    }
+
+    function renderTrendChart() {
+      const grouped = {};
+      filteredRows.forEach(r => {
+        const key = getPeriodKey(r.date, currentGranularity);
+        if (!grouped[key]) grouped[key] = { kg: 0, ron: 0 };
+        grouped[key].kg += r.cantTotala;
+        grouped[key].ron += r.valTotalaNoVat;
+      });
+
+      const sortedKeys = Object.keys(grouped).sort();
+      const labels = sortedKeys.map(k => formatPeriodLabel(k, currentGranularity));
+      const kgData = sortedKeys.map(k => Math.round(grouped[k].kg * 100) / 100);
+      const ronData = sortedKeys.map(k => Math.round(grouped[k].ron * 100) / 100);
+
+      const granularityNames = {
+        daily: 'Zilnic',
+        weekly: 'Săptămânal',
+        monthly: 'Lunar',
+        yearly: 'Anual'
+      };
+      document.getElementById('trendChartTitle').textContent =
+        `Evoluție Cantitate (kg) & Valoare — ${granularityNames[currentGranularity]}`;
+
+      const mode = document.getElementById('chartMetricMode').value;
+      const isDark = document.documentElement.classList.contains('dark');
+      const gridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.06)';
+      const tickColor = isDark ? '#94a3b8' : '#64748b';
+
+      const datasets = [];
+      if (mode === 'both' || mode === 'kg') {
+        datasets.push({
+          label: 'Cantitate Totală (kg)',
+          data: kgData,
+          backgroundColor: 'rgba(59, 130, 246, 0.78)',
+          borderColor: '#3b82f6',
+          borderWidth: 2,
+          borderRadius: 10,
+          yAxisID: 'y',
+          order: 2
+        });
+      }
+      if (mode === 'both' || mode === 'ron') {
+        datasets.push({
+          type: mode === 'both' ? 'line' : 'bar',
+          label: 'Valoare fără TVA (RON)',
+          data: ronData,
+          backgroundColor: 'rgba(16, 185, 129, 0.25)',
+          borderColor: '#10b981',
+          borderWidth: 3,
+          pointRadius: 3,
+          pointHoverRadius: 6,
+          tension: 0.35,
+          fill: mode === 'ron',
+          borderRadius: 10,
+          yAxisID: mode === 'both' ? 'y1' : 'y',
+          order: 1
+        });
+      }
+
+      const ctx = document.getElementById('trendChart').getContext('2d');
+      if (trendChartInstance) trendChartInstance.destroy();
+
+      trendChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: { labels, datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: {
+              labels: { color: tickColor, usePointStyle: true, boxWidth: 8, font: { weight: '600' } }
+            },
+            tooltip: {
+              backgroundColor: isDark ? 'rgba(15, 23, 42, 0.92)' : 'rgba(255, 255, 255, 0.95)',
+              titleColor: isDark ? '#f8fafc' : '#0f172a',
+              bodyColor: isDark ? '#cbd5e1' : '#334155',
+              borderColor: 'rgba(148, 163, 184, 0.3)',
+              borderWidth: 1,
+              padding: 12,
+              cornerRadius: 14
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: { color: tickColor, maxRotation: 45, autoSkip: true, maxTicksLimit: 18 }
+            },
+            y: {
+              type: 'linear',
+              position: 'left',
+              grid: { color: gridColor },
+              ticks: { color: tickColor },
+              title: {
+                display: true,
+                text: mode === 'ron' ? 'RON (fără TVA)' : 'Cantitate (kg)',
+                color: tickColor,
+                font: { size: 11, weight: '600' }
+              }
+            },
+            ...(mode === 'both' ? {
+              y1: {
+                type: 'linear',
+                position: 'right',
+                grid: { drawOnChartArea: false },
+                ticks: { color: '#10b981' },
+                title: {
+                  display: true,
+                  text: 'Valoare (RON)',
+                  color: '#10b981',
+                  font: { size: 11, weight: '600' }
+                }
+              }
+            } : {})
+          }
+        }
+      });
+    }
+
+    // =========================================================================
+    // 8. PRODUCT BREAKDOWN DOUGHNUT CHART
+    // =========================================================================
+    function renderProductChart() {
+      const prodMap = {};
+      let totalKg = 0;
+      filteredRows.forEach(r => {
+        prodMap[r.product] = (prodMap[r.product] || 0) + r.cantTotala;
+        totalKg += r.cantTotala;
+      });
+
+      const sorted = Object.entries(prodMap).sort((a, b) => b[1] - a[1]);
+      const labels = sorted.map(x => x[0]);
+      const values = sorted.map(x => Math.round(x[1] * 100) / 100);
+
+      const palette = [
+        '#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ec4899',
+        '#06b6d4', '#6366f1', '#14b8a6', '#f97316', '#84cc16'
+      ];
+
+      const isDark = document.documentElement.classList.contains('dark');
+      const ctx = document.getElementById('productChart').getContext('2d');
+      if (productChartInstance) productChartInstance.destroy();
+
+      productChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels,
+          datasets: [{
+            data: values,
+            backgroundColor: palette.slice(0, labels.length),
+            borderColor: isDark ? '#1e293b' : '#ffffff',
+            borderWidth: 2,
+            hoverOffset: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '66%',
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => {
+                  const val = ctx.parsed || 0;
+                  const pct = totalKg > 0 ? ((val / totalKg) * 100).toFixed(1) : 0;
+                  return ` ${formatNumber(val)} kg (${pct}%)`;
+                }
+              }
+            }
+          }
+        }
+      });
+
+      // Render top products legend list below doughnut
+      const listContainer = document.getElementById('topProductsList');
+      if (sorted.length === 0) {
+        listContainer.innerHTML = `<p class="text-center text-slate-400 py-2">Nu există date pentru selecția curentă.</p>`;
+        return;
+      }
+
+      listContainer.innerHTML = sorted.map(([name, kg], idx) => {
+        const pct = totalKg > 0 ? ((kg / totalKg) * 100).toFixed(1) : 0;
+        const color = palette[idx % palette.length];
+        return `
+          <div class="flex items-center justify-between gap-2 py-1 border-b border-slate-200/40 dark:border-slate-700/40 last:border-none">
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${color}"></span>
+              <span class="truncate font-medium">${escapeHtml(name)}</span>
+            </div>
+            <span class="font-bold shrink-0">${formatNumber(kg)} kg <span class="text-slate-400 font-normal">(${pct}%)</span></span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // =========================================================================
+    // 9. SMART CUSTOMER DROP & CHURN ANALYZER (Analiză Scădere Achiziții)
+    // =========================================================================
+    function analyzeCustomers() {
+      if (allRows.length === 0) return [];
+
+      // Find the latest transaction date across dataset as reference "today"
+      const allDates = allRows.map(r => r.date).sort();
+      const refDateStr = allDates[allDates.length - 1];
+      const refDate = new Date(refDateStr + 'T00:00:00');
+
+      const clientStats = {};
+
+      allRows.forEach(r => {
+        if (!clientStats[r.client]) {
+          clientStats[r.client] = {
+            client: r.client,
+            recent30Kg: 0,
+            prev60Kg: 0, // Days 31 to 90 (2 months baseline)
+            totalKg: 0,
+            lastOrderDate: r.date,
+            orderDates: new Set(),
+            maxPayDays: 0,
+            maxBlockDays: 0,
+            topProductMap: {}
+          };
+        }
+
+        const st = clientStats[r.client];
+        const rowDate = new Date(r.date + 'T00:00:00');
+        const diffDays = Math.floor((refDate - rowDate) / (1000 * 60 * 60 * 24));
+
+        st.totalKg += r.cantTotala;
+        st.orderDates.add(r.date);
+        if (r.date > st.lastOrderDate) st.lastOrderDate = r.date;
+        if (r.zilePlata > st.maxPayDays) st.maxPayDays = r.zilePlata;
+        if (r.zileBlocare > st.maxBlockDays) st.maxBlockDays = r.zileBlocare;
+        st.topProductMap[r.product] = (st.topProductMap[r.product] || 0) + r.cantTotala;
+
+        if (diffDays <= 30) {
+          st.recent30Kg += r.cantTotala;
+        } else if (diffDays > 30 && diffDays <= 90) {
+          st.prev60Kg += r.cantTotala;
+        }
+      });
+
+      const results = Object.values(clientStats).map(st => {
+        const lastDateObj = new Date(st.lastOrderDate + 'T00:00:00');
+        const daysSinceLastOrder = Math.floor((refDate - lastDateObj) / (1000 * 60 * 60 * 24));
+
+        // Monthly baseline from days 31..90 (2 months -> divide by 2)
+        const monthlyBaselineKg = st.prev60Kg / 2;
+        let changePct = 0;
+        if (monthlyBaselineKg > 0) {
+          changePct = ((st.recent30Kg - monthlyBaselineKg) / monthlyBaselineKg) * 100;
+        } else if (st.recent30Kg > 0) {
+          changePct = 100; // New active buyer
+        }
+
+        // Find favorite product
+        let favProd = '-';
+        let favKg = 0;
+        Object.entries(st.topProductMap).forEach(([p, k]) => {
+          if (k > favKg) { favKg = k; favProd = p; }
+        });
+
+        // Determine Alert Severity
+        let status = 'HEALTHY'; // 'CRITICAL' | 'WARNING' | 'INACTIVE' | 'HEALTHY'
+        let badgeText = 'Activ / Stabil';
+        let reason = 'Volumul de achiziții este în parametri normali.';
+
+        if (daysSinceLastOrder > 30 && st.totalKg > 0) {
+          status = 'INACTIVE';
+          badgeText = `Inactiv (${daysSinceLastOrder} zile)`;
+          reason = `Nu a mai comandat de ${daysSinceLastOrder} zile (ultima comandă: ${st.lastOrderDate}).`;
+        } else if (monthlyBaselineKg > 0 && changePct <= -40) {
+          status = 'CRITICAL';
+          badgeText = `Scădere Critică (${changePct.toFixed(0)}%)`;
+          reason = `A cumpărat doar ${formatNumber(st.recent30Kg)} kg în ultimele 30 zile față de media anterioară de ${formatNumber(monthlyBaselineKg)} kg/lună.`;
+        } else if (monthlyBaselineKg > 0 && changePct <= -15) {
+          status = 'WARNING';
+          badgeText = `Cumpără mai puțin (${changePct.toFixed(0)}%)`;
+          reason = `Scădere de ${formatNumber(monthlyBaselineKg - st.recent30Kg)} kg față de ritmul obișnuit (${formatNumber(monthlyBaselineKg)} kg/lună).`;
+        } else if (changePct >= 15 && monthlyBaselineKg > 0) {
+          status = 'HEALTHY';
+          badgeText = `Creștere (+${changePct.toFixed(0)}%)`;
+          reason = `Achiziții în creștere față de media lunară anterioară (${formatNumber(monthlyBaselineKg)} kg).`;
+        }
+
+        return {
+          ...st,
+          daysSinceLastOrder,
+          monthlyBaselineKg,
+          changePct,
+          favProd,
+          status,
+          badgeText,
+          reason
+        };
+      });
+
+      // Sort: Critical & Inactive & Warning first
+      const priority = { CRITICAL: 1, INACTIVE: 2, WARNING: 3, HEALTHY: 4 };
+      return results.sort((a, b) => priority[a.status] - priority[b.status] || a.changePct - b.changePct);
+    }
+
+    function renderCustomerAlerts() {
+      const analyzed = analyzeCustomers();
+      const alertOnlyCount = analyzed.filter(c => c.status !== 'HEALTHY').length;
+      document.getElementById('kpiAlertCount').textContent = `${alertOnlyCount} alerte`;
+
+      const filteredList = analyzed.filter(c => {
+        if (currentAlertFilter === 'ALERTS') return c.status !== 'HEALTHY';
+        if (currentAlertFilter === 'HEALTHY') return c.status === 'HEALTHY';
+        return true;
+      });
+
+      const grid = document.getElementById('customerAlertsGrid');
+      if (filteredList.length === 0) {
+        grid.innerHTML = `<div class="col-span-full text-center py-8 text-sm text-slate-500">Niciun client în această categorie.</div>`;
+        return;
+      }
+
+      grid.innerHTML = filteredList.map(c => {
+        const styles = {
+          CRITICAL: {
+            border: 'border-rose-500/40',
+            badge: 'bg-rose-500/15 text-rose-600 dark:text-rose-300 border border-rose-500/30',
+            icon: 'alert-octagon',
+            iconColor: 'text-rose-500'
+          },
+          INACTIVE: {
+            border: 'border-amber-500/40',
+            badge: 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30',
+            icon: 'clock-alert',
+            iconColor: 'text-amber-500'
+          },
+          WARNING: {
+            border: 'border-orange-500/40',
+            badge: 'bg-orange-500/15 text-orange-700 dark:text-orange-300 border border-orange-500/30',
+            icon: 'trending-down',
+            iconColor: 'text-orange-500'
+          },
+          HEALTHY: {
+            border: 'border-emerald-500/30',
+            badge: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25',
+            icon: 'check-circle-2',
+            iconColor: 'text-emerald-500'
+          }
+        }[c.status];
+
+        return `
+          <div class="ios-glass p-4 rounded-[22px] border ${styles.border} flex flex-col justify-between gap-3">
+            <div>
+              <div class="flex items-start justify-between gap-2">
+                <h4 class="font-bold text-sm sm:text-base leading-snug">${escapeHtml(c.client)}</h4>
+                <span class="text-[11px] font-bold px-2.5 py-1 rounded-full shrink-0 ${styles.badge}">
+                  ${c.badgeText}
+                </span>
+              </div>
+              <p class="text-xs text-slate-600 dark:text-slate-300 mt-2 leading-relaxed">${c.reason}</p>
+            </div>
+
+            <div class="pt-2.5 border-t border-slate-200/50 dark:border-slate-700/50 space-y-1.5 text-xs">
+              <div class="flex justify-between">
+                <span class="text-slate-500 dark:text-slate-400">Ultimele 30 zile vs Media/lună:</span>
+                <span class="font-bold">${formatNumber(c.recent30Kg)} kg / ${formatNumber(c.monthlyBaselineKg)} kg</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500 dark:text-slate-400">Produs favorit:</span>
+                <span class="font-medium truncate max-w-[180px]">${escapeHtml(c.favProd)}</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-slate-500 dark:text-slate-400">Plată / Blocare:</span>
+                <span class="font-semibold">${c.maxPayDays}z / <span class="${c.maxBlockDays > 45 ? 'text-rose-500' : ''}">${c.maxBlockDays}z</span></span>
+              </div>
+              <button onclick="focusClient('${escapeHtml(c.client).replace(/'/g, "\\'")}')" class="mt-1.5 w-full py-1.5 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 font-semibold text-xs transition cursor-pointer">
+                Filtrează graficele pe acest client &rarr;
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function focusClient(clientName) {
+      const select = document.getElementById('clientFilter');
+      select.value = clientName;
+      currentPage = 1;
+      applyFiltersAndRender();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      showToast(`Filtrare activă pe clientul: ${clientName}`, 'info');
+    }
+
+    // =========================================================================
+    // 10. DETAILED TRANSACTIONS TABLE & PAGINATION
+    // =========================================================================
+    function renderTable() {
+      const searchQuery = document.getElementById('tableSearch').value.trim().toLowerCase();
+      const searchedRows = filteredRows.filter(r => {
+        if (!searchQuery) return true;
+        return (
+          r.client.toLowerCase().includes(searchQuery) ||
+          r.product.toLowerCase().includes(searchQuery) ||
+          r.codProdus.toLowerCase().includes(searchQuery) ||
+          r.date.includes(searchQuery)
+        );
+      });
+
+      const totalPages = Math.max(1, Math.ceil(searchedRows.length / rowsPerPage));
+      if (currentPage > totalPages) currentPage = totalPages;
+
+      const startIdx = (currentPage - 1) * rowsPerPage;
+      const pageRows = searchedRows.slice(startIdx, startIdx + rowsPerPage);
+
+      const tbody = document.getElementById('transactionsTableBody');
+      if (pageRows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="py-8 text-center text-slate-400">Nu s-au găsit tranzacții pentru filtrele selectate.</td></tr>`;
+      } else {
+        tbody.innerHTML = pageRows.map(r => `
+          <tr class="hover:bg-white/40 dark:hover:bg-slate-800/40 transition whitespace-nowrap">
+            <td class="py-3 px-3.5 font-medium">${escapeHtml(r.date)}</td>
+            <td class="py-3 px-3.5 font-semibold">${escapeHtml(r.client)}</td>
+            <td class="py-3 px-3.5">
+              <div class="font-medium">${escapeHtml(r.product)}</div>
+              <div class="text-[11px] text-slate-400">Cod: ${escapeHtml(r.codProdus)} • Preț: ${formatNumber(r.currentPrice || r.lastPriceFacturi || r.lastPriceAvize, 2)} RON</div>
+            </td>
+            <td class="py-3 px-3.5 text-right text-slate-600 dark:text-slate-300">${formatNumber(r.cantAvize)} kg</td>
+            <td class="py-3 px-3.5 text-right text-slate-600 dark:text-slate-300">${formatNumber(r.cantFacturi)} kg</td>
+            <td class="py-3 px-3.5 text-right font-bold text-blue-600 dark:text-blue-400">${formatNumber(r.cantTotala)} kg</td>
+            <td class="py-3 px-3.5 text-right font-medium">${formatNumber(r.valTotalaNoVat, 2)} RON</td>
+            <td class="py-3 px-3.5 text-right font-semibold text-emerald-600 dark:text-emerald-400">${formatNumber(r.valTotalaVat, 2)} RON</td>
+            <td class="py-3 px-3.5 text-center">
+              <span class="px-2 py-0.5 rounded-lg text-xs font-semibold bg-slate-500/10">
+                ${r.zilePlata}z / ${r.zileBlocare}z
+              </span>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      document.getElementById('tableRowCount').textContent =
+        `Se afișează ${pageRows.length} din ${searchedRows.length} înregistrări`;
+      document.getElementById('pageIndicator').textContent = `Pagina ${currentPage} din ${totalPages}`;
+      document.getElementById('prevPageBtn').disabled = currentPage <= 1;
+      document.getElementById('nextPageBtn').disabled = currentPage >= totalPages;
+    }
+
+    function changePage(delta) {
+      currentPage += delta;
+      renderTable();
+    }
+
+    // =========================================================================
+    // 11. CSV EXPORT, MODALS, CLIPBOARD & TOASTS
+    // =========================================================================
+    function exportFilteredCSV() {
+      if (filteredRows.length === 0) {
+        showToast('Nu există date de exportat.', 'warning');
+        return;
+      }
+      const headers = [
+        'Data', 'Denumire client', 'Denumire produs', 'Cod produs',
+        'Cantitate avize', 'Cantitate facturi', 'Cantitate totala (kg)',
+        'Valoare totala fara TVA', 'Valoare totala cu TVA', 'Nr. zile plata', 'Nr. zile blocare'
+      ];
+      const csvLines = [headers.join(',')];
+      filteredRows.forEach(r => {
+        csvLines.push([
+          r.date,
+          `"${r.client.replace(/"/g, '""')}"`,
+          `"${r.product.replace(/"/g, '""')}"`,
+          `"${r.codProdus}"`,
+          r.cantAvize,
+          r.cantFacturi,
+          r.cantTotala,
+          r.valTotalaNoVat,
+          r.valTotalaVat,
+          r.zilePlata,
+          r.zileBlocare
+        ].join(','));
+      });
+
+      const blob = new Blob(['\uFEFF' + csvLines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `raport_vanzari_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Raportul CSV a fost descărcat.', 'success');
+    }
+
+    function openConnectModal() {
+      const modal = document.getElementById('connectModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeConnectModal() {
+      const modal = document.getElementById('connectModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function openScriptModal() {
+      const modal = document.getElementById('scriptModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeScriptModal() {
+      const modal = document.getElementById('scriptModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function copyAppsScriptCode() {
+      const textarea = document.createElement('textarea');
+      textarea.value = APPS_SCRIPT_TEMPLATE;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      showToast('Codul Google Apps Script a fost copiat în clipboard!', 'success');
+    }
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      const isDark = html.classList.toggle('dark');
+      localStorage.setItem('salespulse_theme', isDark ? 'dark' : 'light');
+      const icon = document.getElementById('themeIcon');
+      icon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
+      lucide.createIcons();
+      renderTrendChart();
+      renderProductChart();
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const colors = {
+        success: 'border-emerald-500/40 bg-emerald-500/15 text-emerald-800 dark:text-emerald-200',
+        error: 'border-rose-500/40 bg-rose-500/15 text-rose-800 dark:text-rose-200',
+        warning: 'border-amber-500/40 bg-amber-500/15 text-amber-800 dark:text-amber-200',
+        info: 'border-blue-500/40 bg-blue-500/15 text-blue-800 dark:text-blue-200'
+      };
+      const el = document.createElement('div');
+      el.className = `ios-glass-strong px-4 py-3 rounded-2xl border ${colors[type]} text-xs sm:text-sm font-medium shadow-xl pointer-events-auto transition-all duration-300`;
+      el.textContent = message;
+      container.appendChild(el);
+      setTimeout(() => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(-8px)';
+        setTimeout(() => el.remove(), 300);
+      }, 3800);
+    }
+
+    function formatNumber(num, decimals = 0) {
+      return Number(num || 0).toLocaleString('ro-RO', {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      });
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+  </script>
+</body>
+</html>
