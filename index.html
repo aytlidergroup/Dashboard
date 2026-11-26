@@ -3,1634 +3,935 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SalesPulse iOS 27 • Analiză Clienți & Vânzări</title>
-
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- Inter & SF-style Typography -->
+  <title>Raport Cumpărări Clienți — iOS 27</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Inter', 'sans-serif'],
-          },
-          borderRadius: {
-            'ios': '26px',
-            'ios-lg': '32px',
-            'ios-sm': '18px',
-          }
-        }
-      }
-    }
-  </script>
-
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-mesh-1: #e0e7ff;
-      --bg-mesh-2: #fce7f3;
-      --bg-mesh-3: #dbeafe;
-      --bg-mesh-4: #f3e8ff;
-      --glass-bg: rgba(255, 255, 255, 0.58);
-      --glass-bg-strong: rgba(255, 255, 255, 0.78);
-      --glass-border: rgba(255, 255, 255, 0.75);
-      --glass-shadow: 0 20px 45px -15px rgba(15, 23, 42, 0.12), inset 0 1px 1px rgba(255, 255, 255, 0.9);
+      --bg-top: #edf3fb;
+      --bg-mid: #f6f8fc;
+      --bg-bot: #eef2f9;
+      --glass-bg: rgba(255, 255, 255, 0.72);
+      --glass-strong: rgba(255, 255, 255, 0.88);
+      --glass-border: rgba(255, 255, 255, 0.9);
+      --glass-shadow: 0 18px 40px -12px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
       --text-primary: #0f172a;
       --text-secondary: #475569;
-      --pill-bg: rgba(15, 23, 42, 0.06);
-      --pill-active: #ffffff;
+      --text-muted: #64748b;
+      --accent: #007aff;
+      --accent-soft: rgba(0, 122, 255, 0.12);
+      --green: #16a34a;
+      --green-soft: rgba(22, 163, 74, 0.12);
+      --orange: #ea580c;
+      --orange-soft: rgba(234, 88, 12, 0.12);
+      --red: #dc2626;
+      --red-soft: rgba(220, 38, 38, 0.12);
+      --radius-xl: 26px;
+      --radius-lg: 18px;
+      --radius-md: 13px;
     }
 
-    html.dark {
-      --bg-mesh-1: #090d16;
-      --bg-mesh-2: #13182b;
-      --bg-mesh-3: #0f1c2e;
-      --bg-mesh-4: #1b132b;
-      --glass-bg: rgba(24, 31, 48, 0.56);
-      --glass-bg-strong: rgba(28, 36, 56, 0.82);
-      --glass-border: rgba(255, 255, 255, 0.14);
-      --glass-shadow: 0 24px 50px -12px rgba(0, 0, 0, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.16);
-      --text-primary: #f8fafc;
-      --text-secondary: #94a3b8;
-      --pill-bg: rgba(255, 255, 255, 0.08);
-      --pill-active: rgba(255, 255, 255, 0.18);
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif;
       color: var(--text-primary);
-      background-color: var(--bg-mesh-1);
-      background-image:
-        radial-gradient(at 10% 10%, var(--bg-mesh-2) 0px, transparent 50%),
-        radial-gradient(at 90% 15%, var(--bg-mesh-3) 0px, transparent 50%),
-        radial-gradient(at 80% 85%, var(--bg-mesh-4) 0px, transparent 50%),
-        radial-gradient(at 15% 85%, var(--bg-mesh-3) 0px, transparent 50%);
-      background-attachment: fixed;
+      background:
+        radial-gradient(900px 520px at 8% -5%, rgba(56, 189, 248, 0.22), transparent 60%),
+        radial-gradient(850px 500px at 95% 4%, rgba(99, 102, 241, 0.16), transparent 60%),
+        linear-gradient(180deg, var(--bg-top) 0%, var(--bg-mid) 50%, var(--bg-bot) 100%);
       min-height: 100vh;
-      transition: background-color 0.4s ease, color 0.3s ease;
-      overflow-x: hidden;
+      padding: 20px 18px 48px;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* Ambient floating orbs for iOS 27 Spatial Depth */
-    .ambient-orb {
-      position: fixed;
-      border-radius: 9999px;
-      filter: blur(90px);
-      z-index: -1;
-      opacity: 0.55;
-      pointer-events: none;
-      animation: floatOrb 18s ease-in-out infinite alternate;
+    .container {
+      max-width: 1380px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
     }
 
-    @keyframes floatOrb {
-      0% { transform: translate(0px, 0px) scale(1); }
-      100% { transform: translate(35px, -25px) scale(1.08); }
-    }
-
-    /* iOS 27 Frosted Glass Material */
-    .ios-glass {
+    .glass {
       background: var(--glass-bg);
-      backdrop-filter: blur(28px) saturate(185%);
-      -webkit-backdrop-filter: blur(28px) saturate(185%);
+      backdrop-filter: blur(26px) saturate(180%);
+      -webkit-backdrop-filter: blur(26px) saturate(180%);
       border: 1px solid var(--glass-border);
       box-shadow: var(--glass-shadow);
-      border-radius: 28px;
-      transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease;
+      border-radius: var(--radius-xl);
     }
 
-    .ios-glass-hover:hover {
-      transform: translateY(-2px);
+    .header {
+      padding: 18px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
     }
 
-    .ios-glass-strong {
-      background: var(--glass-bg-strong);
-      backdrop-filter: blur(36px) saturate(200%);
-      -webkit-backdrop-filter: blur(36px) saturate(200%);
-      border: 1px solid var(--glass-border);
-      box-shadow: var(--glass-shadow);
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
     }
 
-    /* iOS Segmented Control */
-    .ios-segmented {
-      background: var(--pill-bg);
-      padding: 4px;
-      border-radius: 16px;
+    .app-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #007aff, #38bdf8);
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 800;
+      font-size: 18px;
+      box-shadow: 0 10px 20px -6px rgba(0, 122, 255, 0.5);
+    }
+
+    .brand h1 {
+      font-size: 1.25rem;
+      font-weight: 750;
+      letter-spacing: -0.02em;
+    }
+
+    .brand p {
+      font-size: 0.84rem;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .status-pill {
       display: inline-flex;
-      position: relative;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-    }
-
-    .ios-seg-btn {
-      padding: 7px 14px;
-      border-radius: 12px;
-      font-size: 0.8125rem;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: var(--glass-strong);
+      border: 1px solid rgba(15, 23, 42, 0.06);
+      font-size: 0.82rem;
       font-weight: 600;
       color: var(--text-secondary);
-      transition: all 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 4px var(--green-soft);
+    }
+
+    .dot.loading { background: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+    .dot.error { background: var(--red); box-shadow: 0 0 0 4px var(--red-soft); }
+
+    .btn {
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.84rem;
+      padding: 9px 15px;
+      border-radius: 999px;
+      transition: all 0.18s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 8px 18px -6px rgba(0, 122, 255, 0.55);
+    }
+    .btn-primary:hover { transform: translateY(-1px); filter: brightness(1.05); }
+
+    .btn-soft {
+      background: var(--glass-strong);
+      color: var(--text-primary);
+      border: 1px solid rgba(15, 23, 42, 0.08);
+    }
+    .btn-soft:hover { background: #fff; }
+
+    .filters {
+      padding: 16px 20px;
+      display: grid;
+      grid-template-columns: 1.3fr 1.3fr 1fr 1fr auto;
+      gap: 12px;
+      align-items: end;
+    }
+
+    @media (max-width: 1024px) { .filters { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 600px) { .filters { grid-template-columns: 1fr; } }
+
+    .field label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .input, .select {
+      width: 100%;
+      padding: 10px 13px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(15, 23, 42, 0.1);
+      background: var(--glass-strong);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 500;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .input:focus, .select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+
+    .segment-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .segmented {
+      display: inline-flex;
+      padding: 4px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.06);
+      gap: 4px;
+    }
+
+    .seg-btn {
+      border: none;
+      background: transparent;
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 650;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+
+    .seg-btn.active {
+      background: #fff;
+      color: var(--text-primary);
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.09);
+    }
+
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    @media (max-width: 960px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 520px) { .kpis { grid-template-columns: 1fr; } }
+
+    .kpi-card { padding: 18px 20px; border-radius: var(--radius-lg); }
+    .kpi-label { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); }
+    .kpi-val { font-size: 1.55rem; font-weight: 800; letter-spacing: -0.02em; margin-top: 6px; }
+    .kpi-sub { font-size: 0.78rem; color: var(--text-secondary); margin-top: 4px; }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.55fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    @media (max-width: 1120px) { .main-grid { grid-template-columns: 1fr; } }
+
+    .card { padding: 20px 22px; }
+    .card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .card-title { font-size: 1.02rem; font-weight: 750; letter-spacing: -0.01em; }
+    .card-subtitle { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
+
+    .badge {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
       white-space: nowrap;
     }
 
-    .ios-seg-btn.active {
-      background: var(--pill-active);
-      color: var(--text-primary);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    .badge-red { background: var(--red-soft); color: var(--red); }
+    .badge-orange { background: var(--orange-soft); color: var(--orange); }
+    .badge-green { background: var(--green-soft); color: var(--green); }
+    .badge-blue { background: var(--accent-soft); color: var(--accent); }
+
+    .alert-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 540px;
+      overflow-y: auto;
+      padding-right: 4px;
     }
 
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar {
-      width: 7px;
-      height: 7px;
-    }
-    ::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: rgba(148, 163, 184, 0.35);
-      border-radius: 9999px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: rgba(148, 163, 184, 0.55);
+    .alert-item {
+      padding: 14px 15px;
+      border-radius: var(--radius-lg);
+      background: var(--glass-strong);
+      border: 1px solid rgba(15, 23, 42, 0.06);
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
 
-    /* Select & Input Glass Styling */
-    .ios-input {
-      background: rgba(255, 255, 255, 0.45);
-      border: 1px solid rgba(255, 255, 255, 0.65);
-      border-radius: 16px;
-      color: var(--text-primary);
-      transition: all 0.2s ease;
+    .alert-item:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px -8px rgba(15, 23, 42, 0.14);
     }
-    html.dark .ios-input {
-      background: rgba(15, 23, 42, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.14);
+
+    .alert-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+    .alert-client { font-weight: 700; font-size: 0.92rem; }
+    .alert-meta { display: flex; flex-wrap: wrap; gap: 10px; font-size: 0.8rem; color: var(--text-secondary); margin-top: 8px; }
+    .alert-note { font-size: 0.79rem; color: var(--text-muted); margin-top: 6px; }
+
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+      background: var(--glass-strong);
+      border: 1px solid rgba(15, 23, 42, 0.06);
     }
-    .ios-input:focus {
-      outline: none;
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.22);
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+
+    th {
+      text-align: left;
+      padding: 11px 13px;
+      font-size: 0.74rem;
+      font-weight: 750;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      background: rgba(248, 250, 252, 0.9);
+      border-bottom: 1px solid rgba(15, 23, 42, 0.07);
+      white-space: nowrap;
     }
+
+    td {
+      padding: 11px 13px;
+      border-bottom: 1px solid rgba(15, 23, 42, 0.05);
+      vertical-align: middle;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(0, 122, 255, 0.03); }
+
+    .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .bold { font-weight: 700; }
+    .muted { color: var(--text-muted); font-size: 0.78rem; }
+
+    .empty-state { padding: 36px 20px; text-align: center; color: var(--text-muted); font-size: 0.9rem; }
   </style>
 </head>
+<body>
+  <div class="container">
 
-<body class="antialiased selection:bg-blue-500 selection:text-white">
-  <!-- Ambient Background Orbs -->
-  <div class="ambient-orb w-96 h-96 bg-blue-400/30 dark:bg-blue-600/20 -top-20 -left-20"></div>
-  <div class="ambient-orb w-[28rem] h-[28rem] bg-purple-400/25 dark:bg-indigo-600/20 top-1/3 -right-24" style="animation-delay: -5s;"></div>
-  <div class="ambient-orb w-80 h-80 bg-emerald-300/25 dark:bg-teal-600/15 bottom-10 left-1/4" style="animation-delay: -10s;"></div>
-
-  <!-- Toast Notification Banner (Replaces alert()) -->
-  <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
-
-  <!-- Main Container -->
-  <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-7 space-y-6">
-
-    <!-- Top Dynamic Glass Header (iOS 27 Navigation Bar) -->
-    <header class="ios-glass px-5 py-4 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-      <div class="flex items-center gap-3.5">
-        <div class="w-12 h-12 rounded-[18px] bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/30 shrink-0">
-          <i data-lucide="layers" class="w-6 h-6"></i>
-        </div>
+    <header class="glass header">
+      <div class="brand">
+        <div class="app-icon">KG</div>
         <div>
-          <div class="flex items-center gap-2.5 flex-wrap">
-            <h1 class="text-xl sm:text-2xl font-bold tracking-tight">SalesPulse <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/20 align-middle">iOS 27</span></h1>
-            <span id="dataSourceBadge" class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/25">
-              <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-              Mod Demo (Date Simulated)
-            </span>
-          </div>
-          <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-            Monitorizare Cantități (kg), Rapoarte Zilnice/Săptămânale/Lunare/Anuale &amp; Alerte Scădere Clienți
-          </p>
+          <h1>Raport Cumpărări Clienți</h1>
+          <p>Evidență cantități (kg), produse pe zile, rapoarte periodice și alerte scădere clienți</p>
         </div>
       </div>
 
-      <!-- Header Actions -->
-      <div class="flex flex-wrap items-center gap-2.5">
-        <button onclick="openScriptModal()" class="ios-input px-3.5 py-2.5 text-xs sm:text-sm font-semibold flex items-center gap-2 hover:bg-white/70 dark:hover:bg-slate-800/80 transition cursor-pointer">
-          <i data-lucide="code-2" class="w-4 h-4 text-indigo-500"></i>
-          <span>Cod Apps Script</span>
-        </button>
-
-        <button onclick="openConnectModal()" class="px-4 py-2.5 rounded-[16px] bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-blue-600/25 flex items-center gap-2 transition cursor-pointer">
-          <i data-lucide="sheet" class="w-4 h-4"></i>
-          <span>Conectează Google Sheet</span>
-        </button>
-
-        <button id="refreshBtn" onclick="syncSheetData(true)" title="Reîmprospătează datele" class="ios-input p-2.5 hover:bg-white/70 dark:hover:bg-slate-800/80 transition cursor-pointer">
-          <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-        </button>
-
-        <button onclick="toggleTheme()" title="Schimbă tema Dark / Light" class="ios-input p-2.5 hover:bg-white/70 dark:hover:bg-slate-800/80 transition cursor-pointer">
-          <i id="themeIcon" data-lucide="moon" class="w-4 h-4"></i>
-        </button>
+      <div class="header-actions">
+        <div class="status-pill" id="statusPill">
+          <span class="dot loading" id="statusDot"></span>
+          <span id="statusText">Se încarcă datele...</span>
+        </div>
+        <button class="btn btn-soft" onclick="loadData()">↻ Reîncarcă</button>
+        <button class="btn btn-primary" onclick="exportCSV()">⬇ Export CSV</button>
       </div>
     </header>
 
-    <!-- Control Center: Filters & Time Granularity -->
-    <section class="ios-glass p-4 sm:p-5 space-y-4">
-      <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+    <section class="glass filters">
+      <div class="field">
+        <label for="clientSelect">Client (Denumire client)</label>
+        <select id="clientSelect" class="select" onchange="applyFilters()">
+          <option value="">Toți clienții</option>
+        </select>
+      </div>
 
-        <!-- Segmented Control: Daily / Weekly / Monthly / Yearly -->
-        <div class="flex flex-col sm:flex-row sm:items-center gap-2.5">
-          <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-            <i data-lucide="calendar-clock" class="w-3.5 h-3.5 text-blue-500"></i>
-            Raportare:
-          </span>
-          <div class="ios-segmented self-start" id="granularityControl">
-            <button type="button" data-granularity="daily" class="ios-seg-btn active">Zilnic</button>
-            <button type="button" data-granularity="weekly" class="ios-seg-btn">Săptămânal</button>
-            <button type="button" data-granularity="monthly" class="ios-seg-btn">Lunar</button>
-            <button type="button" data-granularity="yearly" class="ios-seg-btn">Anual</button>
-          </div>
-        </div>
+      <div class="field">
+        <label for="productSelect">Produs (Denumire / Cod)</label>
+        <select id="productSelect" class="select" onchange="applyFilters()">
+          <option value="">Toate produsele</option>
+        </select>
+      </div>
 
-        <!-- Filters Grid: Client, Product, Date Range -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 flex-1 xl:max-w-4xl">
-          <!-- Client Filter (Col B) -->
-          <div class="relative">
-            <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1 ml-1">Client (Col B)</label>
-            <select id="clientFilter" class="ios-input w-full px-3.5 py-2 text-sm font-medium cursor-pointer">
-              <option value="ALL">Toți Clienții</option>
-            </select>
-          </div>
+      <div class="field">
+        <label for="dateFrom">De la data</label>
+        <input type="date" id="dateFrom" class="input" onchange="applyFilters()" />
+      </div>
 
-          <!-- Product Filter (Col C) -->
-          <div class="relative">
-            <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1 ml-1">Produs (Col C)</label>
-            <select id="productFilter" class="ios-input w-full px-3.5 py-2 text-sm font-medium cursor-pointer">
-              <option value="ALL">Toate Produsele</option>
-            </select>
-          </div>
+      <div class="field">
+        <label for="dateTo">Până la data</label>
+        <input type="date" id="dateTo" class="input" onchange="applyFilters()" />
+      </div>
 
-          <!-- Start Date -->
-          <div>
-            <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1 ml-1">De la data (Col A)</label>
-            <input type="date" id="dateFrom" class="ios-input w-full px-3.5 py-1.5 text-sm font-medium" />
-          </div>
-
-          <!-- End Date -->
-          <div>
-            <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1 ml-1">Până la data (Col A)</label>
-            <div class="flex items-center gap-1.5">
-              <input type="date" id="dateTo" class="ios-input w-full px-3.5 py-1.5 text-sm font-medium" />
-              <button onclick="resetFilters()" title="Resetează filtrele" class="ios-input p-2 shrink-0 hover:bg-white/80 dark:hover:bg-slate-800 transition cursor-pointer">
-                <i data-lucide="rotate-ccw" class="w-4 h-4 text-slate-500"></i>
-              </button>
-            </div>
-          </div>
-        </div>
+      <div>
+        <button class="btn btn-soft" onclick="resetFilters()" style="height: 41px;">Resetează</button>
       </div>
     </section>
 
-    <!-- iOS 27 KPI Widgets Row -->
-    <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
-      <!-- KPI 1: Total Quantity (kg) -->
-      <div class="ios-glass ios-glass-hover p-5 relative overflow-hidden">
-        <div class="flex items-start justify-between">
-          <div>
-            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Cantitate Totală (Col M)</p>
-            <h2 id="kpiTotalKg" class="text-2xl sm:text-3xl font-extrabold mt-1.5 tracking-tight">0 kg</h2>
-          </div>
-          <div class="w-11 h-11 rounded-2xl bg-blue-500/15 text-blue-600 dark:text-blue-400 flex items-center justify-center">
-            <i data-lucide="scale" class="w-5 h-5"></i>
-          </div>
-        </div>
-        <div class="mt-3 pt-3 border-t border-slate-200/50 dark:border-slate-700/50 flex items-center justify-between text-xs">
-          <span class="text-slate-500 dark:text-slate-400">Avize: <strong id="kpiAvizeKg" class="text-slate-700 dark:text-slate-200">0 kg</strong></span>
-          <span class="text-slate-500 dark:text-slate-400">Facturi: <strong id="kpiFacturiKg" class="text-slate-700 dark:text-slate-200">0 kg</strong></span>
-        </div>
+    <div class="segment-wrap">
+      <div class="segmented" role="tablist">
+        <button class="seg-btn active" data-period="day" onclick="setPeriod('day', this)">Zilnic</button>
+        <button class="seg-btn" data-period="week" onclick="setPeriod('week', this)">Săptămânal</button>
+        <button class="seg-btn" data-period="month" onclick="setPeriod('month', this)">Lunar</button>
+        <button class="seg-btn" data-period="year" onclick="setPeriod('year', this)">Anual</button>
+      </div>
+      <div class="muted" id="tabsLoadedInfo"></div>
+    </div>
+
+    <section class="kpis">
+      <div class="glass kpi-card">
+        <div class="kpi-label">Cantitate Totală (kg)</div>
+        <div class="kpi-val" id="kpiKg">0 kg</div>
+        <div class="kpi-sub" id="kpiKgSplit">Avize: 0 kg · Facturi: 0 kg</div>
       </div>
 
-      <!-- KPI 2: Total Revenue ex VAT & inc VAT -->
-      <div class="ios-glass ios-glass-hover p-5 relative overflow-hidden">
-        <div class="flex items-start justify-between">
-          <div>
-            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Valoare Totală fără TVA (Col N)</p>
-            <h2 id="kpiTotalNoVat" class="text-2xl sm:text-3xl font-extrabold mt-1.5 tracking-tight">0 RON</h2>
-          </div>
-          <div class="w-11 h-11 rounded-2xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-            <i data-lucide="banknote" class="w-5 h-5"></i>
-          </div>
-        </div>
-        <div class="mt-3 pt-3 border-t border-slate-200/50 dark:border-slate-700/50 flex items-center justify-between text-xs">
-          <span class="text-slate-500 dark:text-slate-400">Cu TVA (Col O):</span>
-          <strong id="kpiTotalWithVat" class="text-emerald-600 dark:text-emerald-400 font-bold">0 RON</strong>
-        </div>
+      <div class="glass kpi-card">
+        <div class="kpi-label">Valoare Totală fără TVA</div>
+        <div class="kpi-val" id="kpiValFara">0,00</div>
+        <div class="kpi-sub" id="kpiValCu">Cu TVA: 0,00</div>
       </div>
 
-      <!-- KPI 3: Top Product & Active Customers -->
-      <div class="ios-glass ios-glass-hover p-5 relative overflow-hidden">
-        <div class="flex items-start justify-between">
-          <div class="min-w-0 pr-2">
-            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Produs Principal &amp; Clienți</p>
-            <h2 id="kpiTopProduct" class="text-lg sm:text-xl font-bold mt-1.5 truncate">-</h2>
-          </div>
-          <div class="w-11 h-11 rounded-2xl bg-purple-500/15 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
-            <i data-lucide="package-check" class="w-5 h-5"></i>
-          </div>
-        </div>
-        <div class="mt-3 pt-3 border-t border-slate-200/50 dark:border-slate-700/50 flex items-center justify-between text-xs">
-          <span class="text-slate-500 dark:text-slate-400">Clienți activi în selecție:</span>
-          <strong id="kpiActiveClients" class="text-purple-600 dark:text-purple-400 font-bold">0 clienți</strong>
-        </div>
+      <div class="glass kpi-card">
+        <div class="kpi-label">Clienți Activi / Produse</div>
+        <div class="kpi-val" id="kpiEntities">0 / 0</div>
+        <div class="kpi-sub" id="kpiOrders">0 înregistrări filtrate</div>
       </div>
 
-      <!-- KPI 4: Customer Drop Alerts & Payment Status -->
-      <div class="ios-glass ios-glass-hover p-5 relative overflow-hidden">
-        <div class="flex items-start justify-between">
-          <div>
-            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Alerte Scădere Achiziții</p>
-            <h2 id="kpiAlertCount" class="text-2xl sm:text-3xl font-extrabold mt-1.5 tracking-tight text-rose-600 dark:text-rose-400">0 alerte</h2>
-          </div>
-          <div class="w-11 h-11 rounded-2xl bg-rose-500/15 text-rose-600 dark:text-rose-400 flex items-center justify-center">
-            <i data-lucide="bell-ring" class="w-5 h-5"></i>
-          </div>
-        </div>
-        <div class="mt-3 pt-3 border-t border-slate-200/50 dark:border-slate-700/50 flex items-center justify-between text-xs">
-          <span class="text-slate-500 dark:text-slate-400">Medie zile plată (Col Q):</span>
-          <strong id="kpiAvgPayDays" class="text-slate-700 dark:text-slate-200 font-bold">0 zile</strong>
-        </div>
+      <div class="glass kpi-card">
+        <div class="kpi-label">Clienți cu Scădere sau Inactivi</div>
+        <div class="kpi-val" id="kpiAlertsCount" style="color: var(--red);">0</div>
+        <div class="kpi-sub">Necesită atenție comercială</div>
       </div>
     </section>
 
-    <!-- Charts Section: Time-Series Quantity/Value + Product Mix -->
-    <section class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-      <!-- Main Time-Series Chart (8 cols) -->
-      <div class="ios-glass p-5 sm:p-6 lg:col-span-8 flex flex-col justify-between">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+    <section class="main-grid">
+
+      <div class="glass card">
+        <div class="card-head">
           <div>
-            <h3 id="trendChartTitle" class="text-base sm:text-lg font-bold">Evoluție Cantitate (kg) &amp; Valoare — Zilnic</h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">Vizualizează exact în ce zi / săptămână / lună / an s-au comandat cantitățile</p>
+            <div class="card-title">Analiză Scădere & Inactivitate Clienți</div>
+            <div class="card-subtitle">Comparație ultimele 30 zile vs. media anterioară (kg)</div>
           </div>
-          <div class="flex items-center gap-2">
-            <select id="chartMetricMode" class="ios-input px-3 py-1.5 text-xs font-semibold cursor-pointer">
-              <option value="both">Cantitate (kg) + Valoare (RON)</option>
-              <option value="kg">Doar Cantitate (kg)</option>
-              <option value="ron">Doar Valoare fără TVA (RON)</option>
-            </select>
-          </div>
+          <span class="badge badge-red" id="alertBadge">0 alerte</span>
         </div>
-        <div class="relative w-full h-72 sm:h-80">
-          <canvas id="trendChart"></canvas>
+
+        <div class="alert-list" id="alertList">
+          <div class="empty-state">Se analizează istoricul clienților...</div>
         </div>
       </div>
 
-      <!-- Product Breakdown Chart (4 cols) -->
-      <div class="ios-glass p-5 sm:p-6 lg:col-span-4 flex flex-col justify-between">
-        <div class="mb-4">
-          <h3 class="text-base sm:text-lg font-bold">Distribuție pe Produse (kg)</h3>
-          <p class="text-xs text-slate-500 dark:text-slate-400">Ponderea fiecărui produs din cantitatea totală</p>
+      <div class="glass card">
+        <div class="card-head">
+          <div>
+            <div class="card-title" id="periodTableTitle">Sumar Zilnic — Client & Produs</div>
+            <div class="card-subtitle">Cantitate (kg), Avize, Facturi și Valoare pe perioadă</div>
+          </div>
+          <span class="badge badge-blue" id="periodRowCount">0 rânduri</span>
         </div>
-        <div class="relative w-full h-60 flex items-center justify-center">
-          <canvas id="productChart"></canvas>
+
+        <div class="table-wrap" style="max-height: 540px; overflow-y: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Perioadă</th>
+                <th>Client</th>
+                <th>Produs</th>
+                <th class="num">Avize (kg)</th>
+                <th class="num">Facturi (kg)</th>
+                <th class="num">Total (kg)</th>
+                <th class="num">Val. fără TVA</th>
+                <th class="num">Val. cu TVA</th>
+              </tr>
+            </thead>
+            <tbody id="periodTableBody">
+              <tr><td colspan="8" class="empty-state">Se încarcă...</td></tr>
+            </tbody>
+          </table>
         </div>
-        <div id="topProductsList" class="mt-4 space-y-2 max-h-28 overflow-y-auto pr-1 text-xs"></div>
       </div>
+
     </section>
 
-    <!-- SMART ANALYZER: Customer Purchase Drop & Churn Alerts -->
-    <section class="ios-glass p-5 sm:p-6 space-y-4">
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
-        <div class="flex items-start sm:items-center gap-3">
-          <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-rose-500 to-orange-500 text-white flex items-center justify-center shadow-md shadow-rose-500/25 shrink-0">
-            <i data-lucide="trending-down" class="w-5 h-5"></i>
-          </div>
-          <div>
-            <div class="flex items-center gap-2 flex-wrap">
-              <h3 class="text-base sm:text-lg font-bold">Analiză Inteligentă &amp; Alerte Scădere Clienți</h3>
-              <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-rose-500/15 text-rose-600 dark:text-rose-400">Detector Automat</span>
-            </div>
-            <p class="text-xs text-slate-500 dark:text-slate-400">
-              Compară ultimele 30 de zile ale fiecărui client cu media lui anterioară (30-90 zile) și verifică frecvența comenzilor + zilele de blocare (Col R).
-            </p>
-          </div>
-        </div>
-
-        <!-- Filter Alert Status -->
-        <div class="ios-segmented self-start" id="alertFilterControl">
-          <button type="button" data-alert-filter="ALL" class="ios-seg-btn active">Toți Clienții</button>
-          <button type="button" data-alert-filter="ALERTS" class="ios-seg-btn">Doar Alerte</button>
-          <button type="button" data-alert-filter="HEALTHY" class="ios-seg-btn">Activi / Creștere</button>
-        </div>
-      </div>
-
-      <!-- Alert Cards Grid -->
-      <div id="customerAlertsGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        <!-- Populated dynamically via JS -->
-      </div>
-    </section>
-
-    <!-- Detailed Breakdown Table (Exact Date, Client, Product, Avize, Facturi, Total kg, Values, Payment/Block Days) -->
-    <section class="ios-glass p-5 sm:p-6 space-y-4">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <section class="glass card">
+      <div class="card-head">
         <div>
-          <h3 class="text-base sm:text-lg font-bold">Registru Detaliat Tranzacții (Coloanele A – R)</h3>
-          <p class="text-xs text-slate-500 dark:text-slate-400">Vezi exact în ce zi, ce client, ce produs și câte kg a cumpărat (Avize vs. Facturi)</p>
+          <div class="card-title">Istoric Detaliat Cumpărări (Toate Coloanele A – R)</div>
+          <div class="card-subtitle">Vezi exact în ce zi, ce produs, câte kg și la ce preț a cumpărat fiecare client</div>
         </div>
-
-        <div class="flex flex-wrap items-center gap-2.5">
-          <div class="relative flex-1 sm:flex-initial">
-            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
-            <input type="text" id="tableSearch" placeholder="Caută client, produs, cod..." class="ios-input pl-9 pr-3.5 py-2 text-xs sm:text-sm w-full sm:w-64" />
-          </div>
-          <button onclick="exportFilteredCSV()" class="ios-input px-3.5 py-2 text-xs sm:text-sm font-semibold flex items-center gap-1.5 hover:bg-white/80 dark:hover:bg-slate-800 transition cursor-pointer">
-            <i data-lucide="download" class="w-4 h-4 text-blue-500"></i>
-            <span>Export CSV</span>
-          </button>
-        </div>
+        <span class="badge badge-green" id="detailRowCount">0 înregistrări</span>
       </div>
 
-      <div class="overflow-x-auto rounded-2xl border border-slate-200/60 dark:border-slate-700/60">
-        <table class="w-full text-left border-collapse text-xs sm:text-sm">
+      <div class="table-wrap" style="max-height: 520px; overflow-y: auto;">
+        <table>
           <thead>
-            <tr class="bg-slate-900/5 dark:bg-white/5 text-slate-600 dark:text-slate-300 border-b border-slate-200/60 dark:border-slate-700/60 whitespace-nowrap">
-              <th class="py-3 px-3.5 font-semibold">Data (A)</th>
-              <th class="py-3 px-3.5 font-semibold">Denumire Client (B)</th>
-              <th class="py-3 px-3.5 font-semibold">Produs (C) &amp; Cod (P)</th>
-              <th class="py-3 px-3.5 font-semibold text-right">Avize kg (D)</th>
-              <th class="py-3 px-3.5 font-semibold text-right">Facturi kg (H)</th>
-              <th class="py-3 px-3.5 font-semibold text-right">Total kg (M)</th>
-              <th class="py-3 px-3.5 font-semibold text-right">Val. fără TVA (N)</th>
-              <th class="py-3 px-3.5 font-semibold text-right">Val. cu TVA (O)</th>
-              <th class="py-3 px-3.5 font-semibold text-center">Plată / Blocare (Q/R)</th>
+            <tr>
+              <th>Data</th>
+              <th>Client</th>
+              <th>Produs (Cod)</th>
+              <th class="num">Cant. Avize</th>
+              <th class="num">Preț Avize</th>
+              <th class="num">Cant. Facturi</th>
+              <th class="num">Preț Facturi</th>
+              <th class="num">Preț Curent</th>
+              <th class="num">Total (kg)</th>
+              <th class="num">Total fără TVA</th>
+              <th class="num">Total cu TVA</th>
+              <th class="num">Zile Plată / Blocare</th>
             </tr>
           </thead>
-          <tbody id="transactionsTableBody" class="divide-y divide-slate-200/40 dark:divide-slate-700/40">
-            <!-- Populated dynamically -->
+          <tbody id="detailTableBody">
+            <tr><td colspan="12" class="empty-state">Se încarcă...</td></tr>
           </tbody>
         </table>
       </div>
-
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400">
-        <span id="tableRowCount">Se afișează 0 înregistrări</span>
-        <div class="flex items-center gap-2">
-          <button id="prevPageBtn" onclick="changePage(-1)" class="ios-input px-3 py-1.5 font-semibold disabled:opacity-40 cursor-pointer">Anterior</button>
-          <span id="pageIndicator" class="font-semibold">Pagina 1</span>
-          <button id="nextPageBtn" onclick="changePage(1)" class="ios-input px-3 py-1.5 font-semibold disabled:opacity-40 cursor-pointer">Următor</button>
-        </div>
-      </div>
     </section>
 
   </div>
 
-  <!-- MODAL 1: Connect Google Sheets Web App URL -->
-  <div id="connectModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/50 backdrop-blur-md p-4">
-    <div class="ios-glass-strong max-w-lg w-full rounded-[30px] p-6 space-y-5 shadow-2xl">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2.5">
-          <div class="w-10 h-10 rounded-2xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-            <i data-lucide="link" class="w-5 h-5"></i>
-          </div>
-          <div>
-            <h3 class="text-lg font-bold">Conectare Google Sheets</h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">Lipește link-ul Web App obținut din Google Apps Script</p>
-          </div>
-        </div>
-        <button onclick="closeConnectModal()" class="p-2 rounded-full hover:bg-slate-500/10 cursor-pointer">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-
-      <div class="space-y-3">
-        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">URL Web App (exec)</label>
-        <input type="url" id="sheetUrlInput" placeholder="https://script.google.com/macros/s/AKfycbxZ2eettzWFfA8lIGwbVZ8yLmXNn6denV-De1-ATV9_dcX_NVIq0t-RU6X6WU-mL88/exec" class="ios-input w-full px-4 py-3 text-sm" />
-        <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-          Asigură-te că în Google Apps Script ai selectat <strong>Deploy &rarr; New deployment &rarr; Web app</strong> cu acces setat pe <strong>Anyone (Oricine)</strong>.
-        </p>
-      </div>
-
-      <div class="flex flex-wrap items-center justify-between gap-2 pt-2">
-        <button onclick="loadDemoData(true)" class="ios-input px-4 py-2.5 text-xs font-semibold hover:bg-white/80 dark:hover:bg-slate-800 transition cursor-pointer">
-          Încarcă Date Demo
-        </button>
-        <div class="flex items-center gap-2">
-          <button onclick="closeConnectModal()" class="ios-input px-4 py-2.5 text-xs font-semibold cursor-pointer">Anulează</button>
-          <button onclick="saveAndConnectSheet()" class="px-5 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-lg shadow-blue-600/25 cursor-pointer">
-            Salvează &amp; Sincronizează
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL 2: Google Apps Script Code Viewer -->
-  <div id="scriptModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/50 backdrop-blur-md p-4">
-    <div class="ios-glass-strong max-w-2xl w-full rounded-[30px] p-6 space-y-4 shadow-2xl max-h-[90vh] flex flex-col">
-      <div class="flex items-center justify-between">
-        <div>
-          <h3 class="text-lg font-bold">Cod Google Apps Script (Backend)</h3>
-          <p class="text-xs text-slate-500 dark:text-slate-400">Copiază acest cod în Google Sheets &rarr; Extensions &rarr; Apps Script</p>
-        </div>
-        <button onclick="closeScriptModal()" class="p-2 rounded-full hover:bg-slate-500/10 cursor-pointer">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-
-      <pre id="appsScriptCodeBlock" class="bg-slate-950 text-slate-100 p-4 rounded-2xl text-xs overflow-auto font-mono leading-relaxed flex-1 border border-slate-800"></pre>
-
-      <div class="flex items-center justify-between pt-2">
-        <span class="text-xs text-slate-500 dark:text-slate-400">Citește automat coloanele A – R din primul sheet.</span>
-        <button onclick="copyAppsScriptCode()" class="px-4 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center gap-2 shadow-lg shadow-indigo-600/25 cursor-pointer">
-          <i data-lucide="copy" class="w-4 h-4"></i>
-          <span>Copiază Codul</span>
-        </button>
-      </div>
-    </div>
-  </div>
-
   <script>
-    // =========================================================================
-    // 1. GOOGLE APPS SCRIPT SOURCE CODE (Embedded for 1-click Copy)
-    // =========================================================================
-    const APPS_SCRIPT_TEMPLATE = `function doGet(e) {
-  try {
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
-    // Ia prima foaie sau foaia specificata prin parametru ?sheet=NumeFoaie
-    var sheetName = e && e.parameter && e.parameter.sheet ? e.parameter.sheet : null;
-    var sheet = sheetName ? ss.getSheetByName(sheetName) : ss.getSheets()[0];
-    
-    var data = sheet.getDataRange().getValues();
-    if (data.length <= 1) {
-      return ContentService.createTextOutput(JSON.stringify({ status: "empty", rows: [] }))
-        .setMimeType(ContentService.MimeType.JSON);
+    // لینک Web App گوگل اسکریپت خودتان را اینجا بگذارید (ختم به /exec)
+    const API_URL = "https://script.google.com/macros/s/AKfycbz.../exec";
+
+    let ALL_RECORDS = [];
+    let FILTERED_RECORDS = [];
+    let CURRENT_PERIOD = "day";
+
+    const fmtNum = (n, dec = 2) =>
+      Number(n || 0).toLocaleString("ro-RO", {
+        minimumFractionDigits: dec,
+        maximumFractionDigits: dec
+      });
+
+    const fmtKg = (n) =>
+      Number(n || 0).toLocaleString("ro-RO", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+      });
+
+    function setStatus(type, text) {
+      document.getElementById("statusDot").className = "dot " + type;
+      document.getElementById("statusText").textContent = text;
     }
 
-    var rows = [];
-    // Sarim peste randul 1 (antetul tabelului)
-    for (var i = 1; i < data.length; i++) {
-      var r = data[i];
-      if (!r[0] && !r[1]) continue; // Ignora randurile complet goale
-
-      // Formatare sigura a datei (Coloana A)
-      var rawDate = r[0];
-      var formattedDate = "";
-      if (rawDate instanceof Date) {
-        formattedDate = Utilities.formatDate(rawDate, ss.getSpreadsheetTimeZone(), "yyyy-MM-dd");
-      } else {
-        formattedDate = String(rawDate).trim();
-      }
-
-      rows.push({
-        date: formattedDate,                        // A: date
-        client: String(r[1] || "").trim(),          // B: Denumire client
-        product: String(r[2] || "").trim(),         // C: Denumire produs
-        cantAvize: Number(r[3]) || 0,               // D: Cantitate avize
-        valAvizeNoVat: Number(r[4]) || 0,           // E: Valoare avize fara TVA
-        valAvizeVat: Number(r[5]) || 0,             // F: Valoare avize cu TVA
-        lastPriceAvize: Number(r[6]) || 0,          // G: Ultimul pret avize (fara TVA)
-        cantFacturi: Number(r[7]) || 0,             // H: Cantitate facturi
-        valFacturiNoVat: Number(r[8]) || 0,         // I: Valoare facturi fara TVA
-        valFacturiVat: Number(r[9]) || 0,           // J: Valoare facturi cu TVA
-        lastPriceFacturi: Number(r[10]) || 0,       // K: Ultimul pret facturi (fara TVA)
-        currentPrice: Number(r[11]) || 0,           // L: Pret curent (fara TVA)
-        cantTotala: Number(r[12]) || 0,             // M: Cantitate totala (kg)
-        valTotalaNoVat: Number(r[13]) || 0,         // N: Valoare totala fara TVA
-        valTotalaVat: Number(r[14]) || 0,           // O: Valoare totala cu TVA
-        codProdus: String(r[15] || "").trim(),      // P: Cod produs
-        zilePlata: Number(r[16]) || 0,              // Q: Nr. zile plata
-        zileBlocare: Number(r[17]) || 0             // R: Nr. zile blocare
-      });
-    }
-
-    return ContentService
-      .createTextOutput(JSON.stringify({ status: "ok", count: rows.length, rows: rows }))
-      .setMimeType(ContentService.MimeType.JSON);
-
-  } catch (err) {
-    return ContentService
-      .createTextOutput(JSON.stringify({ status: "error", message: err.toString() }))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
-}`;
-
-    // =========================================================================
-    // 2. APPLICATION STATE & INITIALIZATION
-    // =========================================================================
-    let allRows = [];
-    let filteredRows = [];
-    let currentGranularity = 'daily'; // 'daily' | 'weekly' | 'monthly' | 'yearly'
-    let currentAlertFilter = 'ALL';   // 'ALL' | 'ALERTS' | 'HEALTHY'
-    let currentPage = 1;
-    const rowsPerPage = 15;
-
-    let trendChartInstance = null;
-    let productChartInstance = null;
-
-    document.addEventListener('DOMContentLoaded', () => {
-      lucide.createIcons();
-      document.getElementById('appsScriptCodeBlock').textContent = APPS_SCRIPT_TEMPLATE;
-
-      // Initialize Theme from localStorage or System
-      const savedTheme = localStorage.getItem('salespulse_theme');
-      if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.classList.add('dark');
-        document.getElementById('themeIcon').setAttribute('data-lucide', 'sun');
-        lucide.createIcons();
-      }
-
-      // Bind Segmented Controls
-      document.querySelectorAll('#granularityControl .ios-seg-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('#granularityControl .ios-seg-btn').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          currentGranularity = btn.dataset.granularity;
-          updateDashboard();
-        });
-      });
-
-      document.querySelectorAll('#alertFilterControl .ios-seg-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('#alertFilterControl .ios-seg-btn').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          currentAlertFilter = btn.dataset.alertFilter;
-          renderCustomerAlerts();
-        });
-      });
-
-      // Bind Filters
-      ['clientFilter', 'productFilter', 'dateFrom', 'dateTo'].forEach(id => {
-        document.getElementById(id).addEventListener('change', () => {
-          currentPage = 1;
-          applyFiltersAndRender();
-        });
-      });
-
-      document.getElementById('chartMetricMode').addEventListener('change', () => {
-        renderTrendChart();
-      });
-
-      document.getElementById('tableSearch').addEventListener('input', () => {
-        currentPage = 1;
-        renderTable();
-      });
-
-      // Load saved Google Sheet URL or start with realistic demo dataset
-      const savedUrl = localStorage.getItem('salespulse_sheet_url');
-      if (savedUrl) {
-        document.getElementById('sheetUrlInput').value = savedUrl;
-        syncSheetData(false);
-      } else {
-        loadDemoData(false);
-      }
-    });
-
-    // =========================================================================
-    // 3. REALISTIC DEMO DATA GENERATOR (Simulates A-R columns over 14 months)
-    // =========================================================================
-    function generateRealisticDemoData() {
-      const clients = [
-        { name: 'SC Brutăria Artizanală SRL', pattern: 'dropping', payDays: 30, blockDays: 45 },
-        { name: 'Patiseria La Cuptorul de Aur', pattern: 'healthy', payDays: 15, blockDays: 30 },
-        { name: 'Distribuție HoReCa Nord SA', pattern: 'critical_drop', payDays: 45, blockDays: 60 },
-        { name: 'Supermarket FreshMarket SRL', pattern: 'growing', payDays: 30, blockDays: 45 },
-        { name: 'Cofetăria Sweet Velvet', pattern: 'inactive', payDays: 30, blockDays: 35 },
-        { name: 'Panificație Muntenia Grup', pattern: 'healthy', payDays: 21, blockDays: 30 }
-      ];
-
-      const products = [
-        { code: 'FA-001', name: 'Făină Albă Superioară 000 (kg)', price: 2.85 },
-        { code: 'FA-650', name: 'Făină Panificație Tip 650 (kg)', price: 2.45 },
-        { code: 'ZA-010', name: 'Zahăr Cristal Rafinat (kg)', price: 4.20 },
-        { code: 'UL-025', name: 'Ulei Floarea Soarelui Rafinat (kg)', price: 6.90 },
-        { code: 'DR-005', name: 'Drojdie Proaspătă Panificație (kg)', price: 9.50 },
-        { code: 'UN-820', name: 'Unt 82% Grăsime Calup (kg)', price: 34.00 }
-      ];
-
-      const rows = [];
-      const today = new Date();
-      const totalDays = 400; // Covers > 1 year for Yearly/Monthly/Weekly/Daily views
-
-      for (let d = totalDays; d >= 0; d--) {
-        const currentDate = new Date(today);
-        currentDate.setDate(today.getDate() - d);
-        const dayOfWeek = currentDate.getDay();
-        if (dayOfWeek === 0) continue; // Skip Sundays
-
-        const isoDate = currentDate.toISOString().split('T')[0];
-
-        clients.forEach((client, cIdx) => {
-          // Determine order probability based on client behavior pattern
-          let orderChance = 0.22;
-          let qtyMultiplier = 1.0;
-
-          if (client.pattern === 'dropping') {
-            // Bought 450kg regularly, dropped by ~55% in last 30 days
-            orderChance = d <= 30 ? 0.14 : 0.28;
-            qtyMultiplier = d <= 30 ? 0.45 : 1.15;
-          } else if (client.pattern === 'critical_drop') {
-            // Dropped by >75% recently
-            orderChance = d <= 30 ? 0.08 : 0.30;
-            qtyMultiplier = d <= 30 ? 0.25 : 1.3;
-          } else if (client.pattern === 'inactive') {
-            // Stopped buying 38 days ago
-            if (d <= 38) return;
-            orderChance = 0.26;
-          } else if (client.pattern === 'growing') {
-            qtyMultiplier = d <= 30 ? 1.35 : 0.95;
-          }
-
-          // Deterministic pseudo-random so data looks natural & consistent
-          const seed = (d * 31 + cIdx * 17) % 100;
-          if (seed / 100 < orderChance) {
-            const prod = products[(d + cIdx) % products.length];
-            const baseKg = (120 + ((d * 13 + cIdx * 29) % 380)) * qtyMultiplier;
-            const totalKg = Math.round(baseKg);
-
-            // Split between Avize (D) and Facturi (H)
-            const isAvizOnly = (d + cIdx) % 4 === 0;
-            const cantAvize = isAvizOnly ? totalKg : Math.round(totalKg * 0.3);
-            const cantFacturi = totalKg - cantAvize;
-
-            const price = prod.price;
-            const valAvizeNoVat = +(cantAvize * price).toFixed(2);
-            const valAvizeVat = +(valAvizeNoVat * 1.09).toFixed(2); // 9% food VAT in RO
-            const valFacturiNoVat = +(cantFacturi * price).toFixed(2);
-            const valFacturiVat = +(valFacturiNoVat * 1.09).toFixed(2);
-
-            rows.push({
-              date: isoDate,
-              client: client.name,
-              product: prod.name,
-              cantAvize,
-              valAvizeNoVat,
-              valAvizeVat,
-              lastPriceAvize: price,
-              cantFacturi,
-              valFacturiNoVat,
-              valFacturiVat,
-              lastPriceFacturi: price,
-              currentPrice: price,
-              cantTotala: totalKg,
-              valTotalaNoVat: +(valAvizeNoVat + valFacturiNoVat).toFixed(2),
-              valTotalaVat: +(valAvizeVat + valFacturiVat).toFixed(2),
-              codProdus: prod.code,
-              zilePlata: client.payDays,
-              zileBlocare: client.blockDays
-            });
-          }
-        });
-      }
-
-      return rows.sort((a, b) => b.date.localeCompare(a.date));
-    }
-
-    function loadDemoData(showNotification = true) {
-      localStorage.removeItem('salespulse_sheet_url');
-      document.getElementById('sheetUrlInput').value = '';
-      allRows = generateRealisticDemoData();
-      updateSourceBadge(false);
-      populateDropdowns();
-      setDefaultDateRange();
-      applyFiltersAndRender();
-      closeConnectModal();
-      if (showNotification) {
-        showToast('Date demo încărcate cu succes (6 clienți, 14 luni istoric).', 'info');
-      }
-    }
-
-    // =========================================================================
-    // 4. GOOGLE SHEETS LIVE SYNC
-    // =========================================================================
-    async function syncSheetData(notify = true) {
-      const url = localStorage.getItem('salespulse_sheet_url');
-      if (!url) {
-        loadDemoData(notify);
+    async function loadData() {
+      if (!API_URL || API_URL.includes("AKfycbz...")) {
+        setStatus("error", "Puneți link-ul Web App în variabila API_URL din cod.");
         return;
       }
 
-      const refreshIcon = document.querySelector('#refreshBtn i');
-      if (refreshIcon) refreshIcon.classList.add('animate-spin');
+      setStatus("loading", "Se încarcă datele din Google Sheets...");
 
       try {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const json = await response.json();
+        const res = await fetch(API_URL, { redirect: "follow" });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json();
 
-        if (json.status === 'error') {
-          throw new Error(json.message || 'Eroare în Google Apps Script');
+        if (!data || data.status === "error") {
+          throw new Error(data ? data.message : "Răspuns invalid.");
         }
 
-        const rawRows = Array.isArray(json) ? json : (json.rows || []);
-        if (rawRows.length === 0) {
-          showToast('Tabelul Google Sheet este gol sau nu are date după rândul 1.', 'warning');
-          return;
-        }
-
-        // Normalize incoming rows & fallback if cantTotala wasn't pre-summed
-        allRows = rawRows.map(r => {
-          const cAvize = Number(r.cantAvize) || 0;
-          const cFact = Number(r.cantFacturi) || 0;
-          const cTot = Number(r.cantTotala) || (cAvize + cFact);
-          const vNoVat = Number(r.valTotalaNoVat) || ((Number(r.valAvizeNoVat) || 0) + (Number(r.valFacturiNoVat) || 0));
-          const vVat = Number(r.valTotalaVat) || ((Number(r.valAvizeVat) || 0) + (Number(r.valFacturiVat) || 0));
-
+        ALL_RECORDS = (data.records || []).map(r => {
+          const cantTotala = r.cant_totala || (r.cant_avize + r.cant_facturi);
+          const valFara = r.val_totala_fara || (r.val_avize_fara + r.val_facturi_fara);
+          const valCu = r.val_totala_cu || (r.val_avize_cu + r.val_facturi_cu);
           return {
-            date: normalizeDateString(r.date),
-            client: String(r.client || 'Client Necunoscut').trim(),
-            product: String(r.product || 'Produs Necunoscut').trim(),
-            cantAvize: cAvize,
-            valAvizeNoVat: Number(r.valAvizeNoVat) || 0,
-            valAvizeVat: Number(r.valAvizeVat) || 0,
-            lastPriceAvize: Number(r.lastPriceAvize) || 0,
-            cantFacturi: cFact,
-            valFacturiNoVat: Number(r.valFacturiNoVat) || 0,
-            valFacturiVat: Number(r.valFacturiVat) || 0,
-            lastPriceFacturi: Number(r.lastPriceFacturi) || 0,
-            currentPrice: Number(r.currentPrice) || 0,
-            cantTotala: cTot,
-            valTotalaNoVat: vNoVat,
-            valTotalaVat: vVat,
-            codProdus: String(r.codProdus || '-').trim(),
-            zilePlata: Number(r.zilePlata) || 0,
-            zileBlocare: Number(r.zileBlocare) || 0
+            ...r,
+            cant_totala: cantTotala,
+            val_totala_fara: valFara,
+            val_totala_cu: valCu
           };
-        }).filter(r => r.date).sort((a, b) => b.date.localeCompare(a.date));
+        });
 
-        updateSourceBadge(true, allRows.length);
+        ALL_RECORDS.sort((a, b) => b.date.localeCompare(a.date));
+
+        document.getElementById("tabsLoadedInfo").textContent =
+          (data.tabs && data.tabs.length) ? "Tab-uri încărcate: " + data.tabs.join(", ") : "";
+
         populateDropdowns();
-        setDefaultDateRange();
-        applyFiltersAndRender();
+        applyFilters();
+        analyzeCustomerDrops();
 
-        if (notify) {
-          showToast(`Sincronizat cu succes: ${allRows.length} înregistrări din Google Sheets!`, 'success');
-        }
+        setStatus("", `Conectat · ${ALL_RECORDS.length.toLocaleString("ro-RO")} înregistrări`);
       } catch (err) {
-        console.error('Sync error:', err);
-        showToast(`Eroare la conectarea cu Google Sheets: ${err.message}`, 'error');
-      } finally {
-        if (refreshIcon) refreshIcon.classList.remove('animate-spin');
+        setStatus("error", "Eroare conectare: " + err.message);
       }
     }
 
-    function normalizeDateString(val) {
-      if (!val) return '';
-      const str = String(val).trim();
-      if (/^\d{4}-\d{2}-\d{2}/.test(str)) return str.slice(0, 10);
-      // Handle DD.MM.YYYY or DD/MM/YYYY
-      const parts = str.match(/^(\d{1,2})[./-](\d{1,2})[./-](\d{4})/);
-      if (parts) {
-        return `${parts[3]}-${parts[2].padStart(2, '0')}-${parts[1].padStart(2, '0')}`;
-      }
-      const parsed = new Date(str);
-      if (!isNaN(parsed.getTime())) {
-        return parsed.toISOString().split('T')[0];
-      }
-      return '';
-    }
-
-    function saveAndConnectSheet() {
-      const url = document.getElementById('sheetUrlInput').value.trim();
-      if (!url || !url.startsWith('https://script.google.com/')) {
-        showToast('Te rog introdu un URL valid de Google Apps Script (https://script.google.com/...).', 'error');
-        return;
-      }
-      localStorage.setItem('salespulse_sheet_url', url);
-      closeConnectModal();
-      syncSheetData(true);
-    }
-
-    function updateSourceBadge(isLive, count = 0) {
-      const badge = document.getElementById('dataSourceBadge');
-      if (isLive) {
-        badge.className = 'inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25';
-        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Live Google Sheet (${count} rânduri)`;
-      } else {
-        badge.className = 'inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/25';
-        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> Mod Demo (Date Simulate)`;
-      }
-    }
-
-    // =========================================================================
-    // 5. FILTERS & DROPDOWNS
-    // =========================================================================
     function populateDropdowns() {
-      const clientSelect = document.getElementById('clientFilter');
-      const productSelect = document.getElementById('productFilter');
+      const clientSel = document.getElementById("clientSelect");
+      const prodSel = document.getElementById("productSelect");
+      const currentClient = clientSel.value;
+      const currentProd = prodSel.value;
 
-      const clients = [...new Set(allRows.map(r => r.client))].sort((a, b) => a.localeCompare(b));
-      const products = [...new Set(allRows.map(r => r.product))].sort((a, b) => a.localeCompare(b));
+      const clients = [...new Set(ALL_RECORDS.map(r => r.client).filter(Boolean))].sort((a, b) => a.localeCompare(b, "ro"));
+      const products = [...new Set(ALL_RECORDS.map(r => r.produs).filter(Boolean))].sort((a, b) => a.localeCompare(b, "ro"));
 
-      clientSelect.innerHTML = `<option value="ALL">Toți Clienții (${clients.length})</option>` +
-        clients.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+      clientSel.innerHTML = '<option value="">Toți clienții (' + clients.length + ')</option>' +
+        clients.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join("");
 
-      productSelect.innerHTML = `<option value="ALL">Toate Produsele (${products.length})</option>` +
-        products.map(p => `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`).join('');
+      prodSel.innerHTML = '<option value="">Toate produsele (' + products.length + ')</option>' +
+        products.map(p => `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`).join("");
+
+      clientSel.value = currentClient;
+      prodSel.value = currentProd;
     }
 
-    function setDefaultDateRange() {
-      if (allRows.length === 0) return;
-      const dates = allRows.map(r => r.date).sort();
-      const maxDate = dates[dates.length - 1];
-      const minDate = dates[0];
+    function applyFilters() {
+      const client = document.getElementById("clientSelect").value;
+      const prod = document.getElementById("productSelect").value;
+      const from = document.getElementById("dateFrom").value;
+      const to = document.getElementById("dateTo").value;
 
-      // Default to last 90 days if dataset spans more, so daily chart is crisp & readable
-      const maxObj = new Date(maxDate);
-      const ninetyAgo = new Date(maxObj);
-      ninetyAgo.setDate(maxObj.getDate() - 90);
-      const ninetyIso = ninetyAgo.toISOString().split('T')[0];
-
-      document.getElementById('dateFrom').value = ninetyIso > minDate ? ninetyIso : minDate;
-      document.getElementById('dateTo').value = maxDate;
-    }
-
-    function resetFilters() {
-      document.getElementById('clientFilter').value = 'ALL';
-      document.getElementById('productFilter').value = 'ALL';
-      document.getElementById('tableSearch').value = '';
-      if (allRows.length > 0) {
-        const dates = allRows.map(r => r.date).sort();
-        document.getElementById('dateFrom').value = dates[0];
-        document.getElementById('dateTo').value = dates[dates.length - 1];
-      }
-      currentPage = 1;
-      applyFiltersAndRender();
-      showToast('Filtrele au fost resetate pe tot istoricul disponibil.', 'info');
-    }
-
-    function applyFiltersAndRender() {
-      const selectedClient = document.getElementById('clientFilter').value;
-      const selectedProduct = document.getElementById('productFilter').value;
-      const dateFrom = document.getElementById('dateFrom').value;
-      const dateTo = document.getElementById('dateTo').value;
-
-      filteredRows = allRows.filter(row => {
-        if (selectedClient !== 'ALL' && row.client !== selectedClient) return false;
-        if (selectedProduct !== 'ALL' && row.product !== selectedProduct) return false;
-        if (dateFrom && row.date < dateFrom) return false;
-        if (dateTo && row.date > dateTo) return false;
+      FILTERED_RECORDS = ALL_RECORDS.filter(r => {
+        if (client && r.client !== client) return false;
+        if (prod && r.produs !== prod) return false;
+        if (from && r.date < from) return false;
+        if (to && r.date > to) return false;
         return true;
       });
 
-      updateDashboard();
-    }
-
-    function updateDashboard() {
       updateKPIs();
-      renderTrendChart();
-      renderProductChart();
-      renderCustomerAlerts();
-      renderTable();
+      renderPeriodicTable();
+      renderDetailTable();
     }
 
-    // =========================================================================
-    // 6. KPI CALCULATIONS
-    // =========================================================================
-    function updateKPIs() {
-      let totalKg = 0;
-      let avizeKg = 0;
-      let facturiKg = 0;
-      let totalNoVat = 0;
-      let totalVat = 0;
-      let payDaysSum = 0;
-      let payDaysCount = 0;
-
-      const clientSet = new Set();
-      const productKgMap = {};
-
-      filteredRows.forEach(r => {
-        totalKg += r.cantTotala;
-        avizeKg += r.cantAvize;
-        facturiKg += r.cantFacturi;
-        totalNoVat += r.valTotalaNoVat;
-        totalVat += r.valTotalaVat;
-        clientSet.add(r.client);
-
-        productKgMap[r.product] = (productKgMap[r.product] || 0) + r.cantTotala;
-
-        if (r.zilePlata > 0) {
-          payDaysSum += r.zilePlata;
-          payDaysCount++;
-        }
-      });
-
-      // Top product
-      let topProd = '-';
-      let topProdKg = 0;
-      Object.entries(productKgMap).forEach(([prod, kg]) => {
-        if (kg > topProdKg) {
-          topProdKg = kg;
-          topProd = prod;
-        }
-      });
-
-      document.getElementById('kpiTotalKg').textContent = `${formatNumber(totalKg)} kg`;
-      document.getElementById('kpiAvizeKg').textContent = `${formatNumber(avizeKg)} kg`;
-      document.getElementById('kpiFacturiKg').textContent = `${formatNumber(facturiKg)} kg`;
-      document.getElementById('kpiTotalNoVat').textContent = `${formatNumber(totalNoVat, 2)} RON`;
-      document.getElementById('kpiTotalWithVat').textContent = `${formatNumber(totalVat, 2)} RON`;
-      document.getElementById('kpiTopProduct').textContent = topProd !== '-' ? `${topProd} (${formatNumber(topProdKg)} kg)` : '-';
-      document.getElementById('kpiActiveClients').textContent = `${clientSet.size} clienți`;
-
-      const avgPay = payDaysCount > 0 ? Math.round(payDaysSum / payDaysCount) : 0;
-      document.getElementById('kpiAvgPayDays').textContent = `${avgPay} zile`;
+    function resetFilters() {
+      document.getElementById("clientSelect").value = "";
+      document.getElementById("productSelect").value = "";
+      document.getElementById("dateFrom").value = "";
+      document.getElementById("dateTo").value = "";
+      applyFilters();
     }
 
-    // =========================================================================
-    // 7. TIME-SERIES CHART (DAILY / WEEKLY / MONTHLY / YEARLY)
-    // =========================================================================
-    function getPeriodKey(isoDate, granularity) {
-      if (granularity === 'daily') return isoDate;
-      if (granularity === 'monthly') return isoDate.slice(0, 7); // YYYY-MM
-      if (granularity === 'yearly') return isoDate.slice(0, 4);  // YYYY
+    function setPeriod(period, btn) {
+      CURRENT_PERIOD = period;
+      document.querySelectorAll(".seg-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
 
-      // Weekly (ISO Week)
-      const d = new Date(isoDate + 'T00:00:00');
+      const titles = {
+        day: "Sumar Zilnic — Client & Produs",
+        week: "Sumar Săptămânal — Client & Produs",
+        month: "Sumar Lunar — Client & Produs",
+        year: "Sumar Anual — Client & Produs"
+      };
+      document.getElementById("periodTableTitle").textContent = titles[period];
+      renderPeriodicTable();
+    }
+
+    function getPeriodKey(dateStr, period) {
+      if (!dateStr) return "-";
+      if (period === "day") return dateStr;
+      if (period === "month") return dateStr.slice(0, 7);
+      if (period === "year") return dateStr.slice(0, 4);
+
+      const d = new Date(dateStr + "T00:00:00");
+      if (isNaN(d.getTime())) return dateStr;
       const dayNum = d.getUTCDay() || 7;
       d.setUTCDate(d.getUTCDate() + 4 - dayNum);
       const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
       const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-      return `${d.getUTCFullYear()}-S${String(weekNo).padStart(2, '0')}`;
+      return `${d.getUTCFullYear()}-S${String(weekNo).padStart(2, "0")}`;
     }
 
-    function formatPeriodLabel(key, granularity) {
-      if (granularity === 'daily') {
-        const [y, m, d] = key.split('-');
-        return `${d}.${m}.${y}`;
+    function formatPeriodDisplay(key, period) {
+      if (period === "day") {
+        const p = key.split("-");
+        return p.length === 3 ? `${p[2]}.${p[1]}.${p[0]}` : key;
       }
-      if (granularity === 'monthly') {
-        const months = ['Ian', 'Feb', 'Mar', 'Apr', 'Mai', 'Iun', 'Iul', 'Aug', 'Sep', 'Oct', 'Noi', 'Dec'];
-        const [y, m] = key.split('-');
-        return `${months[parseInt(m, 10) - 1]} ${y}`;
+      if (period === "month") {
+        const p = key.split("-");
+        return p.length === 2 ? `${p[1]}.${p[0]}` : key;
       }
       return key;
     }
 
-    function renderTrendChart() {
-      const grouped = {};
-      filteredRows.forEach(r => {
-        const key = getPeriodKey(r.date, currentGranularity);
-        if (!grouped[key]) grouped[key] = { kg: 0, ron: 0 };
-        grouped[key].kg += r.cantTotala;
-        grouped[key].ron += r.valTotalaNoVat;
+    function updateKPIs() {
+      let totalKg = 0, avizeKg = 0, facturiKg = 0;
+      let totalFara = 0, totalCu = 0;
+      const clients = new Set();
+      const products = new Set();
+
+      FILTERED_RECORDS.forEach(r => {
+        totalKg += r.cant_totala;
+        avizeKg += r.cant_avize;
+        facturiKg += r.cant_facturi;
+        totalFara += r.val_totala_fara;
+        totalCu += r.val_totala_cu;
+        if (r.client) clients.add(r.client);
+        if (r.produs) products.add(r.produs);
       });
 
-      const sortedKeys = Object.keys(grouped).sort();
-      const labels = sortedKeys.map(k => formatPeriodLabel(k, currentGranularity));
-      const kgData = sortedKeys.map(k => Math.round(grouped[k].kg * 100) / 100);
-      const ronData = sortedKeys.map(k => Math.round(grouped[k].ron * 100) / 100);
-
-      const granularityNames = {
-        daily: 'Zilnic',
-        weekly: 'Săptămânal',
-        monthly: 'Lunar',
-        yearly: 'Anual'
-      };
-      document.getElementById('trendChartTitle').textContent =
-        `Evoluție Cantitate (kg) & Valoare — ${granularityNames[currentGranularity]}`;
-
-      const mode = document.getElementById('chartMetricMode').value;
-      const isDark = document.documentElement.classList.contains('dark');
-      const gridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.06)';
-      const tickColor = isDark ? '#94a3b8' : '#64748b';
-
-      const datasets = [];
-      if (mode === 'both' || mode === 'kg') {
-        datasets.push({
-          label: 'Cantitate Totală (kg)',
-          data: kgData,
-          backgroundColor: 'rgba(59, 130, 246, 0.78)',
-          borderColor: '#3b82f6',
-          borderWidth: 2,
-          borderRadius: 10,
-          yAxisID: 'y',
-          order: 2
-        });
-      }
-      if (mode === 'both' || mode === 'ron') {
-        datasets.push({
-          type: mode === 'both' ? 'line' : 'bar',
-          label: 'Valoare fără TVA (RON)',
-          data: ronData,
-          backgroundColor: 'rgba(16, 185, 129, 0.25)',
-          borderColor: '#10b981',
-          borderWidth: 3,
-          pointRadius: 3,
-          pointHoverRadius: 6,
-          tension: 0.35,
-          fill: mode === 'ron',
-          borderRadius: 10,
-          yAxisID: mode === 'both' ? 'y1' : 'y',
-          order: 1
-        });
-      }
-
-      const ctx = document.getElementById('trendChart').getContext('2d');
-      if (trendChartInstance) trendChartInstance.destroy();
-
-      trendChartInstance = new Chart(ctx, {
-        type: 'bar',
-        data: { labels, datasets },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          interaction: { mode: 'index', intersect: false },
-          plugins: {
-            legend: {
-              labels: { color: tickColor, usePointStyle: true, boxWidth: 8, font: { weight: '600' } }
-            },
-            tooltip: {
-              backgroundColor: isDark ? 'rgba(15, 23, 42, 0.92)' : 'rgba(255, 255, 255, 0.95)',
-              titleColor: isDark ? '#f8fafc' : '#0f172a',
-              bodyColor: isDark ? '#cbd5e1' : '#334155',
-              borderColor: 'rgba(148, 163, 184, 0.3)',
-              borderWidth: 1,
-              padding: 12,
-              cornerRadius: 14
-            }
-          },
-          scales: {
-            x: {
-              grid: { display: false },
-              ticks: { color: tickColor, maxRotation: 45, autoSkip: true, maxTicksLimit: 18 }
-            },
-            y: {
-              type: 'linear',
-              position: 'left',
-              grid: { color: gridColor },
-              ticks: { color: tickColor },
-              title: {
-                display: true,
-                text: mode === 'ron' ? 'RON (fără TVA)' : 'Cantitate (kg)',
-                color: tickColor,
-                font: { size: 11, weight: '600' }
-              }
-            },
-            ...(mode === 'both' ? {
-              y1: {
-                type: 'linear',
-                position: 'right',
-                grid: { drawOnChartArea: false },
-                ticks: { color: '#10b981' },
-                title: {
-                  display: true,
-                  text: 'Valoare (RON)',
-                  color: '#10b981',
-                  font: { size: 11, weight: '600' }
-                }
-              }
-            } : {})
-          }
-        }
-      });
+      document.getElementById("kpiKg").textContent = `${fmtKg(totalKg)} kg`;
+      document.getElementById("kpiKgSplit").textContent = `Avize: ${fmtKg(avizeKg)} kg · Facturi: ${fmtKg(facturiKg)} kg`;
+      document.getElementById("kpiValFara").textContent = fmtNum(totalFara);
+      document.getElementById("kpiValCu").textContent = `Cu TVA: ${fmtNum(totalCu)}`;
+      document.getElementById("kpiEntities").textContent = `${clients.size} / ${products.size}`;
+      document.getElementById("kpiOrders").textContent = `${FILTERED_RECORDS.length.toLocaleString("ro-RO")} înregistrări filtrate`;
     }
 
-    // =========================================================================
-    // 8. PRODUCT BREAKDOWN DOUGHNUT CHART
-    // =========================================================================
-    function renderProductChart() {
-      const prodMap = {};
-      let totalKg = 0;
-      filteredRows.forEach(r => {
-        prodMap[r.product] = (prodMap[r.product] || 0) + r.cantTotala;
-        totalKg += r.cantTotala;
-      });
-
-      const sorted = Object.entries(prodMap).sort((a, b) => b[1] - a[1]);
-      const labels = sorted.map(x => x[0]);
-      const values = sorted.map(x => Math.round(x[1] * 100) / 100);
-
-      const palette = [
-        '#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ec4899',
-        '#06b6d4', '#6366f1', '#14b8a6', '#f97316', '#84cc16'
-      ];
-
-      const isDark = document.documentElement.classList.contains('dark');
-      const ctx = document.getElementById('productChart').getContext('2d');
-      if (productChartInstance) productChartInstance.destroy();
-
-      productChartInstance = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels,
-          datasets: [{
-            data: values,
-            backgroundColor: palette.slice(0, labels.length),
-            borderColor: isDark ? '#1e293b' : '#ffffff',
-            borderWidth: 2,
-            hoverOffset: 8
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          cutout: '66%',
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label: (ctx) => {
-                  const val = ctx.parsed || 0;
-                  const pct = totalKg > 0 ? ((val / totalKg) * 100).toFixed(1) : 0;
-                  return ` ${formatNumber(val)} kg (${pct}%)`;
-                }
-              }
-            }
-          }
-        }
-      });
-
-      // Render top products legend list below doughnut
-      const listContainer = document.getElementById('topProductsList');
-      if (sorted.length === 0) {
-        listContainer.innerHTML = `<p class="text-center text-slate-400 py-2">Nu există date pentru selecția curentă.</p>`;
+    function renderPeriodicTable() {
+      const tbody = document.getElementById("periodTableBody");
+      if (!FILTERED_RECORDS.length) {
+        tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Nu există date pentru filtrele selectate.</td></tr>';
+        document.getElementById("periodRowCount").textContent = "0 rânduri";
         return;
       }
 
-      listContainer.innerHTML = sorted.map(([name, kg], idx) => {
-        const pct = totalKg > 0 ? ((kg / totalKg) * 100).toFixed(1) : 0;
-        const color = palette[idx % palette.length];
-        return `
-          <div class="flex items-center justify-between gap-2 py-1 border-b border-slate-200/40 dark:border-slate-700/40 last:border-none">
-            <div class="flex items-center gap-2 min-w-0">
-              <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${color}"></span>
-              <span class="truncate font-medium">${escapeHtml(name)}</span>
-            </div>
-            <span class="font-bold shrink-0">${formatNumber(kg)} kg <span class="text-slate-400 font-normal">(${pct}%)</span></span>
-          </div>
-        `;
-      }).join('');
-    }
-
-    // =========================================================================
-    // 9. SMART CUSTOMER DROP & CHURN ANALYZER (Analiză Scădere Achiziții)
-    // =========================================================================
-    function analyzeCustomers() {
-      if (allRows.length === 0) return [];
-
-      // Find the latest transaction date across dataset as reference "today"
-      const allDates = allRows.map(r => r.date).sort();
-      const refDateStr = allDates[allDates.length - 1];
-      const refDate = new Date(refDateStr + 'T00:00:00');
-
-      const clientStats = {};
-
-      allRows.forEach(r => {
-        if (!clientStats[r.client]) {
-          clientStats[r.client] = {
+      const map = new Map();
+      FILTERED_RECORDS.forEach(r => {
+        const pKey = getPeriodKey(r.date, CURRENT_PERIOD);
+        const key = `${pKey}||${r.client}||${r.produs}`;
+        if (!map.has(key)) {
+          map.set(key, {
+            periodKey: pKey,
             client: r.client,
-            recent30Kg: 0,
-            prev60Kg: 0, // Days 31 to 90 (2 months baseline)
+            produs: r.produs,
+            avizeKg: 0,
+            facturiKg: 0,
             totalKg: 0,
-            lastOrderDate: r.date,
-            orderDates: new Set(),
-            maxPayDays: 0,
-            maxBlockDays: 0,
-            topProductMap: {}
-          };
+            valFara: 0,
+            valCu: 0
+          });
         }
-
-        const st = clientStats[r.client];
-        const rowDate = new Date(r.date + 'T00:00:00');
-        const diffDays = Math.floor((refDate - rowDate) / (1000 * 60 * 60 * 24));
-
-        st.totalKg += r.cantTotala;
-        st.orderDates.add(r.date);
-        if (r.date > st.lastOrderDate) st.lastOrderDate = r.date;
-        if (r.zilePlata > st.maxPayDays) st.maxPayDays = r.zilePlata;
-        if (r.zileBlocare > st.maxBlockDays) st.maxBlockDays = r.zileBlocare;
-        st.topProductMap[r.product] = (st.topProductMap[r.product] || 0) + r.cantTotala;
-
-        if (diffDays <= 30) {
-          st.recent30Kg += r.cantTotala;
-        } else if (diffDays > 30 && diffDays <= 90) {
-          st.prev60Kg += r.cantTotala;
-        }
+        const item = map.get(key);
+        item.avizeKg += r.cant_avize;
+        item.facturiKg += r.cant_facturi;
+        item.totalKg += r.cant_totala;
+        item.valFara += r.val_totala_fara;
+        item.valCu += r.val_totala_cu;
       });
 
-      const results = Object.values(clientStats).map(st => {
-        const lastDateObj = new Date(st.lastOrderDate + 'T00:00:00');
-        const daysSinceLastOrder = Math.floor((refDate - lastDateObj) / (1000 * 60 * 60 * 24));
+      const rows = [...map.values()].sort((a, b) =>
+        b.periodKey.localeCompare(a.periodKey) || b.totalKg - a.totalKg
+      );
 
-        // Monthly baseline from days 31..90 (2 months -> divide by 2)
-        const monthlyBaselineKg = st.prev60Kg / 2;
-        let changePct = 0;
-        if (monthlyBaselineKg > 0) {
-          changePct = ((st.recent30Kg - monthlyBaselineKg) / monthlyBaselineKg) * 100;
-        } else if (st.recent30Kg > 0) {
-          changePct = 100; // New active buyer
-        }
+      document.getElementById("periodRowCount").textContent = `${rows.length} rânduri`;
 
-        // Find favorite product
-        let favProd = '-';
-        let favKg = 0;
-        Object.entries(st.topProductMap).forEach(([p, k]) => {
-          if (k > favKg) { favKg = k; favProd = p; }
-        });
-
-        // Determine Alert Severity
-        let status = 'HEALTHY'; // 'CRITICAL' | 'WARNING' | 'INACTIVE' | 'HEALTHY'
-        let badgeText = 'Activ / Stabil';
-        let reason = 'Volumul de achiziții este în parametri normali.';
-
-        if (daysSinceLastOrder > 30 && st.totalKg > 0) {
-          status = 'INACTIVE';
-          badgeText = `Inactiv (${daysSinceLastOrder} zile)`;
-          reason = `Nu a mai comandat de ${daysSinceLastOrder} zile (ultima comandă: ${st.lastOrderDate}).`;
-        } else if (monthlyBaselineKg > 0 && changePct <= -40) {
-          status = 'CRITICAL';
-          badgeText = `Scădere Critică (${changePct.toFixed(0)}%)`;
-          reason = `A cumpărat doar ${formatNumber(st.recent30Kg)} kg în ultimele 30 zile față de media anterioară de ${formatNumber(monthlyBaselineKg)} kg/lună.`;
-        } else if (monthlyBaselineKg > 0 && changePct <= -15) {
-          status = 'WARNING';
-          badgeText = `Cumpără mai puțin (${changePct.toFixed(0)}%)`;
-          reason = `Scădere de ${formatNumber(monthlyBaselineKg - st.recent30Kg)} kg față de ritmul obișnuit (${formatNumber(monthlyBaselineKg)} kg/lună).`;
-        } else if (changePct >= 15 && monthlyBaselineKg > 0) {
-          status = 'HEALTHY';
-          badgeText = `Creștere (+${changePct.toFixed(0)}%)`;
-          reason = `Achiziții în creștere față de media lunară anterioară (${formatNumber(monthlyBaselineKg)} kg).`;
-        }
-
-        return {
-          ...st,
-          daysSinceLastOrder,
-          monthlyBaselineKg,
-          changePct,
-          favProd,
-          status,
-          badgeText,
-          reason
-        };
-      });
-
-      // Sort: Critical & Inactive & Warning first
-      const priority = { CRITICAL: 1, INACTIVE: 2, WARNING: 3, HEALTHY: 4 };
-      return results.sort((a, b) => priority[a.status] - priority[b.status] || a.changePct - b.changePct);
+      tbody.innerHTML = rows.slice(0, 400).map(row => `
+        <tr>
+          <td class="bold">${escapeHtml(formatPeriodDisplay(row.periodKey, CURRENT_PERIOD))}</td>
+          <td>${escapeHtml(row.client)}</td>
+          <td>${escapeHtml(row.produs)}</td>
+          <td class="num">${fmtKg(row.avizeKg)}</td>
+          <td class="num">${fmtKg(row.facturiKg)}</td>
+          <td class="num bold">${fmtKg(row.totalKg)} kg</td>
+          <td class="num">${fmtNum(row.valFara)}</td>
+          <td class="num">${fmtNum(row.valCu)}</td>
+        </tr>
+      `).join("");
     }
 
-    function renderCustomerAlerts() {
-      const analyzed = analyzeCustomers();
-      const alertOnlyCount = analyzed.filter(c => c.status !== 'HEALTHY').length;
-      document.getElementById('kpiAlertCount').textContent = `${alertOnlyCount} alerte`;
+    function renderDetailTable() {
+      const tbody = document.getElementById("detailTableBody");
+      document.getElementById("detailRowCount").textContent = `${FILTERED_RECORDS.length} înregistrări`;
 
-      const filteredList = analyzed.filter(c => {
-        if (currentAlertFilter === 'ALERTS') return c.status !== 'HEALTHY';
-        if (currentAlertFilter === 'HEALTHY') return c.status === 'HEALTHY';
-        return true;
-      });
-
-      const grid = document.getElementById('customerAlertsGrid');
-      if (filteredList.length === 0) {
-        grid.innerHTML = `<div class="col-span-full text-center py-8 text-sm text-slate-500">Niciun client în această categorie.</div>`;
+      if (!FILTERED_RECORDS.length) {
+        tbody.innerHTML = '<tr><td colspan="12" class="empty-state">Nu există înregistrări de afișat.</td></tr>';
         return;
       }
 
-      grid.innerHTML = filteredList.map(c => {
-        const styles = {
-          CRITICAL: {
-            border: 'border-rose-500/40',
-            badge: 'bg-rose-500/15 text-rose-600 dark:text-rose-300 border border-rose-500/30',
-            icon: 'alert-octagon',
-            iconColor: 'text-rose-500'
-          },
-          INACTIVE: {
-            border: 'border-amber-500/40',
-            badge: 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30',
-            icon: 'clock-alert',
-            iconColor: 'text-amber-500'
-          },
-          WARNING: {
-            border: 'border-orange-500/40',
-            badge: 'bg-orange-500/15 text-orange-700 dark:text-orange-300 border border-orange-500/30',
-            icon: 'trending-down',
-            iconColor: 'text-orange-500'
-          },
-          HEALTHY: {
-            border: 'border-emerald-500/30',
-            badge: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25',
-            icon: 'check-circle-2',
-            iconColor: 'text-emerald-500'
-          }
-        }[c.status];
+      tbody.innerHTML = FILTERED_RECORDS.slice(0, 500).map(r => {
+        const dParts = r.date.split("-");
+        const dRo = dParts.length === 3 ? `${dParts[2]}.${dParts[1]}.${dParts[0]}` : r.date;
+        const codTag = r.cod_produs ? `<span class="muted">(${escapeHtml(r.cod_produs)})</span>` : "";
 
         return `
-          <div class="ios-glass p-4 rounded-[22px] border ${styles.border} flex flex-col justify-between gap-3">
-            <div>
-              <div class="flex items-start justify-between gap-2">
-                <h4 class="font-bold text-sm sm:text-base leading-snug">${escapeHtml(c.client)}</h4>
-                <span class="text-[11px] font-bold px-2.5 py-1 rounded-full shrink-0 ${styles.badge}">
-                  ${c.badgeText}
-                </span>
-              </div>
-              <p class="text-xs text-slate-600 dark:text-slate-300 mt-2 leading-relaxed">${c.reason}</p>
-            </div>
-
-            <div class="pt-2.5 border-t border-slate-200/50 dark:border-slate-700/50 space-y-1.5 text-xs">
-              <div class="flex justify-between">
-                <span class="text-slate-500 dark:text-slate-400">Ultimele 30 zile vs Media/lună:</span>
-                <span class="font-bold">${formatNumber(c.recent30Kg)} kg / ${formatNumber(c.monthlyBaselineKg)} kg</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-slate-500 dark:text-slate-400">Produs favorit:</span>
-                <span class="font-medium truncate max-w-[180px]">${escapeHtml(c.favProd)}</span>
-              </div>
-              <div class="flex justify-between items-center">
-                <span class="text-slate-500 dark:text-slate-400">Plată / Blocare:</span>
-                <span class="font-semibold">${c.maxPayDays}z / <span class="${c.maxBlockDays > 45 ? 'text-rose-500' : ''}">${c.maxBlockDays}z</span></span>
-              </div>
-              <button onclick="focusClient('${escapeHtml(c.client).replace(/'/g, "\\'")}')" class="mt-1.5 w-full py-1.5 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 font-semibold text-xs transition cursor-pointer">
-                Filtrează graficele pe acest client &rarr;
-              </button>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function focusClient(clientName) {
-      const select = document.getElementById('clientFilter');
-      select.value = clientName;
-      currentPage = 1;
-      applyFiltersAndRender();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      showToast(`Filtrare activă pe clientul: ${clientName}`, 'info');
-    }
-
-    // =========================================================================
-    // 10. DETAILED TRANSACTIONS TABLE & PAGINATION
-    // =========================================================================
-    function renderTable() {
-      const searchQuery = document.getElementById('tableSearch').value.trim().toLowerCase();
-      const searchedRows = filteredRows.filter(r => {
-        if (!searchQuery) return true;
-        return (
-          r.client.toLowerCase().includes(searchQuery) ||
-          r.product.toLowerCase().includes(searchQuery) ||
-          r.codProdus.toLowerCase().includes(searchQuery) ||
-          r.date.includes(searchQuery)
-        );
-      });
-
-      const totalPages = Math.max(1, Math.ceil(searchedRows.length / rowsPerPage));
-      if (currentPage > totalPages) currentPage = totalPages;
-
-      const startIdx = (currentPage - 1) * rowsPerPage;
-      const pageRows = searchedRows.slice(startIdx, startIdx + rowsPerPage);
-
-      const tbody = document.getElementById('transactionsTableBody');
-      if (pageRows.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" class="py-8 text-center text-slate-400">Nu s-au găsit tranzacții pentru filtrele selectate.</td></tr>`;
-      } else {
-        tbody.innerHTML = pageRows.map(r => `
-          <tr class="hover:bg-white/40 dark:hover:bg-slate-800/40 transition whitespace-nowrap">
-            <td class="py-3 px-3.5 font-medium">${escapeHtml(r.date)}</td>
-            <td class="py-3 px-3.5 font-semibold">${escapeHtml(r.client)}</td>
-            <td class="py-3 px-3.5">
-              <div class="font-medium">${escapeHtml(r.product)}</div>
-              <div class="text-[11px] text-slate-400">Cod: ${escapeHtml(r.codProdus)} • Preț: ${formatNumber(r.currentPrice || r.lastPriceFacturi || r.lastPriceAvize, 2)} RON</div>
-            </td>
-            <td class="py-3 px-3.5 text-right text-slate-600 dark:text-slate-300">${formatNumber(r.cantAvize)} kg</td>
-            <td class="py-3 px-3.5 text-right text-slate-600 dark:text-slate-300">${formatNumber(r.cantFacturi)} kg</td>
-            <td class="py-3 px-3.5 text-right font-bold text-blue-600 dark:text-blue-400">${formatNumber(r.cantTotala)} kg</td>
-            <td class="py-3 px-3.5 text-right font-medium">${formatNumber(r.valTotalaNoVat, 2)} RON</td>
-            <td class="py-3 px-3.5 text-right font-semibold text-emerald-600 dark:text-emerald-400">${formatNumber(r.valTotalaVat, 2)} RON</td>
-            <td class="py-3 px-3.5 text-center">
-              <span class="px-2 py-0.5 rounded-lg text-xs font-semibold bg-slate-500/10">
-                ${r.zilePlata}z / ${r.zileBlocare}z
-              </span>
-            </td>
+          <tr>
+            <td class="bold">${escapeHtml(dRo)}</td>
+            <td>${escapeHtml(r.client)}</td>
+            <td>${escapeHtml(r.produs)} ${codTag}</td>
+            <td class="num">${fmtKg(r.cant_avize)}</td>
+            <td class="num">${fmtNum(r.pret_avize)}</td>
+            <td class="num">${fmtKg(r.cant_facturi)}</td>
+            <td class="num">${fmtNum(r.pret_facturi)}</td>
+            <td class="num">${fmtNum(r.pret_curent)}</td>
+            <td class="num bold">${fmtKg(r.cant_totala)} kg</td>
+            <td class="num">${fmtNum(r.val_totala_fara)}</td>
+            <td class="num bold">${fmtNum(r.val_totala_cu)}</td>
+            <td class="num">${r.zile_plata} / ${r.zile_blocare} zile</td>
           </tr>
-        `).join('');
-      }
-
-      document.getElementById('tableRowCount').textContent =
-        `Se afișează ${pageRows.length} din ${searchedRows.length} înregistrări`;
-      document.getElementById('pageIndicator').textContent = `Pagina ${currentPage} din ${totalPages}`;
-      document.getElementById('prevPageBtn').disabled = currentPage <= 1;
-      document.getElementById('nextPageBtn').disabled = currentPage >= totalPages;
+        `;
+      }).join("");
     }
 
-    function changePage(delta) {
-      currentPage += delta;
-      renderTable();
-    }
-
-    // =========================================================================
-    // 11. CSV EXPORT, MODALS, CLIPBOARD & TOASTS
-    // =========================================================================
-    function exportFilteredCSV() {
-      if (filteredRows.length === 0) {
-        showToast('Nu există date de exportat.', 'warning');
+    function analyzeCustomerDrops() {
+      const container = document.getElementById("alertList");
+      if (!ALL_RECORDS.length) {
+        container.innerHTML = '<div class="empty-state">Nu există date suficiente pentru analiză.</div>';
         return;
       }
-      const headers = [
-        'Data', 'Denumire client', 'Denumire produs', 'Cod produs',
-        'Cantitate avize', 'Cantitate facturi', 'Cantitate totala (kg)',
-        'Valoare totala fara TVA', 'Valoare totala cu TVA', 'Nr. zile plata', 'Nr. zile blocare'
-      ];
-      const csvLines = [headers.join(',')];
-      filteredRows.forEach(r => {
-        csvLines.push([
-          r.date,
-          `"${r.client.replace(/"/g, '""')}"`,
-          `"${r.product.replace(/"/g, '""')}"`,
-          `"${r.codProdus}"`,
-          r.cantAvize,
-          r.cantFacturi,
-          r.cantTotala,
-          r.valTotalaNoVat,
-          r.valTotalaVat,
-          r.zilePlata,
-          r.zileBlocare
-        ].join(','));
+
+      const maxDateStr = ALL_RECORDS[0].date;
+      const refDate = new Date(maxDateStr + "T00:00:00");
+      const dayMs = 86400000;
+
+      const byClient = new Map();
+      ALL_RECORDS.forEach(r => {
+        if (!r.client) return;
+        if (!byClient.has(r.client)) byClient.set(r.client, []);
+        byClient.get(r.client).push(r);
       });
 
-      const blob = new Blob(['\uFEFF' + csvLines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      const alerts = [];
+
+      byClient.forEach((recs, client) => {
+        let last30Kg = 0;
+        let prev60Kg = 0;
+        let totalKg = 0;
+        let lastOrderDate = recs[0].date;
+        let maxBlocare = 0;
+
+        recs.forEach(r => {
+          totalKg += r.cant_totala;
+          if (r.zile_blocare > maxBlocare) maxBlocare = r.zile_blocare;
+          const d = new Date(r.date + "T00:00:00");
+          const diffDays = Math.floor((refDate - d) / dayMs);
+
+          if (diffDays <= 30) {
+            last30Kg += r.cant_totala;
+          } else if (diffDays <= 90) {
+            prev60Kg += r.cant_totala;
+          }
+        });
+
+        const lastDateObj = new Date(lastOrderDate + "T00:00:00");
+        const daysSinceLast = Math.floor((refDate - lastDateObj) / dayMs);
+        const prevMonthlyAvg = prev60Kg / 2;
+
+        if (daysSinceLast >= 21 && totalKg > 0) {
+          alerts.push({
+            client,
+            severity: daysSinceLast >= 45 ? "red" : "orange",
+            badgeText: `Inactiv de ${daysSinceLast} zile`,
+            last30Kg,
+            prevAvg: prevMonthlyAvg,
+            dropPct: prevMonthlyAvg > 0 ? Math.round(((last30Kg - prevMonthlyAvg) / prevMonthlyAvg) * 100) : -100,
+            note: maxBlocare > 0
+              ? `Atenție: Nr. zile blocare = ${maxBlocare}. Ultima comandă: ${formatPeriodDisplay(lastOrderDate, "day")}.`
+              : `Ultima achiziție a fost pe ${formatPeriodDisplay(lastOrderDate, "day")}.`
+          });
+        } else if (prevMonthlyAvg > 0 && last30Kg < prevMonthlyAvg * 0.75) {
+          const dropPct = Math.round(((last30Kg - prevMonthlyAvg) / prevMonthlyAvg) * 100);
+          alerts.push({
+            client,
+            severity: dropPct <= -50 ? "red" : "orange",
+            badgeText: `Scădere ${dropPct}% (kg)`,
+            last30Kg,
+            prevAvg: prevMonthlyAvg,
+            dropPct,
+            note: `Ultimele 30 zile: ${fmtKg(last30Kg)} kg față de media anterioară de ${fmtKg(prevMonthlyAvg)} kg / lună.`
+          });
+        }
+      });
+
+      alerts.sort((a, b) => a.dropPct - b.dropPct);
+
+      document.getElementById("kpiAlertsCount").textContent = alerts.length;
+      document.getElementById("alertBadge").textContent = `${alerts.length} alerte`;
+
+      if (!alerts.length) {
+        container.innerHTML = '<div class="empty-state">Toți clienții au un ritm normal de cumpărare.</div>';
+        return;
+      }
+
+      container.innerHTML = alerts.map(a => `
+        <div class="alert-item" onclick="selectClientFromAlert('${escapeJs(a.client)}')">
+          <div class="alert-top">
+            <div class="alert-client">${escapeHtml(a.client)}</div>
+            <span class="badge ${a.severity === 'red' ? 'badge-red' : 'badge-orange'}">${escapeHtml(a.badgeText)}</span>
+          </div>
+          <div class="alert-meta">
+            <span>Ultimele 30 zile: <strong>${fmtKg(a.last30Kg)} kg</strong></span>
+            <span>Medie anterioară: <strong>${fmtKg(a.prevAvg)} kg</strong></span>
+          </div>
+          <div class="alert-note">${escapeHtml(a.note)} (Click pentru filtrare)</div>
+        </div>
+      `).join("");
+    }
+
+    function selectClientFromAlert(clientName) {
+      document.getElementById("clientSelect").value = clientName;
+      applyFilters();
+    }
+
+    function exportCSV() {
+      if (!FILTERED_RECORDS.length) return;
+      const headers = [
+        "Data", "Denumire client", "Denumire produs", "Cod produs",
+        "Cantitate avize", "Valoare avize fara TVA", "Valoare avize cu TVA", "Ultimul pret avize",
+        "Cantitate facturi", "Valoare facturi fara TVA", "Valoare facturi cu TVA", "Ultimul pret facturi",
+        "Pret curent", "Cantitate totala", "Valoare totala fara TVA", "Valoare totala cu TVA",
+        "Nr zile plata", "Nr zile blocare"
+      ];
+
+      const lines = [headers.join(";")];
+      FILTERED_RECORDS.forEach(r => {
+        lines.push([
+          r.date, r.client, r.produs, r.cod_produs,
+          r.cant_avize, r.val_avize_fara, r.val_avize_cu, r.pret_avize,
+          r.cant_facturi, r.val_facturi_fara, r.val_facturi_cu, r.pret_facturi,
+          r.pret_curent, r.cant_totala, r.val_totala_fara, r.val_totala_cu,
+          r.zile_plata, r.zile_blocare
+        ].map(v => `"${String(v ?? "").replace(/"/g, '""')}"`).join(";"));
+      });
+
+      const blob = new Blob(["\uFEFF" + lines.join("\n")], { type: "text/csv;charset=utf-8;" });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
-      a.download = `raport_vanzari_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.download = `raport_clienti_${new Date().toISOString().slice(0, 10)}.csv`;
       a.click();
       URL.revokeObjectURL(url);
-      showToast('Raportul CSV a fost descărcat.', 'success');
-    }
-
-    function openConnectModal() {
-      const modal = document.getElementById('connectModal');
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-    }
-
-    function closeConnectModal() {
-      const modal = document.getElementById('connectModal');
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-    }
-
-    function openScriptModal() {
-      const modal = document.getElementById('scriptModal');
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-    }
-
-    function closeScriptModal() {
-      const modal = document.getElementById('scriptModal');
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-    }
-
-    function copyAppsScriptCode() {
-      const textarea = document.createElement('textarea');
-      textarea.value = APPS_SCRIPT_TEMPLATE;
-      document.body.appendChild(textarea);
-      textarea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textarea);
-      showToast('Codul Google Apps Script a fost copiat în clipboard!', 'success');
-    }
-
-    function toggleTheme() {
-      const html = document.documentElement;
-      const isDark = html.classList.toggle('dark');
-      localStorage.setItem('salespulse_theme', isDark ? 'dark' : 'light');
-      const icon = document.getElementById('themeIcon');
-      icon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
-      lucide.createIcons();
-      renderTrendChart();
-      renderProductChart();
-    }
-
-    function showToast(message, type = 'info') {
-      const container = document.getElementById('toastContainer');
-      const colors = {
-        success: 'border-emerald-500/40 bg-emerald-500/15 text-emerald-800 dark:text-emerald-200',
-        error: 'border-rose-500/40 bg-rose-500/15 text-rose-800 dark:text-rose-200',
-        warning: 'border-amber-500/40 bg-amber-500/15 text-amber-800 dark:text-amber-200',
-        info: 'border-blue-500/40 bg-blue-500/15 text-blue-800 dark:text-blue-200'
-      };
-      const el = document.createElement('div');
-      el.className = `ios-glass-strong px-4 py-3 rounded-2xl border ${colors[type]} text-xs sm:text-sm font-medium shadow-xl pointer-events-auto transition-all duration-300`;
-      el.textContent = message;
-      container.appendChild(el);
-      setTimeout(() => {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(-8px)';
-        setTimeout(() => el.remove(), 300);
-      }, 3800);
-    }
-
-    function formatNumber(num, decimals = 0) {
-      return Number(num || 0).toLocaleString('ro-RO', {
-        minimumFractionDigits: decimals,
-        maximumFractionDigits: decimals
-      });
     }
 
     function escapeHtml(str) {
-      return String(str || '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
     }
+
+    function escapeJs(str) {
+      return String(str || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+    }
+
+    window.addEventListener("DOMContentLoaded", loadData);
   </script>
 </body>
 </html>
